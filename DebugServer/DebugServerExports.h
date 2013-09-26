@@ -12,6 +12,6 @@
 
 extern "C" {
 
-DEBUGSERVER_API bool InitDebugger();
+DEBUGSERVER_API bool InitDebugger(const char*);
 
 };
