@@ -1,2 +1,2 @@
-*.exp
-DebugServer/
+Debug/
+Release/
