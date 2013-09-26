@@ -145,24 +145,11 @@ VALUE DebugInspectorFunc(const rb_debug_inspector_t* di, void* data) {
   for (int i=0; i < bt_count; ++i) {
     VALUE bt_val = RARRAY_PTR(bt)[i];
     std::string frame_str = GetRubyObjectAsString(bt_val);
-    
-    //static ID id_label = rb_intern("label");
-    //VALUE bt_label_val = ProtectFuncall(bt_val, id_label, 0);
-    //std::string frame_label = GetRubyObjectAsString(bt_label_val);
-
     VALUE binding_val = rb_debug_inspector_frame_binding_get(di, i);
-    //std::string binding_str = GetRubyObjectAsString(binding_val);
-
     StackFrame frame;
     frame.name = frame_str;
     frame.binding = binding_val;
     frames->push_back(frame);
-
-//     VALUE self_val = rb_debug_inspector_frame_self_get(di, i);
-//     std::string self_str = GetRubyObjectAsString(self_val);
-// 
-//     VALUE class_val = rb_debug_inspector_frame_class_get(di, i);
-//     std::string class_str = GetRubyObjectAsString(class_val);
   }
   return Qnil;
 }
@@ -303,20 +290,6 @@ void Server::Impl::TraceFunc(VALUE tp_val, void* data) {
         server->ui_->Break(*bp); // Blocked here until ui says continue
         server->ClearBreakData();
       }
-//   } else if (event_id == id_class) {
-//     int i=0;
-//   } else if (event_id == id_call) {
-//     int i=0;
-//   } else if (event_id == id_c_call) {
-//     int i=0;
-//   } else if (event_id == id_return || event_id == id_end) {
-//     int i=0;
-//   } else if (event_id == id_c_return) {
-//     int i=0;
-//   } else if (event_id == id_raise) {
-//     int i=0;
-//   } else {
-//     return;
     }
   }
 
