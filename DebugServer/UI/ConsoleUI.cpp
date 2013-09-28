@@ -125,7 +125,7 @@ void ConsoleUI::ConsoleThreadFunc() {
 
   // Command loop
   std::string line_str;
-  SketchUp::RubyDebugger::ConsoleInputBuffer ci;
+  ConsoleInputBuffer ci;
   HANDLE hStdInput = ::GetStdHandle(STD_INPUT_HANDLE);
   HANDLE hArray[2] = { hStdInput, NULL };
   bool done = false;
@@ -136,7 +136,9 @@ void ConsoleUI::ConsoleThreadFunc() {
       case WAIT_OBJECT_0:
         {
           if (ci.ReadLine(line_str)) {
-            EvaluateCommand(line_str);
+            if (EvaluateCommand(line_str)) {
+              ConsoleInputBuffer::RecordHistory(line_str);
+            }
           }
           break;
         }
@@ -147,7 +149,7 @@ void ConsoleUI::ConsoleThreadFunc() {
   }
 }
 
-void ConsoleUI::EvaluateCommand(const std::string& str_command) {
+bool ConsoleUI::EvaluateCommand(const std::string& str_command) {
   bool is_legal_command = false;
   bool signal_server_can_continue = false;
   bool write_prompt = true;
@@ -265,6 +267,7 @@ void ConsoleUI::EvaluateCommand(const std::string& str_command) {
     WritePrompt();
   }
   server_will_continue_ = false;
+  return is_legal_command;
 }
 
 void ConsoleUI::WriteFrames() {

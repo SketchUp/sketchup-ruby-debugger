@@ -5,6 +5,10 @@
 namespace SketchUp {
 namespace RubyDebugger {
 
+// Static history variables
+std::vector<std::string> ConsoleInputBuffer::history_;
+size_t ConsoleInputBuffer::history_index_ = 0;
+
 /*!
     Adds all pending keyboard input to the internal buffer.   The
     implementation uses ReadConsoleInput() which is a non-blocking function.
@@ -52,6 +56,41 @@ void ConsoleInputBuffer::AddPendingInputToBuffer() {
             // Add to the buffer
             buffer_ += c;
           }
+        } else if (evt.wVirtualKeyCode == VK_UP ||
+                   evt.wVirtualKeyCode == VK_DOWN) {
+          // Move up/down the history
+          bool up = (evt.wVirtualKeyCode == VK_UP);
+          if (up) {
+            if (history_index_ == 0)
+              history_index_ = history_.size();
+            else
+              --history_index_;
+          } else {
+            if (history_index_ >= history_.size())
+              history_index_ = 0;
+            else
+              ++history_index_;
+          }
+          std::string new_command;
+          if (history_index_ < history_.size())
+            new_command = history_[history_index_];
+          // else empty string
+          
+          HANDLE hStdOut = ::GetStdHandle(STD_OUTPUT_HANDLE);
+          CONSOLE_SCREEN_BUFFER_INFO info;
+          ::GetConsoleScreenBufferInfo(hStdOut, &info);
+          // Clear first
+          std::wstring clearStr(buffer_.size(), L' ');
+          COORD pos = info.dwCursorPosition;
+          pos.X -= clearStr.size();
+          DWORD dwWritten;
+          ::WriteConsoleOutputCharacter(hStdOut, clearStr.c_str(),
+                                        clearStr.size(), pos, &dwWritten);
+          // Set cursor to the beginning
+          SetConsoleCursorPosition(hStdOut, pos);
+          // Write the new line
+          std::cout << new_command;
+          buffer_ = new_command;
         }
       }
     }
@@ -81,6 +120,11 @@ bool ConsoleInputBuffer::ReadNextLineFromBuffer(std::string& line) {
 bool ConsoleInputBuffer::ReadLine(std::string& line) {
   AddPendingInputToBuffer();
   return ReadNextLineFromBuffer(line);   
+}
+
+void ConsoleInputBuffer::RecordHistory(const std::string& command) {
+  history_.push_back(command);
+  history_index_ = history_.size();
 }
 
 } // end namespace RubyDebugger

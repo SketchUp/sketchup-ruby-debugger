@@ -24,7 +24,7 @@ public:
 
 private:
   void ConsoleThreadFunc();
-  void EvaluateCommand(const std::string& str_command);
+  bool EvaluateCommand(const std::string& str_command);
   void WritePrompt();
   void WriteFrames();
 
