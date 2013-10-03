@@ -1,3 +1,9 @@
+// SketchUp Ruby API Debugger. Copyright 2013 Trimble Navigation Ltd.
+// Authors:
+// - Bugra Barin
+//
+// License: Apache License, Version 2.0
+
 // The following ifdef block is the standard way of creating macros which make exporting 
 // from a DLL simpler. All files within this DLL are compiled with the DEBUGSERVER_EXPORTS
 // symbol defined on the command line. This symbol should not be defined on any project
@@ -12,6 +18,7 @@
 
 extern "C" {
 
+// The one and only exported function called by SketchUp at program startup.
 DEBUGSERVER_API bool InitDebugger(const char*);
 
 };

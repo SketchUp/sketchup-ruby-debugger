@@ -19,6 +19,9 @@
     <Filter Include="UI">
       <UniqueIdentifier>{3f1144c4-eab4-4aac-a7e1-569d68a751c6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI\Console">
+      <UniqueIdentifier>{ed2595c9-53c7-45f4-a713-3daa8b2403a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -29,12 +32,6 @@
     </ClInclude>
     <ClInclude Include="DebugServerExports.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ConsoleInputBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\ConsoleUI.h">
-      <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="Server.h">
       <Filter>Header Files</Filter>
@@ -54,6 +51,12 @@
     <ClInclude Include="..\Common\StackFrame.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="UI\Console\Win\ConsoleUI.h">
+      <Filter>UI\Console</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\Console\Win\ConsoleInputBuffer.h">
+      <Filter>UI\Console</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -65,14 +68,14 @@
     <ClCompile Include="DebugServerExports.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ConsoleInputBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\ConsoleUI.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
     <ClCompile Include="Server.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\Console\Win\ConsoleUI.cpp">
+      <Filter>UI\Console</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\Console\Win\ConsoleInputBuffer.cpp">
+      <Filter>UI\Console</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

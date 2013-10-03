@@ -1,10 +1,15 @@
-// DebugServer.cpp : Defines the exported functions for the DLL application.
+// SketchUp Ruby API Debugger. Copyright 2013 Trimble Navigation Ltd.
+// Authors:
+// - Bugra Barin
 //
-
+// License: Apache License, Version 2.0
 #include "stdafx.h"
-#include "DebugServerExports.h"
-#include "Server.h"
-#include "UI/ConsoleUI.h"
+#include "./DebugServerExports.h"
+#include "./Server.h"
+
+#ifdef WIN32
+#include <DebugServer/UI/Console/Win/ConsoleUI.h>
+#endif
 
 #include <boost/algorithm/string.hpp>
 

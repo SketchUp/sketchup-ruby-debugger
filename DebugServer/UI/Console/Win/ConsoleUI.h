@@ -1,7 +1,12 @@
-#ifndef RDEBUGGER_DEBUGSERVER_UI_CONSOLEUI_H_
-#define RDEBUGGER_DEBUGSERVER_UI_CONSOLEUI_H_
+// SketchUp Ruby API Debugger. Copyright 2013 Trimble Navigation Ltd.
+// Authors:
+// - Bugra Barin
+//
+// License: Apache License, Version 2.0
+#ifndef RDEBUGGER_DEBUGSERVER_UI_CONSOLE_WIN_CONSOLEUI_H_
+#define RDEBUGGER_DEBUGSERVER_UI_CONSOLE_WIN_CONSOLEUI_H_
 
-#include "IDebuggerUI.h"
+#include <DebugServer/UI/IDebuggerUI.h>
 
 #include <boost/thread.hpp>
 #include <boost/atomic.hpp>
@@ -45,4 +50,4 @@ private:
 } // end namespace RubyDebugger
 } // end namespace SketchUp
 
-#endif // RDEBUGGER_DEBUGSERVER_UI_CONSOLEUI_H_
+#endif // RDEBUGGER_DEBUGSERVER_UI_CONSOLE_WIN_CONSOLEUI_H_

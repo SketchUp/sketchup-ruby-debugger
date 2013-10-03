@@ -1,3 +1,8 @@
+// SketchUp Ruby API Debugger. Copyright 2013 Trimble Navigation Ltd.
+// Authors:
+// - Bugra Barin
+//
+// License: Apache License, Version 2.0
 #pragma once
 
 // Including SDKDDKVer.h defines the highest available Windows platform.

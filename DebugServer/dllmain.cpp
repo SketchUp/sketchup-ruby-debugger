@@ -1,3 +1,9 @@
+// SketchUp Ruby API Debugger. Copyright 2013 Trimble Navigation Ltd.
+// Authors:
+// - Bugra Barin
+//
+// License: Apache License, Version 2.0
+//
 // dllmain.cpp : Defines the entry point for the DLL application.
 #include "stdafx.h"
 

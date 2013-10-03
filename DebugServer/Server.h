@@ -1,8 +1,13 @@
+// SketchUp Ruby API Debugger. Copyright 2013 Trimble Navigation Ltd.
+// Authors:
+// - Bugra Barin
+//
+// License: Apache License, Version 2.0
 #ifndef RDEBUGGER_DEBUGSERVER_SERVER_H_
 #define RDEBUGGER_DEBUGSERVER_SERVER_H_
 
-#include "IDebugServer.h"
-#include "UI/IDebuggerUI.h"
+#include "./IDebugServer.h"
+#include <DebugServer/UI/IDebuggerUI.h>
 
 #include <memory>
 

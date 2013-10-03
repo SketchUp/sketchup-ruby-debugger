@@ -1,5 +1,10 @@
-#ifndef RDEBUGGER_DEBUGSERVER_CONSOLEINPUTBUFFER_H_
-#define RDEBUGGER_DEBUGSERVER_CONSOLEINPUTBUFFER_H_
+// SketchUp Ruby API Debugger. Copyright 2013 Trimble Navigation Ltd.
+// Authors:
+// - Bugra Barin
+//
+// License: Apache License, Version 2.0
+#ifndef RDEBUGGER_DEBUGSERVER_UI_CONSOLE_WIN_CONSOLEINPUTBUFFER_H_
+#define RDEBUGGER_DEBUGSERVER_UI_CONSOLE_WIN_CONSOLEINPUTBUFFER_H_
 
 // Code adapted from http://athile.net/library/blog/?p=44
 
@@ -29,4 +34,4 @@ private:
 } // end namespace RubyDebugger
 } // end namespace SketchUp
 
-#endif // RDEBUGGER_DEBUGSERVER_CONSOLEINPUTBUFFER_H_
+#endif // RDEBUGGER_DEBUGSERVER_UI_CONSOLE_WIN_CONSOLEINPUTBUFFER_H_

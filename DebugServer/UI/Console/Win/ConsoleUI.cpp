@@ -1,9 +1,15 @@
+// SketchUp Ruby API Debugger. Copyright 2013 Trimble Navigation Ltd.
+// Authors:
+// - Bugra Barin
+//
+// License: Apache License, Version 2.0
 #include "stdafx.h"
 #include "./ConsoleUI.h"
-#include "../ConsoleInputBuffer.h"
-#include "../IDebugServer.h"
-#include "Common/BreakPoint.h"
-#include "Common/StackFrame.h"
+#include "./ConsoleInputBuffer.h"
+
+#include <DebugServer/IDebugServer.h>
+#include <Common/BreakPoint.h>
+#include <Common/StackFrame.h>
 
 #include <boost/regex.hpp>
 #include <boost/lexical_cast.hpp>
