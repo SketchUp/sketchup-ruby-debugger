@@ -133,24 +133,14 @@ void ConsoleUI::ConsoleThreadFunc() {
   std::string line_str;
   ConsoleInputBuffer ci;
   HANDLE hStdInput = ::GetStdHandle(STD_INPUT_HANDLE);
-  HANDLE hArray[2] = { hStdInput, NULL };
-  bool done = false;
   WritePrompt();
-  while (!done) {
-    DWORD which = ::WaitForMultipleObjects(1, hArray, FALSE, INFINITE);
-    switch (which) {
-      case WAIT_OBJECT_0:
-        {
-          if (ci.ReadLine(line_str)) {
-            if (EvaluateCommand(line_str)) {
-              ConsoleInputBuffer::RecordHistory(line_str);
-            }
-          }
-          break;
+  while (true) {
+    if(::WaitForSingleObject(hStdInput, INFINITE) == WAIT_OBJECT_0) {
+      if (ci.ReadLine(line_str)) {
+        if (EvaluateCommand(line_str)) {
+          ConsoleInputBuffer::RecordHistory(line_str);
         }
-      case WAIT_OBJECT_0 + 1:
-        done = true;
-        break;
+      }
     }
   }
 }
