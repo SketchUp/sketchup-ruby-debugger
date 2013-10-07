@@ -552,20 +552,26 @@ size_t Server::GetBreakLineNumber() const {
   return impl_->last_break_line_;
 }
 
-IDebugServer::VariablesVector Server::GetVariables(const char* type) const {
+IDebugServer::VariablesVector Server::GetVariables(const char* type,
+    bool use_toplevel_binding) const {
   VariablesVector vec;
-  if (!impl_->frames_.empty() &&
-    impl_->active_frame_index_ < impl_->frames_.size()) {
+  VALUE binding = 0;
+  if (use_toplevel_binding) {
+    binding = rb_const_get(rb_cObject, rb_intern("TOPLEVEL_BINDING"));
+  } else if (!impl_->frames_.empty() &&
+             impl_->active_frame_index_ < impl_->frames_.size()) {
     const auto& cur_frame = impl_->frames_[impl_->active_frame_index_];
-    VALUE arr_val = EvaluateRubyExpressionAsValue(type,
-                                                  cur_frame.binding);
+    binding = cur_frame.binding;
+  }
+  if (binding != 0) {
+    VALUE arr_val = EvaluateRubyExpressionAsValue(type, binding);
     int count = RARRAY_LEN(arr_val);
     for (int i = 0; i < count; ++i) {
       VALUE var_val = RARRAY_PTR(arr_val)[i];
       std::string var_str = GetRubyObjectAsString(var_val);
       if (!var_str.empty()) {
         VALUE eval_val =
-            EvaluateRubyExpressionAsValue(var_str, cur_frame.binding);
+            EvaluateRubyExpressionAsValue(var_str, binding);
         std::string eval_str = GetRubyObjectAsString(eval_val);
         vec.push_back(std::make_pair(var_str, eval_str));
       }
@@ -575,11 +581,11 @@ IDebugServer::VariablesVector Server::GetVariables(const char* type) const {
 }
 
 IDebugServer::VariablesVector Server::GetGlobalVariables() const {
-  return GetVariables("global_variables");
+  return GetVariables("global_variables", true);
 }
 
 IDebugServer::VariablesVector Server::GetLocalVariables() const {
-  return GetVariables("local_variables");
+  return GetVariables("local_variables", false);
 }
 
 } // end namespace RubyDebugger

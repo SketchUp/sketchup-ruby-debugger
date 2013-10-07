@@ -53,7 +53,8 @@ private:
   Server();
   ~Server();
 
-  VariablesVector GetVariables(const char* type) const;
+  VariablesVector GetVariables(const char* type,
+                               bool use_toplevel_binding) const;
 
   std::unique_ptr<Impl> impl_;
 };
