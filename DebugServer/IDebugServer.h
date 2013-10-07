@@ -39,6 +39,12 @@ public:
       GetCodeLines(size_t beg_line, size_t end_line) const = 0;
 
   virtual size_t GetBreakLineNumber() const = 0;
+
+  typedef std::vector<std::pair<std::string, std::string>> VariablesVector;
+
+  virtual VariablesVector GetGlobalVariables() const = 0;
+
+  virtual VariablesVector GetLocalVariables() const = 0;
 };
 
 } // end namespace RubyDebugger

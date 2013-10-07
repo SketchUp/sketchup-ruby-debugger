@@ -89,6 +89,13 @@ void WriteCodeLines(const std::vector<std::pair<size_t, std::string>>& lines,
   }
 }
 
+void WriteVariables(const IDebugServer::VariablesVector& var_vec) {
+  std::cout << std::endl;
+  for (auto it = var_vec.cbegin(), ite = var_vec.cend(); it != ite; ++it) {
+    std::cout << "  " << it->first << " => " << it->second << std::endl;
+  }
+}
+
 } // end anonymous namespace
 
 namespace SketchUp {
@@ -96,7 +103,9 @@ namespace RubyDebugger {
 
 ConsoleUI::ConsoleUI() :
   server_will_continue_(false),
-  server_can_continue_(false)
+  server_can_continue_(false),
+  need_server_response_(false),
+  need_what_from_server_(NEED_NOTHING)
 {}
 
 void ConsoleUI::Initialize(IDebugServer* server) {
@@ -150,6 +159,7 @@ bool ConsoleUI::EvaluateCommand(const std::string& str_command) {
   bool signal_server_can_continue = false;
   bool write_prompt = true;
   need_server_response_ = false;
+  need_what_from_server_ = NEED_NOTHING;
   expression_to_evaluate_.clear();
 
   static const boost::regex reg_brk_list("^\\s*b(?:reak)?$");
@@ -160,10 +170,11 @@ bool ConsoleUI::EvaluateCommand(const std::string& str_command) {
   static const boost::regex reg_where("^\\s*w(?:here)?$");
   static const boost::regex reg_frame("^\\s*f(?:rame)?$");
   static const boost::regex reg_step("^\\s*s(?:tep)?$");
-  static const boost::regex reg_list("^\\s*l(?:ist)?(?:\\s+(.+))?$");
+  static const boost::regex reg_list("^\\s*l(?:ist)?$");
   static const boost::regex reg_up("^\\s*up?$");
   static const boost::regex reg_down("^\\s*down?$");
   static const boost::regex reg_eval("^\\s*p\\s+");
+  static const boost::regex reg_var("^\\s*v(ar)?\\s+");
 
   boost::smatch what;
   if (regex_match(str_command, reg_brk_list)) {
@@ -204,7 +215,6 @@ bool ConsoleUI::EvaluateCommand(const std::string& str_command) {
     server_->Step();
     signal_server_can_continue = true;
     is_legal_command = true;
-    //write_prompt = false;
   } else if (regex_match(str_command, reg_help)) {
     PrintHelp();
     is_legal_command = true;
@@ -220,20 +230,31 @@ bool ConsoleUI::EvaluateCommand(const std::string& str_command) {
              regex_match(str_command, reg_frame)) {
     WriteFrames();
     is_legal_command = true;
-  } else if (regex_match(str_command, what, reg_list)) {
-    std::string lines = what[1];
-    if (!lines.empty()) {
-      
-    }
+  } else if (regex_match(str_command, reg_list)) {
     auto code_lines = server_->GetCodeLines(0, 0);
     size_t current_line = server_->GetBreakLineNumber();
     WriteCodeLines(code_lines, current_line);
     is_legal_command = true;
   } else if (regex_search(str_command, what, reg_eval)) {
     expression_to_evaluate_ = what.suffix();
+    need_what_from_server_ = NEED_EVAL;
     is_legal_command = true;
     write_prompt = false;
     need_server_response_ = true;
+  } else if (regex_search(str_command, what, reg_var)) {
+    std::string suffix = what.suffix();
+    static const boost::regex reg_global("^g(lobal)?$");
+    static const boost::regex reg_local("^l(ocal)?$");
+    if (regex_match(suffix, reg_global)) {
+      need_what_from_server_ = NEED_GLOBAL_VARS;
+    } else if (regex_match(suffix, reg_local)) {
+      need_what_from_server_ = NEED_LOCAL_VARS;
+    }
+    if (need_what_from_server_ != NEED_NOTHING) {
+      is_legal_command = true;
+      need_server_response_ = true;
+      write_prompt = false;
+    }
   } else {
     if (!str_command.empty()) {
       expression_to_evaluate_ = str_command;
@@ -283,9 +304,17 @@ void ConsoleUI::WaitForContinue() {
     server_wait_cv_.wait(lock);
     // Check if server response is needed
     if (need_server_response_) {
-      std::string eval_res = server_->EvaluateExpression(expression_to_evaluate_);
-      boost::unique_lock<boost::mutex> lock(console_output_mutex_);
-      WriteText(eval_res.c_str());
+      if (need_what_from_server_ == NEED_EVAL) {
+        std::string eval_res = server_->EvaluateExpression(expression_to_evaluate_);
+        boost::unique_lock<boost::mutex> lock(console_output_mutex_);
+        WriteText(eval_res.c_str());
+      } else if (need_what_from_server_ == NEED_GLOBAL_VARS) {
+        IDebugServer::VariablesVector var_vec = server_->GetGlobalVariables();
+        WriteVariables(var_vec);
+      } else if (need_what_from_server_ == NEED_LOCAL_VARS) {
+        IDebugServer::VariablesVector var_vec = server_->GetLocalVariables();
+        WriteVariables(var_vec);
+      }
       WritePrompt();
     }
   }

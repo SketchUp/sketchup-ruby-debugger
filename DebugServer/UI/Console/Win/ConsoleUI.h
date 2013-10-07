@@ -44,6 +44,8 @@ private:
   bool server_can_continue_;
 
   boost::atomic<bool> need_server_response_;
+  enum { NEED_NOTHING, NEED_EVAL, NEED_GLOBAL_VARS, NEED_LOCAL_VARS }
+      need_what_from_server_;
   std::string expression_to_evaluate_;
 };
 

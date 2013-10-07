@@ -44,10 +44,16 @@ public:
 
   virtual size_t GetBreakLineNumber() const;
 
+  virtual VariablesVector GetGlobalVariables() const;
+
+  virtual VariablesVector GetLocalVariables() const;
+
   class Impl; // Forward
 private:
   Server();
   ~Server();
+
+  VariablesVector GetVariables(const char* type) const;
 
   std::unique_ptr<Impl> impl_;
 };

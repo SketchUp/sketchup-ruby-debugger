@@ -135,11 +135,16 @@ VALUE ProtectFuncall(VALUE obj, ID func, int argc, ...) {
   return result;
 }
 
-std::string EvaluateRubyExpression(const std::string& expr, VALUE binding) {
+VALUE EvaluateRubyExpressionAsValue(const std::string& expr, VALUE binding) {
   VALUE str_to_eval = GetRubyInterface(expr.c_str());
   static ID eval_method_id = rb_intern("eval");
   VALUE val = ProtectFuncall(rb_mKernel, eval_method_id, 2, str_to_eval,
                              binding);
+  return val;
+}
+
+std::string EvaluateRubyExpression(const std::string& expr, VALUE binding) {
+  VALUE val = EvaluateRubyExpressionAsValue(expr, binding);
   return GetRubyObjectAsString(val);
 }
 
@@ -297,17 +302,6 @@ void Server::Impl::TraceFunc(VALUE tp_val, void* data) {
       }
     }
   }
-
-//   if (false) {
-//     VALUE val;
-//     if (EvaluateRubyExpression("local_variables", &val)) {
-//       int count = RARRAY_LEN(val);
-//       for (int i=0; i < count; ++i) {
-//         VALUE var_val = RARRAY_PTR(val)[i];
-//         AtLastUstring str = GetRubyObjectAsString(var_val);
-//       }
-//     }
-//   }
 }
 
 static int EachKeyValFunc(VALUE key, VALUE val, VALUE data) {
@@ -556,6 +550,36 @@ std::vector<std::pair<size_t, std::string>>
 
 size_t Server::GetBreakLineNumber() const {
   return impl_->last_break_line_;
+}
+
+IDebugServer::VariablesVector Server::GetVariables(const char* type) const {
+  VariablesVector vec;
+  if (!impl_->frames_.empty() &&
+    impl_->active_frame_index_ < impl_->frames_.size()) {
+    const auto& cur_frame = impl_->frames_[impl_->active_frame_index_];
+    VALUE arr_val = EvaluateRubyExpressionAsValue(type,
+                                                  cur_frame.binding);
+    int count = RARRAY_LEN(arr_val);
+    for (int i = 0; i < count; ++i) {
+      VALUE var_val = RARRAY_PTR(arr_val)[i];
+      std::string var_str = GetRubyObjectAsString(var_val);
+      if (!var_str.empty()) {
+        VALUE eval_val =
+            EvaluateRubyExpressionAsValue(var_str, cur_frame.binding);
+        std::string eval_str = GetRubyObjectAsString(eval_val);
+        vec.push_back(std::make_pair(var_str, eval_str));
+      }
+    }
+  }
+  return vec;
+}
+
+IDebugServer::VariablesVector Server::GetGlobalVariables() const {
+  return GetVariables("global_variables");
+}
+
+IDebugServer::VariablesVector Server::GetLocalVariables() const {
+  return GetVariables("local_variables");
 }
 
 } // end namespace RubyDebugger
