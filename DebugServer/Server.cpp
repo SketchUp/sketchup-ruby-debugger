@@ -5,6 +5,7 @@
 // License: Apache License, Version 2.0
 #include "stdafx.h"
 #include "./Server.h"
+#include "./DebuggerSettings.h"
 #include "./FindSubstringCaseInsensitive.h"
 
 #include <Common/BreakPoint.h>
@@ -208,8 +209,7 @@ public:
   // Breakpoints with yet-unresolved file paths
   std::vector<BreakPoint> unresolved_breakpoints_;
 
-  // map<line, map<file, BreakPoint>>
-  std::map<size_t, std::map<std::string, BreakPoint>> breakpoints_;
+  BreakPointsMap breakpoints_;
 
   size_t last_breakpoint_index;
 
@@ -397,6 +397,7 @@ void Server::Start(std::unique_ptr<IDebuggerUI> ui) {
   impl_->script_lines_hash_ = rb_hash_new();
   rb_define_global_const("SCRIPT_LINES__", impl_->script_lines_hash_);
 
+  LoadBreakPoints(impl_->breakpoints_, impl_->unresolved_breakpoints_);
   impl_->ui_ = std::move(ui);
   impl_->ui_->Initialize(this);
   impl_->is_stopped_ = true;
@@ -413,6 +414,7 @@ bool Server::AddBreakPoint(BreakPoint& bp) {
   // Find a matching full file path for the given file.
   bool file_resolved = impl_->ResolveBreakPoint(bp);
   impl_->AddBreakPoint(bp, file_resolved);
+  SaveBreakPoints(impl_->breakpoints_, impl_->unresolved_breakpoints_);
   return true;
 }
 
@@ -448,6 +450,9 @@ bool Server::RemoveBreakPoint(size_t index) {
     }
   }
 
+  if (removed) {
+    SaveBreakPoints(impl_->breakpoints_, impl_->unresolved_breakpoints_);
+  }
   return removed;
 }
 

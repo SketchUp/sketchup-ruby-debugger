@@ -6,6 +6,8 @@
 #ifndef RDEBUGGER_COMMON_BREAKPOINT_H_
 #define RDEBUGGER_COMMON_BREAKPOINT_H_
 
+#include <string>
+
 namespace SketchUp {
 namespace RubyDebugger {
 

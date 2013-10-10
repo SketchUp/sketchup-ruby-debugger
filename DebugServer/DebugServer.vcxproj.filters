@@ -57,6 +57,9 @@
     <ClInclude Include="UI\Console\Win\ConsoleInputBuffer.h">
       <Filter>UI\Console</Filter>
     </ClInclude>
+    <ClInclude Include="DebuggerSettings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -76,6 +79,9 @@
     </ClCompile>
     <ClCompile Include="UI\Console\Win\ConsoleInputBuffer.cpp">
       <Filter>UI\Console</Filter>
+    </ClCompile>
+    <ClCompile Include="DebuggerSettings.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

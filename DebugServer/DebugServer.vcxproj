@@ -90,6 +90,7 @@ xcopy /dy $(TargetDir)$(TargetName).pdb $(SolutionDir)..\2014_maint\src\googlecl
   <ItemGroup>
     <ClInclude Include="..\Common\BreakPoint.h" />
     <ClInclude Include="..\Common\StackFrame.h" />
+    <ClInclude Include="DebuggerSettings.h" />
     <ClInclude Include="FindSubstringCaseInsensitive.h" />
     <ClInclude Include="IDebugServer.h" />
     <ClInclude Include="Server.h" />
@@ -101,6 +102,7 @@ xcopy /dy $(TargetDir)$(TargetName).pdb $(SolutionDir)..\2014_maint\src\googlecl
     <ClInclude Include="UI\IDebuggerUI.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DebuggerSettings.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="DebugServerExports.cpp" />
     <ClCompile Include="dllmain.cpp">
