@@ -17,12 +17,15 @@ namespace RubyDebugger {
 // map<line, map<file, BreakPoint>>
 typedef std::map<size_t, std::map<std::string, BreakPoint>> BreakPointsMap;
 
+namespace Settings {
+
 void SaveBreakPoints(const BreakPointsMap& resolved_bps,
                      const std::vector<BreakPoint>& unresolved_pbs);
 
 void LoadBreakPoints(BreakPointsMap& resolved_bps,
                      std::vector<BreakPoint>& unresolved_pbs);
 
+} // end namespace Settings
 } // end namespace RubyDebugger
 } // end namespace SketchUp
 

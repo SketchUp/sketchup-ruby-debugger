@@ -14,15 +14,19 @@ using namespace SketchUp::RubyDebugger;
 
 namespace SketchUp {
 namespace RubyDebugger {
+namespace Settings {
 
 static std::string GetFilePath() {
   static std::string file_path;
   if (file_path.empty()) {
-    // TODO: Think about unicode user names.
+#ifdef WIN32
+    // Loading from ProgramData because loading from user folder may cause
+    // issues with unicode user names. We might deal with that later.
     char path[MAX_PATH];
     path[0] = '\0';
-    BOOL ok = SHGetSpecialFolderPathA(NULL, path, CSIDL_APPDATA, FALSE);
+    BOOL ok = SHGetSpecialFolderPathA(NULL, path, CSIDL_COMMON_APPDATA, FALSE);
     file_path = std::string(path) + "\\SketchUp\\RubyDebugger.settings";
+#endif
   }
   return file_path;
 }
@@ -118,5 +122,6 @@ void LoadBreakPoints(BreakPointsMap& resolved_bps,
   }
 }
 
+} // end namespace Settings
 } // end namespace RubyDebugger
 } // end namespace SketchUp
