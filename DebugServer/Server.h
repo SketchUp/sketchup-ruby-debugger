@@ -14,6 +14,7 @@
 namespace SketchUp {
 namespace RubyDebugger {
 
+// Debugger server implementation 
 class Server : public IDebugServer {
 public:
 

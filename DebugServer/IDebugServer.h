@@ -11,39 +11,57 @@
 namespace SketchUp {
 namespace RubyDebugger {
 
+// Forward declarations
 struct BreakPoint;
 struct StackFrame;
 
+// Interface to the debugger server.
 class IDebugServer {
 public:
 
+  // Adds the given breakpoint. Returns true on success.
   virtual bool AddBreakPoint(BreakPoint& bp) = 0;
 
+  // Removes the breakpoint at a given index. Returns true on success.
   virtual bool RemoveBreakPoint(size_t index) = 0;
 
+  // Returns all breakpoints.
   virtual std::vector<BreakPoint> GetBreakPoints() const = 0;
 
+  // Returns true if SketchUp has stopped and waiting for the debugger.
+  // Returns false if it is running.
   virtual bool IsStopped() const = 0;
 
+  // Evaluates the given Ruby expression and returns the result as a string.
   virtual std::string EvaluateExpression(const std::string& expr) = 0;
 
+  // Returns current stack frames. Execution must have stopped.
   virtual std::vector<StackFrame> GetStackFrames() const = 0;
 
+  // Shifts the active stack frame index up/down by one.
   virtual void ShiftActiveFrame(bool shift_up) = 0;
 
+  // Returns the currently active stack frame index.
   virtual size_t GetActiveFrameIndex() const = 0;
 
+  // Steps execution to the next line.
   virtual void Step() = 0;
 
+  // Returns the code lines around the current line. Execution must have stopped.
   virtual std::vector<std::pair<size_t, std::string>>
       GetCodeLines(size_t beg_line, size_t end_line) const = 0;
 
+  // Returns the line number at the point of last execution break.
   virtual size_t GetBreakLineNumber() const = 0;
 
+  // Data structure to return Ruby variables.
+  // vector<variable name, variable value>
   typedef std::vector<std::pair<std::string, std::string>> VariablesVector;
 
+  // Returns a list of global variables
   virtual VariablesVector GetGlobalVariables() const = 0;
 
+  // Returns a list of local variables. Execution must have stopped.
   virtual VariablesVector GetLocalVariables() const = 0;
 };
 

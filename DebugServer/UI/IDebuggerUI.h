@@ -11,18 +11,24 @@
 namespace SketchUp {
 namespace RubyDebugger {
 
+// Forward declarations
 class IDebugServer;
 struct BreakPoint;
 
+// Interface to be implemented by a debugger UI.
 class IDebuggerUI
 {
 public:
+  // Initializes the UI, given a server interface.
   virtual void Initialize(IDebugServer* server) = 0;
 
+  // Blocks the calling thread until user issues a continuation command.
   virtual void WaitForContinue() = 0;
 
+  // Called by the server when a breakpoint is hit during execution.
   virtual void Break(BreakPoint bp) = 0;
 
+  // Called by the server when a file/line breakpoint is hit during execution.
   virtual void Break(const std::string& file, size_t line) = 0;
 
 protected:

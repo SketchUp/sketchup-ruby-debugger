@@ -14,6 +14,7 @@
 namespace SketchUp {
 namespace RubyDebugger {
 
+// Console debugger UI implementation.
 class ConsoleUI : public IDebuggerUI
 {
 public:
