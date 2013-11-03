@@ -33,6 +33,8 @@ private:
   bool EvaluateCommand(const std::string& str_command);
   void WritePrompt();
   void WriteFrames();
+  void WriteCodeLines();
+  void WriteCurrentLine();
 
 private:
   boost::thread console_thread_;

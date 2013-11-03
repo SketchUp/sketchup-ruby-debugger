@@ -40,13 +40,13 @@ void PrintHelp() {
   "  del[ete]                   delete a breakpoint\n"
   "  c[ont]                     run until program ends or hits a breakpoint\n"
   "  s[tep]                     step (into methods) one line\n"
+  "  s[tep] o[ut]               step out of the current method\n"
+  "  n[ext]                     go over one line, stepping over methods\n"
   "  w[here]                    display frames\n"
   "  f[rame]                    alias for where\n"
   "  l[ist]                     list program\n"
   "  up                         move to higher frame\n"
   "  down                       move to lower frame\n"
-//   "  fin[ish]                   return to outer frame\n"
-//   "  q[uit]                     exit from debugger\n"
   "  v[ar] g[lobal]             show global variables\n"
   "  v[ar] l[ocal]              show local variables\n"
 //   "  v[ar] i[nstance] <object>  show instance variables of object\n"
@@ -75,17 +75,6 @@ void WriteBreakPoints(const std::vector<BreakPoint>& bps) {
       const auto& bp = bps[i];
       WriteBreakPoint(bp);
     }
-  }
-}
-
-void WriteCodeLines(const std::vector<std::pair<size_t, std::string>>& lines,
-                    size_t current_line) {
-  std::cout << std::endl;
-  for (size_t i = 0; i < lines.size(); ++i) {
-    const auto& line_pair = lines[i];
-    std::string prefix = (line_pair.first == current_line) ? "=>" : "  ";
-    std::cout << prefix << std::setw(4) << line_pair.first << "  "
-              << line_pair.second;
   }
 }
 
@@ -169,7 +158,8 @@ bool ConsoleUI::EvaluateCommand(const std::string& str_command) {
   static const boost::regex reg_help("^\\s*h(?:elp)?$");
   static const boost::regex reg_where("^\\s*w(?:here)?$");
   static const boost::regex reg_frame("^\\s*f(?:rame)?$");
-  static const boost::regex reg_step("^\\s*s(?:tep)?$");
+  static const boost::regex reg_step("^\\s*s(?:tep)?\\s?");
+  static const boost::regex reg_next("^\\s*n(?:ext)?$");
   static const boost::regex reg_list("^\\s*l(?:ist)?$");
   static const boost::regex reg_up("^\\s*up?$");
   static const boost::regex reg_down("^\\s*down?$");
@@ -211,8 +201,18 @@ bool ConsoleUI::EvaluateCommand(const std::string& str_command) {
   } else if (regex_match(str_command, reg_cont)) {
     signal_server_can_continue = true;
     is_legal_command = true;
-  } else if (regex_match(str_command, reg_step)) {
-    server_->Step();
+  } else if (regex_search(str_command, what, reg_step)) {
+    std::string suffix = what.suffix();
+    static const boost::regex reg_out("^o(ut)?$");
+    if (regex_match(suffix, reg_out)) {
+      server_->StepOut();
+    } else {
+      server_->Step();
+    }
+    signal_server_can_continue = true;
+    is_legal_command = true;
+  } else if (regex_match(str_command, reg_next)) {
+    server_->StepOver();
     signal_server_can_continue = true;
     is_legal_command = true;
   } else if (regex_match(str_command, reg_help)) {
@@ -231,9 +231,7 @@ bool ConsoleUI::EvaluateCommand(const std::string& str_command) {
     WriteFrames();
     is_legal_command = true;
   } else if (regex_match(str_command, reg_list)) {
-    auto code_lines = server_->GetCodeLines(0, 0);
-    size_t current_line = server_->GetBreakLineNumber();
-    WriteCodeLines(code_lines, current_line);
+    WriteCodeLines();
     is_legal_command = true;
   } else if (regex_search(str_command, what, reg_eval)) {
     expression_to_evaluate_ = what.suffix();
@@ -325,6 +323,7 @@ void ConsoleUI::Break(BreakPoint bp) {
     boost::unique_lock<boost::mutex> lock(console_output_mutex_);
     std::cout << std::endl << "BreakPoint " << bp.index << " at " << bp.file
               << ":" << bp.line;
+    WriteCurrentLine();
     WritePrompt();
   }
   WaitForContinue();
@@ -334,9 +333,34 @@ void ConsoleUI::Break(const std::string& file, size_t line) {
   {
     boost::unique_lock<boost::mutex> lock(console_output_mutex_);
     std::cout << std::endl << "Stopped at " << file << ":" << line;
+    WriteCurrentLine();
     WritePrompt();
   }
   WaitForContinue();
+}
+
+void ConsoleUI::WriteCodeLines()
+{
+  auto code_lines = server_->GetCodeLines(0, 0);
+  size_t current_line = server_->GetBreakLineNumber();
+  std::cout << std::endl;
+  for (size_t i = 0; i < code_lines.size(); ++i) {
+    const auto& line_pair = code_lines[i];
+    std::string prefix = (line_pair.first == current_line) ? "=>" : "  ";
+    std::cout << prefix << std::setw(4) << line_pair.first << "  "
+              << line_pair.second;
+  }
+}
+
+void ConsoleUI::WriteCurrentLine()
+{
+  size_t current_line = server_->GetBreakLineNumber();
+  auto code_lines = server_->GetCodeLines(current_line, current_line);
+  if (!code_lines.empty()) {
+    const auto& line_pair = code_lines.front();
+    std::cout << std::endl << "Line " << line_pair.first << ": "
+              << line_pair.second;
+  }
 }
 
 } // end namespace RubyDebugger

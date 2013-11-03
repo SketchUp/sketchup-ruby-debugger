@@ -182,8 +182,10 @@ public:
       script_lines_hash_(0),
       is_stopped_(false),
       break_at_next_line_(false),
+      break_at_call_depth_(-1),
       active_frame_index_(0),
-      last_break_line_(0)
+      last_break_line_(0),
+      call_depth_(0)
   {}
 
   void EnableTracePoint();
@@ -203,6 +205,10 @@ public:
   void SaveBreakPoints() const;
 
   void LoadBreakPoints();
+
+  void DoBreak(const std::string& file_path, size_t line);
+
+  bool ShouldBreak();
 
   static std::vector<StackFrame> GetStackFrames();
 
@@ -226,6 +232,8 @@ public:
   boost::atomic<bool> is_stopped_;
 
   boost::atomic<bool> break_at_next_line_;
+
+  boost::atomic<size_t> break_at_call_depth_;
   
   std::vector<StackFrame> frames_;
 
@@ -234,6 +242,8 @@ public:
   std::string last_break_file_path_;
 
   size_t last_break_line_;
+
+  size_t call_depth_;
 };
 
 void Server::Impl::ClearBreakData() {
@@ -244,7 +254,8 @@ void Server::Impl::ClearBreakData() {
 }
 
 void Server::Impl::EnableTracePoint() {
-  VALUE tp = rb_tracepoint_new(Qnil, RUBY_EVENT_LINE, &TraceFunc, this);
+  VALUE tp = rb_tracepoint_new(Qnil, RUBY_EVENT_LINE | RUBY_EVENT_CALL |
+                               RUBY_EVENT_RETURN, &TraceFunc, this);
   rb_tracepoint_enable(tp);
 }
 
@@ -289,14 +300,8 @@ void Server::Impl::TraceFunc(VALUE tp_val, void* data) {
   int line = GetRubyInt(rb_tracearg_lineno(trace_arg));
 
   if (event_id == id_line) {
-    if (server->break_at_next_line_) {
-      server->break_at_next_line_ = false;
-      server->frames_ = GetStackFrames();
-      server->last_break_file_path_ = file_path;
-      server->last_break_line_ = line;
-      server->is_stopped_ = true;
-      server->ui_->Break(file_path, line); // Blocked here until ui says continue
-      server->ClearBreakData();
+    if (server->ShouldBreak()) {
+      server->DoBreak(file_path, line);
     } else {
       // Try to resolve any unresolved breakpoints
       if (!server->unresolved_breakpoints_.empty())
@@ -313,7 +318,32 @@ void Server::Impl::TraceFunc(VALUE tp_val, void* data) {
         server->ClearBreakData();
       }
     }
+  } else if (event_id == id_call) {
+    ++server->call_depth_;
+  } else if (event_id == id_return) {
+    if (server->ShouldBreak()) {
+      server->DoBreak(file_path, line);
+    }
+    assert(server->call_depth_ > 0);
+    --server->call_depth_;
   }
+}
+
+bool Server::Impl::ShouldBreak() {
+  return break_at_next_line_ ||
+         (break_at_call_depth_ != -1 && call_depth_ <= break_at_call_depth_);
+}
+
+// Performs necessary operations when a break point is hit.
+void Server::Impl::DoBreak(const std::string& file_path, size_t line) {
+  break_at_next_line_ = false;
+  break_at_call_depth_ = -1;
+  frames_ = GetStackFrames();
+  last_break_file_path_ = file_path;
+  last_break_line_ = line;
+  is_stopped_ = true;
+  ui_->Break(file_path, line); // Blocked here until ui says continue
+  ClearBreakData();
 }
 
 static int EachKeyValFunc(VALUE key, VALUE val, VALUE data) {
@@ -532,6 +562,16 @@ size_t Server::GetActiveFrameIndex() const {
 void Server::Step() {
   if (IsStopped())
     impl_->break_at_next_line_ = true;
+}
+
+void Server::StepOver() {
+  if (IsStopped())
+    impl_->break_at_call_depth_ = impl_->call_depth_;
+}
+
+void Server::StepOut() {
+  if (IsStopped())
+    impl_->break_at_call_depth_ = impl_->call_depth_ - 1;
 }
 
 std::vector<std::pair<size_t, std::string>>

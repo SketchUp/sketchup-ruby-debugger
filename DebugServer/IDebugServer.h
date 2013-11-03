@@ -44,8 +44,14 @@ public:
   // Returns the currently active stack frame index.
   virtual size_t GetActiveFrameIndex() const = 0;
 
-  // Steps execution to the next line.
+  // Steps execution to the next line, stepping in methods.
   virtual void Step() = 0;
+
+  // Steps execution to the next line, stepping over methods.
+  virtual void StepOver() = 0;
+
+  // Steps execution out of the current method.
+  virtual void StepOut() = 0;
 
   // Returns the code lines around the current line. Execution must have stopped.
   virtual std::vector<std::pair<size_t, std::string>>
