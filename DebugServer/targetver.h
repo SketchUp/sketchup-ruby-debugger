@@ -2,7 +2,6 @@
 // Authors:
 // - Bugra Barin
 //
-// License: Apache License, Version 2.0
 #pragma once
 
 // Including SDKDDKVer.h defines the highest available Windows platform.

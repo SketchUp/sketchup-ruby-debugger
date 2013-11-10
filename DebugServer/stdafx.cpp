@@ -2,7 +2,6 @@
 // Authors:
 // - Bugra Barin
 //
-// License: Apache License, Version 2.0
 
 // stdafx.cpp : source file that includes just the standard includes
 // DebugServer.pch will be the pre-compiled header

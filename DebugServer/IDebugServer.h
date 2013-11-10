@@ -2,7 +2,6 @@
 // Authors:
 // - Bugra Barin
 //
-// License: Apache License, Version 2.0
 #ifndef RDEBUGGER_DEBUGSERVER_IDEBUGSERVER_H_
 #define RDEBUGGER_DEBUGSERVER_IDEBUGSERVER_H_
 

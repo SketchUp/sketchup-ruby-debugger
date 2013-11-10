@@ -2,7 +2,6 @@
 // Authors:
 // - Bugra Barin
 //
-// License: Apache License, Version 2.0
 
 // stdafx.h : include file for standard system include files,
 // or project specific include files that are used frequently, but

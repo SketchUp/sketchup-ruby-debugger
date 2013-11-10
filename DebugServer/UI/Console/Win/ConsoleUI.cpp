@@ -2,7 +2,6 @@
 // Authors:
 // - Bugra Barin
 //
-// License: Apache License, Version 2.0
 #include "stdafx.h"
 #include "./ConsoleUI.h"
 #include "./ConsoleInputBuffer.h"
