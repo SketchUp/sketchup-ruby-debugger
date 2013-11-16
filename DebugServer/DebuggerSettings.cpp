@@ -83,7 +83,8 @@ void SaveBreakPoints(const BreakPointsMap& resolved_bps,
 }
 
 void LoadBreakPoints(BreakPointsMap& resolved_bps,
-                     std::vector<BreakPoint>& unresolved_pbs) {
+                     std::vector<BreakPoint>& unresolved_pbs,
+                     size_t& last_breakpoint_index) {
   ptree pt;
   resolved_bps.clear();
   unresolved_pbs.clear();
@@ -103,6 +104,7 @@ void LoadBreakPoints(BreakPointsMap& resolved_bps,
         Load(pt_bp, bp);
         std::map<std::string, BreakPoint>& map = resolved_bps[bp.line];
         map[bp.file] = bp;
+        last_breakpoint_index = std::max(last_breakpoint_index, bp.index);
       }
     }
 
@@ -115,6 +117,7 @@ void LoadBreakPoints(BreakPointsMap& resolved_bps,
         BreakPoint bp;
         Load(pt_bp, bp);
         unresolved_pbs.push_back(bp);
+        last_breakpoint_index = std::max(last_breakpoint_index, bp.index);
       }
     }
   } catch (const std::exception&) {

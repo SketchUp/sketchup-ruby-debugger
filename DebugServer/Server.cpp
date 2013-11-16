@@ -276,7 +276,8 @@ void Server::Impl::SaveBreakPoints() const {
 }
 
 void Server::Impl::LoadBreakPoints() {
-  Settings::LoadBreakPoints(breakpoints_, unresolved_breakpoints_);
+  Settings::LoadBreakPoints(breakpoints_, unresolved_breakpoints_,
+                            last_breakpoint_index);
 }
 
 void Server::Impl::TraceFunc(VALUE tp_val, void* data) {

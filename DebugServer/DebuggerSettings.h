@@ -22,9 +22,11 @@ namespace Settings {
 void SaveBreakPoints(const BreakPointsMap& resolved_bps,
                      const std::vector<BreakPoint>& unresolved_pbs);
 
-// Loads breakpoints from the settings file.
+// Loads breakpoints from the settings file. Also returns the largest
+// breakpoint index loaded.
 void LoadBreakPoints(BreakPointsMap& resolved_bps,
-                     std::vector<BreakPoint>& unresolved_pbs);
+                     std::vector<BreakPoint>& unresolved_pbs,
+                     size_t& last_breakpoint_index);
 
 } // end namespace Settings
 } // end namespace RubyDebugger
