@@ -60,8 +60,9 @@
       <AdditionalDependencies>libboost_thread-mt-gd.lib;libboost_system-mt-gd.lib;libboost_regex-mt-gd.lib;msvcrt-ruby200.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /dy $(TargetPath) $(SolutionDir)..\2014_maint\src\googleclient\sketchup\source\sketchup\winapp\Debug
-xcopy /dy $(TargetDir)$(TargetName).pdb $(SolutionDir)..\2014_maint\src\googleclient\sketchup\source\sketchup\winapp\Debug</Command>
+      <Command>set TARGETDIR=$(TargetDir)
+call $(SolutionDir)postbuild.bat
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -83,8 +84,9 @@ xcopy /dy $(TargetDir)$(TargetName).pdb $(SolutionDir)..\2014_maint\src\googlecl
       <AdditionalDependencies>libboost_thread-mt.lib;libboost_system-mt.lib;libboost_regex-mt.lib;msvcrt-ruby200.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /dy $(TargetPath) $(SolutionDir)..\2014_maint\src\googleclient\sketchup\source\sketchup\winapp\Release
-xcopy /dy $(TargetDir)$(TargetName).pdb $(SolutionDir)..\2014_maint\src\googleclient\sketchup\source\sketchup\winapp\Release</Command>
+      <Command>set TARGETDIR=$(TargetDir)
+call $(SolutionDir)postbuild.bat
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -119,6 +121,9 @@ xcopy /dy $(TargetDir)$(TargetName).pdb $(SolutionDir)..\2014_maint\src\googlecl
     </ClCompile>
     <ClCompile Include="UI\Console\Win\ConsoleInputBuffer.cpp" />
     <ClCompile Include="UI\Console\Win\ConsoleUI.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\postbuild.bat" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

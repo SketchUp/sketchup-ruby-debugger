@@ -84,4 +84,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\postbuild.bat" />
+  </ItemGroup>
 </Project>
