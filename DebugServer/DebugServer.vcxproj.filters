@@ -22,6 +22,9 @@
     <Filter Include="UI\Console">
       <UniqueIdentifier>{ed2595c9-53c7-45f4-a713-3daa8b2403a0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI\RDIP">
+      <UniqueIdentifier>{114e0867-a870-45f4-8983-ddd7b51409dd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -60,6 +63,9 @@
     <ClInclude Include="DebuggerSettings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="UI\RDIP\Win\RDIP.h">
+      <Filter>UI\RDIP</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -82,6 +88,9 @@
     </ClCompile>
     <ClCompile Include="DebuggerSettings.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\RDIP\Win\RDIP.cpp">
+      <Filter>UI\RDIP</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -2,3 +2,5 @@ Debug/
 Release/
 !ThirdParty/**/*
 *.suo
+*.sdf
+ipch/
