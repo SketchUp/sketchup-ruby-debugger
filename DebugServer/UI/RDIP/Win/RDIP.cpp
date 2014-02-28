@@ -29,6 +29,7 @@ public:
 
     void wait();
     void stopAtBreakpoint(BreakPoint bp);
+    void suspendAt(const std::string& file, size_t line);
 
 private:
     void start(const boost::system::error_code& err);
@@ -84,6 +85,8 @@ void RDIP::Break(BreakPoint bp) {
 }
 
 void RDIP::Break(const std::string& file, size_t line) {
+    mService.post(boost::bind(&RDIP::Connection::suspendAt, mConnection.get(), file, line));
+    WaitForContinue();
 }
 
 void RDIP::RunService() {
@@ -125,7 +128,7 @@ void RDIP::Connection::handleCommand(const boost::system::error_code& err)
         std::ostringstream out;
         out << &mReadBuffer;
         std::string str = out.str();
-        ::OutputDebugStringA("\nzCommand from IntelliJ => ");
+        ::OutputDebugStringA("\nCommand from IDE => ");
         ::OutputDebugStringA(str.c_str());
         std::vector<std::string> commands;
         boost::split(commands, str, boost::is_any_of(";"));
@@ -133,7 +136,7 @@ void RDIP::Connection::handleCommand(const boost::system::error_code& err)
         {
             evaluateCommand(boost::trim_copy(cmd));
         }
-        assert(write(mSocket, boost::asio::buffer("<message>some text</message>\n")) > 0);
+        //assert(write(mSocket, boost::asio::buffer("<message>some text</message>\n")) > 0);
         async_read_until(mSocket, mReadBuffer, "\n", boost::bind(&Connection::handleCommand, this, _1));
     }
     else
@@ -178,7 +181,7 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd)
                 std::string s2 = what[2];
                 bp.line = std::atoi(s2.c_str());
                 bp.enabled = true;
-                if(mServer->AddBreakPoint(bp)) 
+                if(mServer->AddBreakPoint(bp, true)) 
                 {
                     std::ostringstream reply;
                     reply << "<breakpointAdded no=\"" << bp.index << "\" location=\"" << bp.file << ":" << bp.line << "\"/>\n";
@@ -267,7 +270,9 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd)
     else if(regex_match(cmd, what, reg_next))
     {
         mServer->StepOver();
-
+        boost::mutex::scoped_lock lock(mServerWaitMutex);
+        mServerCanContinue = true;
+        mServerWaitCond.notify_all();
     }
     else if(regex_match(cmd, what, reg_up))
     {
@@ -338,6 +343,16 @@ void RDIP::Connection::stopAtBreakpoint(BreakPoint bp)
     write(mSocket, boost::asio::buffer(str));
 }
 
+void RDIP::Connection::suspendAt(const std::string& file, size_t line)
+{
+    std::ostringstream ss;
+    ss << "<suspended file=\"" << file << "\" line=\"" << line << "\" threadId=\"1\" frames=\"1\"/>\n";
+    OutputDebugStringA("sending suspendAt => ");
+
+    auto str = ss.str();
+    OutputDebugStringA(str.c_str());
+    write(mSocket, boost::asio::buffer(str));
+}
 
 } // end namespace RubyDebugger
 } // end namespace SketchUp
