@@ -448,14 +448,14 @@ void Server::Start(std::unique_ptr<IDebuggerUI> ui) {
   impl_->ClearBreakData();
 }
 
-bool Server::AddBreakPoint(BreakPoint& bp) {
+bool Server::AddBreakPoint(BreakPoint& bp, bool assume_resolved) {
   boost::lock_guard<boost::mutex> lock(impl_->break_point_mutex_);
   
   // Make sure we have the loaded files
   impl_->ReadScriptLinesHash();
 
   // Find a matching full file path for the given file.
-  bool file_resolved = impl_->ResolveBreakPoint(bp);
+  bool file_resolved = assume_resolved || impl_->ResolveBreakPoint(bp);
   impl_->AddBreakPoint(bp, file_resolved);
   impl_->SaveBreakPoints();
   return true;

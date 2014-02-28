@@ -19,7 +19,7 @@ class IDebugServer {
 public:
 
   // Adds the given breakpoint. Returns true on success.
-  virtual bool AddBreakPoint(BreakPoint& bp) = 0;
+  virtual bool AddBreakPoint(BreakPoint& bp, bool assume_resolved = false) = 0;
 
   // Removes the breakpoint at a given index. Returns true on success.
   virtual bool RemoveBreakPoint(size_t index) = 0;
