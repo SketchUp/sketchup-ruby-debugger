@@ -96,7 +96,8 @@ ConsoleUI::ConsoleUI() :
   need_what_from_server_(NEED_NOTHING)
 {}
 
-void ConsoleUI::Initialize(IDebugServer* server) {
+void ConsoleUI::Initialize(IDebugServer* server,
+                           const std::string& /*str_debugger*/) {
   server_ = server;
   console_thread_ =
       boost::thread(std::bind(&ConsoleUI::ConsoleThreadFunc, this));

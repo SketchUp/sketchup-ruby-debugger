@@ -59,14 +59,22 @@ RDIP::~RDIP()
     mServiceThread.join();
 }
 
-void RDIP::Initialize(IDebugServer* server) {
+void RDIP::Initialize(IDebugServer* server, const std::string& str_debugger) {
     server_ = server;
     auto breakpoints = server_->GetBreakPoints();
     for(auto bp : breakpoints)
     {
         server_->RemoveBreakPoint(bp.index);
     }
-    mServiceThread = boost::thread(boost::bind(&RDIP::RunService, this));
+
+    int port = 1234;
+    const boost::regex reg_port("port=(\\d+)");
+    boost::smatch match;
+    if (regex_search(str_debugger, match, reg_port)) {
+      port = boost::lexical_cast<int>(match[1]);
+    }
+
+    mServiceThread = boost::thread(boost::bind(&RDIP::RunService, this, port));
 }
 
 void RDIP::WaitForContinue() {
@@ -89,9 +97,9 @@ void RDIP::Break(const std::string& file, size_t line) {
     WaitForContinue();
 }
 
-void RDIP::RunService() {
+void RDIP::RunService(int port) {
     mSignalSet.async_wait(std::bind(&RDIP::HandleFatalFailure, this, std::placeholders::_1, std::placeholders::_2));
-    mConnection = boost::make_shared<Connection>(mService, 1234, server_, mServerWaitCond, mServerWaitMutex, mServerCanContinue);
+    mConnection = boost::make_shared<Connection>(mService, port, server_, mServerWaitCond, mServerWaitMutex, mServerCanContinue);
     mConnection->wait();
     mService.run();
 }
@@ -217,6 +225,11 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd)
             std::vector<std::string> splitFrameInfo;
             boost::split(splitFrameInfo, frames[i].name, boost::is_any_of(":"));
 
+            // TODO(bugra): Fix this hack
+            if (splitFrameInfo.size() < 3)
+            {
+              splitFrameInfo.push_back("0");
+            }
             std::string msg;
             if(activeFrameIdx != i)
             {

@@ -27,7 +27,7 @@ bool InitDebugger(const char* debugger) {
 
   if (ui) {
     Server& server = Server::Instance();
-    server.Start(std::move(ui));
+    server.Start(std::move(ui), str_debugger);
     return true;
   } else {
     return false;

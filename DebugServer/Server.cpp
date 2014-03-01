@@ -433,7 +433,8 @@ Server& Server::Instance() {
   return ds;
 }
 
-void Server::Start(std::unique_ptr<IDebuggerUI> ui) {
+void Server::Start(std::unique_ptr<IDebuggerUI> ui,
+                   const std::string& str_debugger) {
   impl_->EnableTracePoint();
 
   // Let Ruby collect source files and code into this hash
@@ -442,7 +443,7 @@ void Server::Start(std::unique_ptr<IDebuggerUI> ui) {
 
   impl_->LoadBreakPoints();
   impl_->ui_ = std::move(ui);
-  impl_->ui_->Initialize(this);
+  impl_->ui_->Initialize(this, str_debugger);
   impl_->is_stopped_ = true;
   impl_->ui_->WaitForContinue();
   impl_->ClearBreakData();

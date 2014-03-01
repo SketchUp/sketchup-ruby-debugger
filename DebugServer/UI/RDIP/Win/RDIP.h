@@ -22,7 +22,8 @@ public:
   RDIP();
   ~RDIP();
 
-  virtual void Initialize(IDebugServer* server);
+  virtual void Initialize(IDebugServer* server,
+                          const std::string& str_debugger);
 
   virtual void WaitForContinue();
 
@@ -33,7 +34,7 @@ public:
 private:
     class Connection;
 
-    void RunService();
+    void RunService(int port);
     void HandleFatalFailure(const boost::system::error_code& err, int signal);
     void HandleConnection(const boost::system::error_code& err);
 

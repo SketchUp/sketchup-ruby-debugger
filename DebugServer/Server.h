@@ -19,7 +19,7 @@ public:
 
   static Server& Instance();
 
-  void Start(std::unique_ptr<IDebuggerUI> ui);
+  void Start(std::unique_ptr<IDebuggerUI> ui, const std::string& str_debugger);
 
   virtual bool AddBreakPoint(BreakPoint& bp, bool assume_resolved);
 
