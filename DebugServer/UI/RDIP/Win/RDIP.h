@@ -9,6 +9,7 @@
 
 #include <boost/thread.hpp>
 #include <boost/atomic.hpp>
+#include <boost/function.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/signal_set.hpp>
 
@@ -47,6 +48,7 @@ private:
     bool mServerCanContinue;
 
     boost::shared_ptr<Connection> mConnection;
+    boost::function<void(Connection&)> mServerResponse;
 };
 
 } // end namespace RubyDebugger

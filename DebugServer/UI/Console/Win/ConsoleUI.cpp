@@ -80,7 +80,7 @@ void WriteBreakPoints(const std::vector<BreakPoint>& bps) {
 void WriteVariables(const IDebugServer::VariablesVector& var_vec) {
   std::cout << std::endl;
   for (auto it = var_vec.cbegin(), ite = var_vec.cend(); it != ite; ++it) {
-    std::cout << "  " << it->first << " => " << it->second << std::endl;
+    std::cout << "  " << it->name << " => " << it->value << std::endl;
   }
 }
 

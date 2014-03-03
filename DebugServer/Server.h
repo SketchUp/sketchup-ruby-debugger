@@ -37,6 +37,8 @@ public:
 
   virtual size_t GetActiveFrameIndex() const;
 
+  virtual void SetActiveFrameIndex(size_t index) const;
+
   virtual void Step();
 
   virtual void StepOver();

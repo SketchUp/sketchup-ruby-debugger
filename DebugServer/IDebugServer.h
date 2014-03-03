@@ -14,6 +14,15 @@ namespace RubyDebugger {
 struct BreakPoint;
 struct StackFrame;
 
+// Information about a local or global variable
+struct Variable {
+  std::string name;
+  std::string type;
+  std::string value;
+  bool has_children;
+  size_t object_id;
+};
+
 // Interface to the debugger server.
 class IDebugServer {
 public:
@@ -43,6 +52,9 @@ public:
   // Returns the currently active stack frame index.
   virtual size_t GetActiveFrameIndex() const = 0;
 
+  // Returns the currently active stack frame index.
+  virtual void SetActiveFrameIndex(size_t index) const = 0;
+
   // Steps execution to the next line, stepping in methods.
   virtual void Step() = 0;
 
@@ -60,8 +72,7 @@ public:
   virtual size_t GetBreakLineNumber() const = 0;
 
   // Data structure to return Ruby variables.
-  // vector<variable name, variable value>
-  typedef std::vector<std::pair<std::string, std::string>> VariablesVector;
+  typedef std::vector<Variable> VariablesVector;
 
   // Returns a list of global variables
   virtual VariablesVector GetGlobalVariables() const = 0;

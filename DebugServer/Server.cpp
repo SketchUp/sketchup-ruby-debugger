@@ -560,6 +560,10 @@ size_t Server::GetActiveFrameIndex() const {
   return impl_->active_frame_index_;
 }
 
+void Server::SetActiveFrameIndex(size_t index) const {
+  impl_->active_frame_index_ = index;
+}
+
 void Server::Step() {
   if (IsStopped())
     impl_->break_at_next_line_ = true;
@@ -627,12 +631,15 @@ IDebugServer::VariablesVector Server::GetVariables(const char* type,
     int count = RARRAY_LEN(arr_val);
     for (int i = 0; i < count; ++i) {
       VALUE var_val = RARRAY_PTR(arr_val)[i];
-      std::string var_str = GetRubyObjectAsString(var_val);
-      if (!var_str.empty()) {
+      Variable var;
+      var.object_id = 0;
+      var.has_children = false;
+      var.name = GetRubyObjectAsString(var_val);
+      if (!var.name.empty()) {
         VALUE eval_val =
-            EvaluateRubyExpressionAsValue(var_str, binding);
-        std::string eval_str = GetRubyObjectAsString(eval_val);
-        vec.push_back(std::make_pair(var_str, eval_str));
+            EvaluateRubyExpressionAsValue(var.name, binding);
+        var.value = GetRubyObjectAsString(eval_val);
+        vec.push_back(var);
       }
     }
   }
