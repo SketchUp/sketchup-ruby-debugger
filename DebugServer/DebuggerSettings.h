@@ -13,8 +13,16 @@
 namespace SketchUp {
 namespace RubyDebugger {
 
+struct CaseInsensitiveStringSort : public std::binary_function<std::string, std::string, bool>
+{
+    bool operator()(const std::string &lhs, const std::string &rhs) const
+    {
+        return _stricmp(lhs.c_str(), rhs.c_str()) < 0;
+    }
+};
+
 // map<line, map<file, BreakPoint>>
-typedef std::map<size_t, std::map<std::string, BreakPoint>> BreakPointsMap;
+typedef std::map<size_t, std::map<std::string, BreakPoint, CaseInsensitiveStringSort>> BreakPointsMap;
 
 namespace Settings {
 
