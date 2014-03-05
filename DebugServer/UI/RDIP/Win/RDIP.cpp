@@ -182,6 +182,16 @@ void RDIP::Connection::handleCommand(const boost::system::error_code& err)
     }
 }
 
+static std::string encodeXml(const std::string& str)
+{
+    std::string encoded = boost::replace_all_copy(str, "&", "&amp;");
+    boost::replace_all(encoded, "\"", "&quot;");
+    boost::replace_all(encoded, "<", "&lt;");
+    boost::replace_all(encoded, ">", "&gt;");
+    boost::replace_all(encoded, "'", "&apos;");
+    return encoded;
+}
+
 void RDIP::Connection::evaluateCommand(const std::string& cmd)
 {
     static const boost::regex reg_brk("^\\s*b(?:reak)?\\s+(?:(.+):)?([^.:]+)$");
@@ -194,7 +204,7 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd)
     static const boost::regex reg_step("^\\s*s(?:tep)?\\s?");
     static const boost::regex reg_next("^\\s*n(?:ext)?$");
     static const boost::regex reg_finish("^\\s*finish?$");
-    static const boost::regex reg_var_inspect("v inspect\\s+");
+    static const boost::regex reg_var_inspect("v i(?:nspect)?\\s+");
     static const boost::regex reg_thr_lst("^\\s*th(?:read)? l(?:ist)?$");
     static const boost::regex reg_eval("^\\s*p\\s+");
     static const boost::regex reg_var_local("^\\s*v(?:ar)? l(?:ocal)?$");
@@ -255,17 +265,25 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd)
             {
               splitFrameInfo.push_back("0");
             }
+            std::string frameNo = splitFrameInfo[0];
+            std::string file = encodeXml(splitFrameInfo[1]);
+            std::string line = encodeXml(splitFrameInfo[2]);
+            // TODO(bugra): Another hack! the top frame sometimes has a weird
+            // name with "call" in it. Skip those to prevent IDE confusion.
+            if (line.find("call") != std::string::npos)
+              continue;
+
             std::string msg;
             if(activeFrameIdx != i)
             {
                 boost::format fmt("<frame no=\"%1%\" file=\"%2%\" line=\"%3%\"/>");
-                fmt % i % (splitFrameInfo[0] + ":" + splitFrameInfo[1]) % splitFrameInfo[2];
+                fmt % i % (frameNo + ":" + file) % line;
                 msg = fmt.str();
             }
             else
             {
                 boost::format fmt("<frame no=\"%1%\" file=\"%2%\" line=\"%3%\" current=\"yes\"/>");
-                fmt % i % (splitFrameInfo[0] + ":" + splitFrameInfo[1]) % splitFrameInfo[2];
+                fmt % i % (frameNo + ":" + file) % line;
                 msg = fmt.str();
             }
 
@@ -395,17 +413,19 @@ void RDIP::Connection::getVariables(bool local)
 void RDIP::Connection::sendVariables(std::string kind)
 {
     OutputDebugStringA("sending variables\n");
-    write(mSocket, boost::asio::buffer("<variables>\n"));
+    std::string send_str = "<variables>\n";
     for(const auto var : mVariablesToSend)
     {
         boost::format fmt("<variable name=\"%s\" kind=\"%s\" value=\"%s\" type=\"%s\" hasChildren=\"%s\" objectId=\"%x\"/>\n");
-        fmt % var.name % kind % var.value % var.type %
+        std::string value = encodeXml(var.value);
+        std::string name = encodeXml(var.name);
+        fmt % name % kind % value % var.type %
              (var.has_children ? "true" : "false") % var.object_id;
-        std::string str = fmt.str();
-        write(mSocket, boost::asio::buffer(str));
-        OutputDebugStringA(fmt.str().c_str());
+        send_str += fmt.str();
     }
-    write(mSocket, boost::asio::buffer("</variables>\n"));
+    send_str += "</variables>\n";
+    OutputDebugStringA(send_str.c_str());
+    write(mSocket, boost::asio::buffer(send_str));
     mVariablesToSend.clear();
 }
 
