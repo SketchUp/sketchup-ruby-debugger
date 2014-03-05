@@ -28,7 +28,8 @@ public:
                boost::condition_variable& serverWaitCond,
                boost::mutex& serverWaitMutex,
                bool& serverCanContinue,
-               boost::function<void(RDIP::Connection&)>& serverResponse);
+               boost::function<void(void)>& serverResponse,
+               boost::function<void(void)>& processServerResponse);
 
     void wait();
     void stopAtBreakpoint(BreakPoint bp);
@@ -38,10 +39,9 @@ private:
     void start(const boost::system::error_code& err);
     void handleCommand(const boost::system::error_code& err);
     void evaluateCommand(const std::string& cmd);
-    void writeVariables(bool local);
-    void writeLocalVariables();
-    void writeGlobalVariables();
-    void writeInspectedVariable();
+    void getVariables(bool local);
+    void evalExpression();
+    void sendVariables(std::string kind);
 
 private:
     boost::asio::ip::tcp::socket mSocket;
@@ -52,9 +52,10 @@ private:
     boost::condition_variable &mServerWaitCond;
     boost::mutex &mServerWaitMutex;
     bool &mServerCanContinue;
-    boost::function<void(RDIP::Connection&)>& mServerResponse;
+    boost::function<void(void)>& mServerResponse;
+    boost::function<void(void)>& mProcessServerResponse;
     std::string mExpressionToEval;
-
+    IDebugServer::VariablesVector mVariablesToSend;
 };
 
 RDIP::RDIP()
@@ -93,7 +94,9 @@ void RDIP::WaitForContinue() {
     {
         if (mServerResponse)
         {
-            mServerResponse(*mConnection);
+            mServerResponse();
+            if (mProcessServerResponse)
+                mService.post(mProcessServerResponse);
             mServerResponse.clear();
         }
         mServerWaitCond.wait(lock);
@@ -114,7 +117,8 @@ void RDIP::Break(const std::string& file, size_t line) {
 void RDIP::RunService(int port) {
     mSignalSet.async_wait(std::bind(&RDIP::HandleFatalFailure, this, std::placeholders::_1, std::placeholders::_2));
     mConnection = boost::make_shared<Connection>(mService, port, server_,
-        mServerWaitCond, mServerWaitMutex, mServerCanContinue, mServerResponse);
+        mServerWaitCond, mServerWaitMutex, mServerCanContinue, mServerResponse,
+        mProcessServerResponse);
     mConnection->wait();
     mService.run();
 }
@@ -130,7 +134,8 @@ RDIP::Connection::Connection(boost::asio::io_service& service, int port,
                              boost::condition_variable& serverWaitCond,
                              boost::mutex& serverWaitMutex,
                              bool& serverCanContinue,
-                             boost::function<void(RDIP::Connection&)>& serverResponse)
+                             boost::function<void(void)>& serverResponse,
+                             boost::function<void(void)>& processServerResponse)
     : mSocket(service)
     , mAcceptor(service, tcp::endpoint(tcp::v4(), port))
     , mServer(server)
@@ -138,6 +143,7 @@ RDIP::Connection::Connection(boost::asio::io_service& service, int port,
     , mServerWaitMutex(serverWaitMutex)
     , mServerCanContinue(serverCanContinue)
     , mServerResponse(serverResponse)
+    , mProcessServerResponse(processServerResponse)
 {}
 
 void RDIP::Connection::wait()
@@ -272,7 +278,8 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd)
     {
         write(mSocket, boost::asio::buffer("<threads>\n"));
         std::ostringstream reply;
-        reply << "<thread id=\"1\" status=\"sleep\" pid=\"" << GetCurrentProcessId() << "\"/>\n";
+        //reply << "<thread id=\"1\" status=\"run\" pid=\"" << GetCurrentProcessId() << "\"/>\n";
+        reply << "<thread id=\"1\" status=\"run\"/>\n";
         write(mSocket, boost::asio::buffer(reply.str()));
         write(mSocket, boost::asio::buffer("</threads>\n"));
     }
@@ -308,7 +315,8 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd)
     else if(regex_search(cmd, what, reg_var_inspect))
     {
         mExpressionToEval = what.suffix();
-        mServerResponse = &RDIP::Connection::writeInspectedVariable;
+        mServerResponse = boost::bind(&RDIP::Connection::evalExpression, this);
+        mProcessServerResponse = boost::bind(&RDIP::Connection::sendVariables, this, "watch");
         mServerWaitCond.notify_all();
     }
     else if(regex_search(cmd, what, reg_eval))
@@ -320,14 +328,16 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd)
     {
         // Local variables must be retrieved in the server thread. Wake it up
         // and have it call us.
-        mServerResponse = &RDIP::Connection::writeLocalVariables;
+        mServerResponse = boost::bind(&RDIP::Connection::getVariables, this, true);
+        mProcessServerResponse = boost::bind(&RDIP::Connection::sendVariables, this, "local");
         mServerWaitCond.notify_all();
     }
     else if(regex_match(cmd, what, reg_var_global))
     {
         // Global variables must be retrieved in the server thread. Wake it up
         // and have it call us.
-        mServerResponse = &RDIP::Connection::writeGlobalVariables;
+        mServerResponse = boost::bind(&RDIP::Connection::getVariables, this, false);
+        mProcessServerResponse = boost::bind(&RDIP::Connection::sendVariables, this, "global");
         mServerWaitCond.notify_all();
     }
     else if(regex_match(cmd, what, reg_var_instance))
@@ -376,43 +386,39 @@ void RDIP::Connection::suspendAt(const std::string& file, size_t line)
     write(mSocket, boost::asio::buffer(str));
 }
 
-void RDIP::Connection::writeVariables(bool local)
+void RDIP::Connection::getVariables(bool local)
 {
-    auto variables = local ? mServer->GetLocalVariables() :
-                             mServer->GetGlobalVariables();
-    std::string kind = local ? "local" : "global";
+    mVariablesToSend = local ? mServer->GetLocalVariables() :
+                               mServer->GetGlobalVariables();
+}
+
+void RDIP::Connection::sendVariables(std::string kind)
+{
+    OutputDebugStringA("sending variables\n");
     write(mSocket, boost::asio::buffer("<variables>\n"));
-    for(const auto var : variables)
+    for(const auto var : mVariablesToSend)
     {
-        boost::format fmt("<variable name=\"%s\" kind=\"%s\" value=\"%s\" type=\"%s\" hasChildren=\"%s\" objectId=\"%x\"/>");
+        boost::format fmt("<variable name=\"%s\" kind=\"%s\" value=\"%s\" type=\"%s\" hasChildren=\"%s\" objectId=\"%x\"/>\n");
         fmt % var.name % kind % var.value % var.type %
              (var.has_children ? "true" : "false") % var.object_id;
-        std::string ss = fmt.str();
-        write(mSocket, boost::asio::buffer(fmt.str()));
+        std::string str = fmt.str();
+        write(mSocket, boost::asio::buffer(str));
+        OutputDebugStringA(fmt.str().c_str());
     }
     write(mSocket, boost::asio::buffer("</variables>\n"));
+    mVariablesToSend.clear();
 }
 
-void RDIP::Connection::writeLocalVariables()
+void RDIP::Connection::evalExpression()
 {
-    writeVariables(true);
-}
-
-void RDIP::Connection::writeGlobalVariables()
-{
-    writeVariables(false);
-}
-
-void RDIP::Connection::writeInspectedVariable()
-{
+    mVariablesToSend.clear();
     if (!mExpressionToEval.empty())
     {
-        std::string eval_res = mServer->EvaluateExpression(mExpressionToEval);
-        // Ummm.. How do we respond?
-//         boost::format fmt("<variable name=\"%s\" kind=\"local\" value=\"%s\" type=\"\" hasChildren=\"false\" objectId=\"0\" </variables>\n>");
-//         fmt % mExpressionToEval % eval_res;
-//         write(mSocket, boost::asio::buffer(fmt.str()));
-//         mExpressionToEval.clear();
+        Variable var;
+        var.name = mExpressionToEval;
+        var.object_id = 0;
+        var.value = mServer->EvaluateExpression(mExpressionToEval);
+        mVariablesToSend.push_back(var);
     }
 }
 

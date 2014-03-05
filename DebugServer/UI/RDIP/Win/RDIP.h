@@ -48,7 +48,8 @@ private:
     bool mServerCanContinue;
 
     boost::shared_ptr<Connection> mConnection;
-    boost::function<void(Connection&)> mServerResponse;
+    boost::function<void(void)> mServerResponse;
+    boost::function<void(void)> mProcessServerResponse;
 };
 
 } // end namespace RubyDebugger
