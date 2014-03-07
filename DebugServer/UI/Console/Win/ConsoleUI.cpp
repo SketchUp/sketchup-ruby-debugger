@@ -303,9 +303,9 @@ void ConsoleUI::WaitForContinue() {
     // Check if server response is needed
     if (need_server_response_) {
       if (need_what_from_server_ == NEED_EVAL) {
-        std::string eval_res = server_->EvaluateExpression(expression_to_evaluate_);
+        Variable eval_res = server_->EvaluateExpression(expression_to_evaluate_);
         boost::unique_lock<boost::mutex> lock(console_output_mutex_);
-        WriteText(eval_res.c_str());
+        WriteText(eval_res.value.c_str());
       } else if (need_what_from_server_ == NEED_GLOBAL_VARS) {
         IDebugServer::VariablesVector var_vec = server_->GetGlobalVariables();
         WriteVariables(var_vec);

@@ -1,6 +1,7 @@
 // SketchUp Ruby API Debugger. Copyright 2014 Trimble Navigation Ltd.
 // Authors:
 // - Orhun Birsoy
+// - Bugra Barin
 //
 #include "stdafx.h"
 #include "./RDIP.h"
@@ -40,6 +41,7 @@ private:
     void handleCommand(const boost::system::error_code& err);
     void evaluateCommand(const std::string& cmd);
     void getVariables(bool local);
+    void getInstanceVariables(size_t object_id);
     void evalExpression();
     void sendVariables(std::string kind);
 
@@ -55,6 +57,7 @@ private:
     boost::function<void(void)>& mServerResponse;
     boost::function<void(void)>& mProcessServerResponse;
     std::string mExpressionToEval;
+    boost::mutex mVariablesToSendMutex;
     IDebugServer::VariablesVector mVariablesToSend;
 };
 
@@ -204,12 +207,12 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd)
     static const boost::regex reg_step("^\\s*s(?:tep)?\\s?");
     static const boost::regex reg_next("^\\s*n(?:ext)?$");
     static const boost::regex reg_finish("^\\s*finish?$");
-    static const boost::regex reg_var_inspect("v i(?:nspect)?\\s+");
+    static const boost::regex reg_var_inspect("v inspect\\s+");
     static const boost::regex reg_thr_lst("^\\s*th(?:read)? l(?:ist)?$");
     static const boost::regex reg_eval("^\\s*p\\s+");
     static const boost::regex reg_var_local("^\\s*v(?:ar)? l(?:ocal)?$");
     static const boost::regex reg_var_global("^\\s*v(?:ar)? g(?:lobal)?$");
-    static const boost::regex reg_var_instance("^\\s*v(?:ar)? instance (.+)*$");
+    static const boost::regex reg_var_instance("^\\s*v(?:ar)? i(?:nstance)? (.+)*$");
 
     boost::smatch what;
     if(regex_match(cmd, what, reg_brk))
@@ -252,7 +255,7 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd)
     else if(regex_match(cmd, what, reg_where))
     {
         auto frames = mServer->GetStackFrames();
-        write(mSocket, boost::asio::buffer("<frames>\n"));
+        std::string str_send = "<frames>\n";
 
         size_t activeFrameIdx = mServer->GetActiveFrameIndex();
         for(size_t i = 0; i < frames.size(); ++i)
@@ -260,46 +263,48 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd)
             std::vector<std::string> splitFrameInfo;
             boost::split(splitFrameInfo, frames[i].name, boost::is_any_of(":"));
 
-            // TODO(bugra): Fix this hack
             if (splitFrameInfo.size() < 3)
             {
-              splitFrameInfo.push_back("0");
+              // Most likely this is the <main> stack frame, e.g. when called
+              // from the ruby console.
+              continue;
             }
             std::string frameNo = splitFrameInfo[0];
             std::string file = encodeXml(splitFrameInfo[1]);
             std::string line = encodeXml(splitFrameInfo[2]);
             // TODO(bugra): Another hack! the top frame sometimes has a weird
-            // name with "call" in it. Skip those to prevent IDE confusion.
-            if (line.find("call") != std::string::npos)
+            // name with "call" or "eval" in it. Skip those to prevent IDE confusion.
+            if (line.find("call") != std::string::npos ||
+                line.find("eval") != std::string::npos)
               continue;
 
-            std::string msg;
             if(activeFrameIdx != i)
             {
                 boost::format fmt("<frame no=\"%1%\" file=\"%2%\" line=\"%3%\"/>");
                 fmt % i % (frameNo + ":" + file) % line;
-                msg = fmt.str();
+                str_send += fmt.str();
             }
             else
             {
                 boost::format fmt("<frame no=\"%1%\" file=\"%2%\" line=\"%3%\" current=\"yes\"/>");
                 fmt % i % (frameNo + ":" + file) % line;
-                msg = fmt.str();
+                str_send += fmt.str();
             }
 
-            ::OutputDebugStringA(msg.c_str());
-            write(mSocket, boost::asio::buffer(msg));
         }
-        write(mSocket, boost::asio::buffer("</frames>\n"));
+        str_send += "</frames>\n";
+        ::OutputDebugStringA(str_send.c_str());
+        write(mSocket, boost::asio::buffer(str_send));
     }
     else if(regex_match(cmd, what, reg_thr_lst))
     {
-        write(mSocket, boost::asio::buffer("<threads>\n"));
+        std::string str_send = "<threads>\n";
         std::ostringstream reply;
         //reply << "<thread id=\"1\" status=\"run\" pid=\"" << GetCurrentProcessId() << "\"/>\n";
         reply << "<thread id=\"1\" status=\"run\"/>\n";
-        write(mSocket, boost::asio::buffer(reply.str()));
-        write(mSocket, boost::asio::buffer("</threads>\n"));
+        reply << "</threads>\n";
+        str_send += reply.str();
+        write(mSocket, boost::asio::buffer(str_send));
     }
     else if(regex_match(cmd, what, reg_frame))
     { 
@@ -360,19 +365,12 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd)
     }
     else if(regex_match(cmd, what, reg_var_instance))
     {
-        std::string varName = what[1];
-        OutputDebugStringA(varName.c_str());
-        OutputDebugStringA("\n");
-        //auto variables = mServer->GetLocalVariables();
-
-        write(mSocket, boost::asio::buffer("<variables>\n"));
-        //for(const auto var : variables)
-        //{
-        //    boost::format fmt("<variable name=\"%1%\" kind=\"local\" value=\"%2%\" type=\"Unknown\" hasChildren=\"false\" objectId=\"0xdead0000\"/>");
-        //    fmt % var.first % var.second;
-        //    write(mSocket, boost::asio::buffer(fmt.str()));
-        //}
-        write(mSocket, boost::asio::buffer("</variables>\n"));
+        size_t objectID = 0;
+        std::string str_what = what[1];
+        sscanf(str_what.c_str(), "%x", &objectID);
+        mServerResponse = boost::bind(&RDIP::Connection::getInstanceVariables, this, objectID);
+        mProcessServerResponse = boost::bind(&RDIP::Connection::sendVariables, this, "instance");
+        mServerWaitCond.notify_all();
     }
     else
     {
@@ -388,7 +386,7 @@ void RDIP::Connection::stopAtBreakpoint(BreakPoint bp)
     ss << "<breakpoint file=\"" << bp.file << "\" line=\"" << bp.line << "\" threadId=\"1\"/>\n";
     OutputDebugStringA("sending stopAtBreakpoint => ");
 
-    auto str = ss.str(); //boost::replace_all_copy(ss.str(), "/", "\\");
+    auto str = ss.str();
     OutputDebugStringA(str.c_str());
     write(mSocket, boost::asio::buffer(str));
 }
@@ -406,12 +404,20 @@ void RDIP::Connection::suspendAt(const std::string& file, size_t line)
 
 void RDIP::Connection::getVariables(bool local)
 {
+    boost::mutex::scoped_lock lock(mVariablesToSendMutex);
     mVariablesToSend = local ? mServer->GetLocalVariables() :
                                mServer->GetGlobalVariables();
 }
 
+void RDIP::Connection::getInstanceVariables(size_t object_id)
+{
+    boost::mutex::scoped_lock lock(mVariablesToSendMutex);
+    mVariablesToSend = mServer->GetInstanceVariables(object_id);
+}
+
 void RDIP::Connection::sendVariables(std::string kind)
 {
+    boost::mutex::scoped_lock lock(mVariablesToSendMutex);
     OutputDebugStringA("sending variables\n");
     std::string send_str = "<variables>\n";
     for(const auto var : mVariablesToSend)
@@ -431,14 +437,13 @@ void RDIP::Connection::sendVariables(std::string kind)
 
 void RDIP::Connection::evalExpression()
 {
+    boost::mutex::scoped_lock lock(mVariablesToSendMutex);
     mVariablesToSend.clear();
     if (!mExpressionToEval.empty())
     {
-        Variable var;
-        var.name = mExpressionToEval;
-        var.object_id = 0;
-        var.value = mServer->EvaluateExpression(mExpressionToEval);
+        Variable var = mServer->EvaluateExpression(mExpressionToEval);
         mVariablesToSend.push_back(var);
+        mExpressionToEval.clear();
     }
 }
 

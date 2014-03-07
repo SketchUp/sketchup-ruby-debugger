@@ -143,9 +143,14 @@ VALUE EvaluateRubyExpressionAsValue(const std::string& expr, VALUE binding) {
   return val;
 }
 
-std::string EvaluateRubyExpression(const std::string& expr, VALUE binding) {
-  VALUE val = EvaluateRubyExpressionAsValue(expr, binding);
-  return GetRubyObjectAsString(val);
+Variable EvaluateRubyExpression(const std::string& expr, VALUE binding) {
+  Variable var;
+  var.name = expr;
+  var.object_id = EvaluateRubyExpressionAsValue(expr, binding);
+  var.has_children = rb_ivar_count(var.object_id) > 0;
+  var.type = rb_obj_classname(var.object_id);
+  var.value = GetRubyObjectAsString(var.object_id);
+  return var;
 }
 
 VALUE DebugInspectorFunc(const rb_debug_inspector_t* di, void* data) {
@@ -155,10 +160,11 @@ VALUE DebugInspectorFunc(const rb_debug_inspector_t* di, void* data) {
   for (int i=0; i < bt_count; ++i) {
     VALUE bt_val = RARRAY_PTR(bt)[i];
     std::string frame_str = GetRubyObjectAsString(bt_val);
-    VALUE binding_val = rb_debug_inspector_frame_binding_get(di, i);
     StackFrame frame;
     frame.name = frame_str;
-    frame.binding = binding_val;
+    frame.binding = rb_debug_inspector_frame_binding_get(di, i);
+    frame.self = rb_debug_inspector_frame_self_get(di, i);
+    frame.klass = rb_debug_inspector_frame_class_get(di, i);
     frames->push_back(frame);
   }
   return Qnil;
@@ -528,14 +534,14 @@ bool Server::IsStopped() const {
   return impl_->is_stopped_;
 }
 
-std::string Server::EvaluateExpression(const std::string& expr) {
- std::string eval_res;
+Variable Server::EvaluateExpression(const std::string& expr) {
+ Variable eval_res;
  if (!impl_->frames_.empty() &&
      impl_->active_frame_index_ < impl_->frames_.size()) {
    const auto& cur_frame = impl_->frames_[impl_->active_frame_index_];
    eval_res = EvaluateRubyExpression(expr, cur_frame.binding);
  } else {
-   eval_res = "Expression cannot be evaluated";
+   eval_res.value = "Expression cannot be evaluated";
  }
  return eval_res;
 }
@@ -632,13 +638,15 @@ IDebugServer::VariablesVector Server::GetVariables(const char* type,
     for (int i = 0; i < count; ++i) {
       VALUE var_val = RARRAY_PTR(arr_val)[i];
       Variable var;
-      var.object_id = 0;
-      var.has_children = false;
+      //var.object_id = var_val;
       var.name = GetRubyObjectAsString(var_val);
       if (!var.name.empty()) {
         VALUE eval_val =
             EvaluateRubyExpressionAsValue(var.name, binding);
+        var.object_id = eval_val;
         var.value = GetRubyObjectAsString(eval_val);
+        var.type = rb_obj_classname(eval_val);
+        var.has_children = rb_ivar_count(eval_val) > 0;
         vec.push_back(var);
       }
     }
@@ -652,6 +660,11 @@ IDebugServer::VariablesVector Server::GetGlobalVariables() const {
 
 IDebugServer::VariablesVector Server::GetLocalVariables() const {
   return GetVariables("local_variables", false);
+}
+
+IDebugServer::VariablesVector Server::GetInstanceVariables(size_t object_id) const {
+  VariablesVector vec;
+  return vec;
 }
 
 } // end namespace RubyDebugger

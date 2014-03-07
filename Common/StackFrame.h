@@ -14,6 +14,8 @@ namespace RubyDebugger {
 struct StackFrame {
   std::string name;
   VALUE binding;
+  VALUE self;
+  VALUE klass;
 };
 
 } // end namespace RubyDebugger

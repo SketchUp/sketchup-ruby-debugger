@@ -29,7 +29,7 @@ public:
 
   virtual bool IsStopped() const;
 
-  virtual std::string EvaluateExpression(const std::string& expr);
+  virtual Variable EvaluateExpression(const std::string& expr);
 
   virtual std::vector<StackFrame> GetStackFrames() const;
 
@@ -53,6 +53,8 @@ public:
   virtual VariablesVector GetGlobalVariables() const;
 
   virtual VariablesVector GetLocalVariables() const;
+
+  virtual VariablesVector GetInstanceVariables(size_t object_id) const;
 
   class Impl; // Forward
 private:

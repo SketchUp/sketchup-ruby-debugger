@@ -16,6 +16,8 @@ struct StackFrame;
 
 // Information about a local or global variable
 struct Variable {
+  Variable() : has_children(false), object_id(0) {}
+
   std::string name;
   std::string type;
   std::string value;
@@ -41,7 +43,7 @@ public:
   virtual bool IsStopped() const = 0;
 
   // Evaluates the given Ruby expression and returns the result as a string.
-  virtual std::string EvaluateExpression(const std::string& expr) = 0;
+  virtual Variable EvaluateExpression(const std::string& expr) = 0;
 
   // Returns current stack frames. Execution must have stopped.
   virtual std::vector<StackFrame> GetStackFrames() const = 0;
@@ -79,6 +81,9 @@ public:
 
   // Returns a list of local variables. Execution must have stopped.
   virtual VariablesVector GetLocalVariables() const = 0;
+
+  // Returns the instance variables of a given object
+  virtual VariablesVector GetInstanceVariables(size_t object_id) const = 0;
 };
 
 } // end namespace RubyDebugger
