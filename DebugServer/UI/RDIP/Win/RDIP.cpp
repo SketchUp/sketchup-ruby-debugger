@@ -74,12 +74,8 @@ RDIP::~RDIP()
 
 void RDIP::Initialize(IDebugServer* server, const std::string& str_debugger) {
     server_ = server;
-    auto breakpoints = server_->GetBreakPoints();
-    for(auto bp : breakpoints)
-    {
-        server_->RemoveBreakPoint(bp.index);
-    }
-
+  
+    // Parse the port number if given.
     int port = 1234;
     const boost::regex reg_port("port=(\\d+)");
     boost::smatch match;
@@ -87,6 +83,7 @@ void RDIP::Initialize(IDebugServer* server, const std::string& str_debugger) {
       port = boost::lexical_cast<int>(match[1]);
     }
 
+    // Start the i/o service thread.
     mServiceThread = boost::thread(boost::bind(&RDIP::RunService, this, port));
 }
 
@@ -104,7 +101,7 @@ void RDIP::WaitForContinue() {
         }
         mServerWaitCond.wait(lock);
     }
-    ::OutputDebugStringA("Let sketchup Start\n");
+    ::OutputDebugStringA("Let SketchUp start\n");
 }
 
 void RDIP::Break(BreakPoint bp) {
@@ -195,6 +192,11 @@ static std::string encodeXml(const std::string& str)
     return encoded;
 }
 
+static bool isValidFileName(const std::string& file)
+{
+    return file.find("eval&apos;") == std::string::npos && file != "eval";
+}
+
 void RDIP::Connection::evaluateCommand(const std::string& cmd)
 {
     static const boost::regex reg_brk("^\\s*b(?:reak)?\\s+(?:(.+):)?([^.:]+)$");
@@ -209,7 +211,6 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd)
     static const boost::regex reg_finish("^\\s*finish?$");
     static const boost::regex reg_var_inspect("v inspect\\s+");
     static const boost::regex reg_thr_lst("^\\s*th(?:read)? l(?:ist)?$");
-    static const boost::regex reg_eval("^\\s*p\\s+");
     static const boost::regex reg_var_local("^\\s*v(?:ar)? l(?:ocal)?$");
     static const boost::regex reg_var_global("^\\s*v(?:ar)? g(?:lobal)?$");
     static const boost::regex reg_var_instance("^\\s*v(?:ar)? i(?:nstance)? (.+)*$");
@@ -222,25 +223,39 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd)
             BreakPoint bp;
             bp.file = what[1];
             boost::replace_all(bp.file, "\\", "/");
-            try 
+            std::string s2 = what[2];
+            bp.line = std::atoi(s2.c_str());
+            bp.enabled = true;
+            if(mServer->AddBreakPoint(bp, true)) 
             {
-                std::string s2 = what[2];
-                bp.line = std::atoi(s2.c_str());
-                bp.enabled = true;
-                if(mServer->AddBreakPoint(bp, true)) 
-                {
-                    std::ostringstream reply;
-                    reply << "<breakpointAdded no=\"" << bp.index << "\" location=\"" << bp.file << ":" << bp.line << "\"/>\n";
-                    write(mSocket, boost::asio::buffer(reply.str()));
-                    ::OutputDebugStringA(reply.str().c_str());
-                    ::OutputDebugStringA("    => Breakpoint added\n");
-                }
-                else 
-                {
-                    ::OutputDebugStringA("Adding breakpoint failed\n.");
-                }
+                std::ostringstream reply;
+                reply << "<breakpointAdded no=\"" << bp.index << "\" location=\"" << bp.file << ":" << bp.line << "\"/>\n";
+                write(mSocket, boost::asio::buffer(reply.str()));
+                ::OutputDebugStringA(reply.str().c_str());
+                ::OutputDebugStringA("    => Breakpoint added\n");
             }
-            catch(boost::bad_lexical_cast&) {
+            else 
+            {
+                ::OutputDebugStringA("Adding breakpoint failed\n.");
+            }
+        }
+    }
+    else if (regex_match(cmd, what, reg_brk_del))
+    {
+        if (what.size() == 2)
+        {
+            size_t bp_index = boost::lexical_cast<size_t>(what[1]);
+            if (mServer->RemoveBreakPoint(bp_index))
+            {
+                std::ostringstream reply;
+                reply << "<breakpointDeleted no=\"" << bp_index << "\" />\n";
+                write(mSocket, boost::asio::buffer(reply.str()));
+                ::OutputDebugStringA(reply.str().c_str());
+                ::OutputDebugStringA("    => Breakpoint deleted\n");
+            }
+            else
+            {
+                OutputDebugStringA("Breakpoint could not be deleted\n");
             }
         }
     }
@@ -272,10 +287,11 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd)
             std::string frameNo = splitFrameInfo[0];
             std::string file = encodeXml(splitFrameInfo[1]);
             std::string line = encodeXml(splitFrameInfo[2]);
-            // TODO(bugra): Another hack! the top frame sometimes has a weird
-            // name with "call" or "eval" in it. Skip those to prevent IDE confusion.
+            // The top frame sometimes has a weird name with "call" or "eval"
+            // in it. Skip those to prevent IDE confusion.
             if (line.find("call") != std::string::npos ||
-                line.find("eval") != std::string::npos)
+                line.find("eval") != std::string::npos ||
+                !isValidFileName(file))
               continue;
 
             if(activeFrameIdx != i)
@@ -300,7 +316,6 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd)
     {
         std::string str_send = "<threads>\n";
         std::ostringstream reply;
-        //reply << "<thread id=\"1\" status=\"run\" pid=\"" << GetCurrentProcessId() << "\"/>\n";
         reply << "<thread id=\"1\" status=\"run\"/>\n";
         reply << "</threads>\n";
         str_send += reply.str();
@@ -341,11 +356,6 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd)
         mServerResponse = boost::bind(&RDIP::Connection::evalExpression, this);
         mProcessServerResponse = boost::bind(&RDIP::Connection::sendVariables, this, "watch");
         mServerWaitCond.notify_all();
-    }
-    else if(regex_search(cmd, what, reg_eval))
-    {
-        std::string expression_to_evaluate_ = what.suffix();
-        OutputDebugStringA("reg_eval\n");
     }
     else if(regex_match(cmd, what, reg_var_local))
     {
@@ -393,6 +403,15 @@ void RDIP::Connection::stopAtBreakpoint(BreakPoint bp)
 
 void RDIP::Connection::suspendAt(const std::string& file, size_t line)
 {
+    if (!isValidFileName(file)) {
+        // Stepped out into a top-level invalid frame. Must send continue
+        // otherwise we get a deadlock.
+        boost::mutex::scoped_lock lock(mServerWaitMutex);
+        mServerCanContinue = true;
+        mServerWaitCond.notify_all();
+        return;
+    }
+
     std::ostringstream ss;
     ss << "<suspended file=\"" << file << "\" line=\"" << line << "\" threadId=\"1\" frames=\"1\"/>\n";
     OutputDebugStringA("sending suspendAt => ");

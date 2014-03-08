@@ -27,6 +27,8 @@ public:
   virtual void Initialize(IDebugServer* server,
                           const std::string& str_debugger);
 
+  virtual bool IsIDE() { return true; }
+
   virtual void WaitForContinue();
 
   virtual void Break(BreakPoint bp);

@@ -22,6 +22,9 @@ public:
   virtual void Initialize(IDebugServer* server,
                           const std::string& str_debugger) = 0;
 
+  // Returns true if the UI is an IDE.
+  virtual bool IsIDE() = 0;
+
   // Blocks the calling thread until user issues a continuation command.
   virtual void WaitForContinue() = 0;
 

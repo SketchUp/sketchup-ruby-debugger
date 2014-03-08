@@ -183,8 +183,9 @@ namespace RubyDebugger {
 class Server::Impl {
 public:
   Impl()
-    : last_breakpoint_index(0),
-      script_lines_hash_(0),
+    : save_breakpoints_(false),
+      last_breakpoint_index(0),
+      script_lines_hash_(Qnil),
       is_stopped_(false),
       break_at_next_line_(false),
       break_at_call_depth_(-1),
@@ -215,11 +216,15 @@ public:
 
   bool ShouldBreak();
 
+  VALUE GetBinding(bool use_toplevel_binding);
+
   static std::vector<StackFrame> GetStackFrames();
 
   static void TraceFunc(VALUE tp_val, void* data);
 
   std::unique_ptr<IDebuggerUI> ui_;
+
+  bool save_breakpoints_;
 
   // Breakpoints with yet-unresolved file paths
   std::vector<BreakPoint> unresolved_breakpoints_;
@@ -278,12 +283,16 @@ const BreakPoint* Server::Impl::GetBreakPoint(const std::string& file,
 }
 
 void Server::Impl::SaveBreakPoints() const {
-  Settings::SaveBreakPoints(breakpoints_, unresolved_breakpoints_);
+  if (save_breakpoints_) {
+    Settings::SaveBreakPoints(breakpoints_, unresolved_breakpoints_);
+  }
 }
 
 void Server::Impl::LoadBreakPoints() {
-  Settings::LoadBreakPoints(breakpoints_, unresolved_breakpoints_,
-                            last_breakpoint_index);
+  if (save_breakpoints_) {
+    Settings::LoadBreakPoints(breakpoints_, unresolved_breakpoints_,
+                              last_breakpoint_index);
+  }
 }
 
 void Server::Impl::TraceFunc(VALUE tp_val, void* data) {
@@ -374,7 +383,9 @@ static int EachKeyValFunc(VALUE key, VALUE val, VALUE data) {
 }
 
 void Server::Impl::ReadScriptLinesHash() {
-  rb_hash_foreach(script_lines_hash_, (int(*)(...))EachKeyValFunc, (VALUE)this);
+  if (script_lines_hash_ != Qnil) {
+    rb_hash_foreach(script_lines_hash_, (int(*)(...))EachKeyValFunc, (VALUE)this);
+  }
 }
 
 bool Server::Impl::ResolveBreakPoint(BreakPoint& bp) {
@@ -427,6 +438,19 @@ std::vector<StackFrame> Server::Impl::GetStackFrames() {
   return frames;
 }
 
+VALUE Server::Impl::GetBinding(bool use_toplevel_binding) {
+  VALUE binding = 0;
+  if (use_toplevel_binding) {
+    binding = rb_const_get(rb_cObject, rb_intern("TOPLEVEL_BINDING"));
+  } else if (!frames_.empty() && active_frame_index_ < frames_.size()) {
+    const auto& cur_frame = frames_[active_frame_index_];
+    binding = cur_frame.binding;
+  } else {
+    assert(false);
+  }
+  return binding;
+}
+
 Server::Server()
   : impl_(new Impl) {
 }
@@ -443,14 +467,21 @@ void Server::Start(std::unique_ptr<IDebuggerUI> ui,
                    const std::string& str_debugger) {
   impl_->EnableTracePoint();
 
-  // Let Ruby collect source files and code into this hash
-  impl_->script_lines_hash_ = rb_hash_new();
-  rb_define_global_const("SCRIPT_LINES__", impl_->script_lines_hash_);
+  bool is_ide = ui->IsIDE();
+
+  if (!is_ide) {
+    // Let Ruby collect source files and code into this hash
+    impl_->script_lines_hash_ = rb_hash_new();
+    rb_define_global_const("SCRIPT_LINES__", impl_->script_lines_hash_);
+  } else {
+    impl_->script_lines_hash_ = Qnil;
+  }
 
   impl_->LoadBreakPoints();
   impl_->ui_ = std::move(ui);
   impl_->ui_->Initialize(this, str_debugger);
   impl_->is_stopped_ = true;
+  impl_->save_breakpoints_ = !is_ide;
   impl_->ui_->WaitForContinue();
   impl_->ClearBreakData();
 }
@@ -624,21 +655,13 @@ size_t Server::GetBreakLineNumber() const {
 IDebugServer::VariablesVector Server::GetVariables(const char* type,
     bool use_toplevel_binding) const {
   VariablesVector vec;
-  VALUE binding = 0;
-  if (use_toplevel_binding) {
-    binding = rb_const_get(rb_cObject, rb_intern("TOPLEVEL_BINDING"));
-  } else if (!impl_->frames_.empty() &&
-             impl_->active_frame_index_ < impl_->frames_.size()) {
-    const auto& cur_frame = impl_->frames_[impl_->active_frame_index_];
-    binding = cur_frame.binding;
-  }
+  VALUE binding = impl_->GetBinding(use_toplevel_binding);
   if (binding != 0) {
     VALUE arr_val = EvaluateRubyExpressionAsValue(type, binding);
     int count = RARRAY_LEN(arr_val);
     for (int i = 0; i < count; ++i) {
       VALUE var_val = RARRAY_PTR(arr_val)[i];
       Variable var;
-      //var.object_id = var_val;
       var.name = GetRubyObjectAsString(var_val);
       if (!var.name.empty()) {
         VALUE eval_val =
@@ -664,6 +687,24 @@ IDebugServer::VariablesVector Server::GetLocalVariables() const {
 
 IDebugServer::VariablesVector Server::GetInstanceVariables(size_t object_id) const {
   VariablesVector vec;
+  //VALUE active_binding = impl_->GetBinding(false);
+  VALUE var_array = rb_obj_instance_variables(object_id);
+  size_t num_vars = RARRAY_LEN(var_array);
+  for (size_t i = 0; i < num_vars; ++i) {
+    VALUE var_val = RARRAY_PTR(var_array)[i];
+    Variable var;
+    var.name = GetRubyObjectAsString(var_val);
+    if (!var.name.empty()) {
+      //VALUE eval_val = EvaluateRubyExpressionAsValue(var.name, active_binding);
+      VALUE instance_str_val = GetRubyInterface(var.name.c_str());
+      VALUE eval_val = rb_obj_instance_eval(1, &instance_str_val, object_id);
+      var.object_id = eval_val;
+      var.value = GetRubyObjectAsString(eval_val);
+      var.type = rb_obj_classname(eval_val);
+      var.has_children = rb_ivar_count(eval_val) > 0;
+      vec.push_back(var);
+    }
+  }
   return vec;
 }
 
