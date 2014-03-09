@@ -220,7 +220,11 @@ public:
 
   static std::vector<StackFrame> GetStackFrames();
 
-  static void TraceFunc(VALUE tp_val, void* data);
+  static void LineEvent(VALUE tp_val, void* data);
+
+  static void ReturnEvent(VALUE tp_val, void* data);
+
+  static void CallEvent(VALUE tp_val, void* data);
 
   std::unique_ptr<IDebuggerUI> ui_;
 
@@ -264,9 +268,21 @@ void Server::Impl::ClearBreakData() {
 }
 
 void Server::Impl::EnableTracePoint() {
-  VALUE tp = rb_tracepoint_new(Qnil, RUBY_EVENT_LINE | RUBY_EVENT_CALL |
-                               RUBY_EVENT_RETURN, &TraceFunc, this);
-  rb_tracepoint_enable(tp);
+  VALUE tp_line = rb_tracepoint_new(Qnil, RUBY_EVENT_LINE, &LineEvent, this);
+  rb_tracepoint_enable(tp_line);
+
+  VALUE tp_return = rb_tracepoint_new(Qnil, RUBY_EVENT_RETURN |
+      RUBY_EVENT_B_RETURN | /*RUBY_EVENT_C_RETURN |*/ RUBY_EVENT_END,
+      &ReturnEvent, this);
+  rb_tracepoint_enable(tp_return);
+
+  VALUE tp_call = rb_tracepoint_new(Qnil, RUBY_EVENT_CALL | RUBY_EVENT_B_CALL |
+      /*RUBY_EVENT_C_CALL |*/ RUBY_EVENT_CLASS, &CallEvent, this);
+  rb_tracepoint_enable(tp_call);
+  /*
+  tp_raise = rb_tracepoint_new(Qnil, RUBY_EVENT_RAISE, &RaiseEvent, this);
+  rb_tracepoint_enable(tp_raise);
+  */
 }
 
 const BreakPoint* Server::Impl::GetBreakPoint(const std::string& file,
@@ -295,53 +311,52 @@ void Server::Impl::LoadBreakPoints() {
   }
 }
 
-void Server::Impl::TraceFunc(VALUE tp_val, void* data) {
-  rb_trace_arg_t* trace_arg = rb_tracearg_from_tracepoint(tp_val);
-  Server::Impl* server = reinterpret_cast<Server::Impl*>(data);
-  server->ClearBreakData();
-  
-  VALUE event = rb_tracearg_event(trace_arg);
-  ID event_id = SYM2ID(event);
-  static const ID id_line = rb_intern("line");
-  static const ID id_class = rb_intern("class");
-  static const ID id_end = rb_intern("end");
-  static const ID id_call = rb_intern("call");
-  static const ID id_return = rb_intern("return");
-  static const ID id_c_call = rb_intern("c_call");
-  static const ID id_c_return = rb_intern("c_return");
-  static const ID id_raise = rb_intern("raise");
+#define EVENT_COMMON_CODE \
+  rb_trace_arg_t* trace_arg = rb_tracearg_from_tracepoint(tp_val);\
+  Server::Impl* server = reinterpret_cast<Server::Impl*>(data);\
+  server->ClearBreakData();\
+  std::string file_path = GetRubyString(rb_tracearg_path(trace_arg));\
+  int line = GetRubyInt(rb_tracearg_lineno(trace_arg));\
+  VALUE event_id = rb_tracearg_event(trace_arg);\
+  OutputDebugStringA(("\n*** Debugger event: " + GetRubyString(rb_sym_to_s(event_id)) + "\n").c_str())
 
-  std::string file_path = GetRubyString(rb_tracearg_path(trace_arg));
-  int line = GetRubyInt(rb_tracearg_lineno(trace_arg));
+void Server::Impl::LineEvent(VALUE tp_val, void* data) {
+  EVENT_COMMON_CODE;
 
-  if (event_id == id_line) {
-    if (server->ShouldBreak()) {
-      server->DoBreak(file_path, line);
-    } else {
-      // Try to resolve any unresolved breakpoints
-      if (!server->unresolved_breakpoints_.empty())
-        server->ResolveBreakPoints();
+  if (server->ShouldBreak()) {
+    server->DoBreak(file_path, line);
+  } else {
+    // Try to resolve any unresolved breakpoints
+    if (!server->unresolved_breakpoints_.empty())
+      server->ResolveBreakPoints();
 
-      auto bp = server->GetBreakPoint(file_path, line);
-      if (bp != nullptr) {
-        // Breakpoint hit
-        server->frames_ = GetStackFrames();
-        server->last_break_file_path_ = file_path;
-        server->last_break_line_ = line;
-        server->is_stopped_ = true;
-        server->ui_->Break(*bp); // Blocked here until ui says continue
-        server->ClearBreakData();
-      }
+    auto bp = server->GetBreakPoint(file_path, line);
+    if (bp != nullptr) {
+      // Breakpoint hit
+      server->frames_ = GetStackFrames();
+      server->last_break_file_path_ = file_path;
+      server->last_break_line_ = line;
+      server->is_stopped_ = true;
+      server->ui_->Break(*bp); // Blocked here until ui says continue
+      server->ClearBreakData();
     }
-  } else if (event_id == id_call) {
-    ++server->call_depth_;
-  } else if (event_id == id_return) {
-    if (server->ShouldBreak()) {
-      server->DoBreak(file_path, line);
-    }
-    assert(server->call_depth_ > 0);
-    --server->call_depth_;
   }
+}
+
+void Server::Impl::ReturnEvent(VALUE tp_val, void* data) {
+  EVENT_COMMON_CODE;
+  
+  if (server->ShouldBreak()) {
+    server->DoBreak(file_path, line);
+  }
+  assert(server->call_depth_ > 0);
+  --server->call_depth_;
+}
+
+void Server::Impl::CallEvent(VALUE tp_val, void* data) {
+  EVENT_COMMON_CODE;
+
+  ++server->call_depth_;
 }
 
 bool Server::Impl::ShouldBreak() {
