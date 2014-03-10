@@ -14,8 +14,9 @@
 #include <ruby/ruby/debug.h>
 #include <ruby/ruby/encoding.h>
 
-#include <boost/thread.hpp>
 #include <boost/atomic.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/thread.hpp>
 
 #include <string>
 #include <iostream>
@@ -188,7 +189,10 @@ public:
       script_lines_hash_(Qnil),
       is_stopped_(false),
       break_at_next_line_(false),
-      break_at_call_depth_(-1),
+      stepout_break_at_next_line_(false),
+      stepover_break_at_next_line_(false),
+      stepout_to_call_depth_(-1),
+      stepover_to_call_depth_(-1),
       active_frame_index_(0),
       last_break_line_(0),
       call_depth_(0)
@@ -208,13 +212,15 @@ public:
 
   void ClearBreakData();
 
+  void ClearShouldBreakData();
+
   void SaveBreakPoints() const;
 
   void LoadBreakPoints();
 
   void DoBreak(const std::string& file_path, size_t line);
 
-  bool ShouldBreak();
+  void DoBreak(const BreakPoint& bp);
 
   VALUE GetBinding(bool use_toplevel_binding);
 
@@ -247,7 +253,13 @@ public:
 
   boost::atomic<bool> break_at_next_line_;
 
-  boost::atomic<size_t> break_at_call_depth_;
+  boost::atomic<bool> stepout_break_at_next_line_;
+
+  boost::atomic<bool> stepover_break_at_next_line_;
+
+  boost::atomic<size_t> stepout_to_call_depth_;
+
+  boost::atomic<size_t> stepover_to_call_depth_;
   
   std::vector<StackFrame> frames_;
 
@@ -263,8 +275,8 @@ public:
 void Server::Impl::ClearBreakData() {
   frames_.clear();
   is_stopped_ = false;
-  last_break_file_path_.clear();
-  last_break_line_ = 0;
+  //last_break_file_path_.clear();
+  //last_break_line_ = 0;
 }
 
 void Server::Impl::EnableTracePoint() {
@@ -272,12 +284,12 @@ void Server::Impl::EnableTracePoint() {
   rb_tracepoint_enable(tp_line);
 
   VALUE tp_return = rb_tracepoint_new(Qnil, RUBY_EVENT_RETURN |
-      RUBY_EVENT_B_RETURN | /*RUBY_EVENT_C_RETURN |*/ RUBY_EVENT_END,
+      RUBY_EVENT_B_RETURN | RUBY_EVENT_C_RETURN | RUBY_EVENT_END,
       &ReturnEvent, this);
   rb_tracepoint_enable(tp_return);
 
   VALUE tp_call = rb_tracepoint_new(Qnil, RUBY_EVENT_CALL | RUBY_EVENT_B_CALL |
-      /*RUBY_EVENT_C_CALL |*/ RUBY_EVENT_CLASS, &CallEvent, this);
+      RUBY_EVENT_C_CALL | RUBY_EVENT_CLASS, &CallEvent, this);
   rb_tracepoint_enable(tp_call);
   /*
   tp_raise = rb_tracepoint_new(Qnil, RUBY_EVENT_RAISE, &RaiseEvent, this);
@@ -317,13 +329,25 @@ void Server::Impl::LoadBreakPoints() {
   server->ClearBreakData();\
   std::string file_path = GetRubyString(rb_tracearg_path(trace_arg));\
   int line = GetRubyInt(rb_tracearg_lineno(trace_arg));\
-  VALUE event_id = rb_tracearg_event(trace_arg);\
-  OutputDebugStringA(("\n*** Debugger event: " + GetRubyString(rb_sym_to_s(event_id)) + "\n").c_str())
+  //VALUE event_id = rb_tracearg_event(trace_arg);\
+  //OutputDebugStringA(("\n*** Debugger event: " +\
+      //GetRubyString(rb_sym_to_s(event_id)) + ", " + file_path.c_str() + ":" +\
+      //boost::lexical_cast<std::string>(line).c_str() + "\n").c_str())
 
-void Server::Impl::LineEvent(VALUE tp_val, void* data) {
-  EVENT_COMMON_CODE;
+static void ProcessLine(Server::Impl* server, const std::string& file_path,
+                        int line) {
+  if (server->call_depth_ == 0)
+    server->call_depth_ = 1;
 
-  if (server->ShouldBreak()) {
+  if (server->last_break_file_path_ == file_path &&
+      server->last_break_line_ == line)
+    return;
+
+  if (server->break_at_next_line_ ||
+      (server->stepover_break_at_next_line_ &&
+       server->stepover_to_call_depth_ >= server->call_depth_) ||
+      (server->stepout_break_at_next_line_)) {
+    server->ClearShouldBreakData();
     server->DoBreak(file_path, line);
   } else {
     // Try to resolve any unresolved breakpoints
@@ -333,46 +357,63 @@ void Server::Impl::LineEvent(VALUE tp_val, void* data) {
     auto bp = server->GetBreakPoint(file_path, line);
     if (bp != nullptr) {
       // Breakpoint hit
-      server->frames_ = GetStackFrames();
-      server->last_break_file_path_ = file_path;
-      server->last_break_line_ = line;
-      server->is_stopped_ = true;
-      server->ui_->Break(*bp); // Blocked here until ui says continue
-      server->ClearBreakData();
+      server->DoBreak(*bp);
     }
   }
 }
 
+void Server::Impl::LineEvent(VALUE tp_val, void* data) {
+  EVENT_COMMON_CODE;
+
+  ProcessLine(server, file_path, line);
+}
+
 void Server::Impl::ReturnEvent(VALUE tp_val, void* data) {
   EVENT_COMMON_CODE;
-  
-  if (server->ShouldBreak()) {
-    server->DoBreak(file_path, line);
+
+  ProcessLine(server, file_path, line);
+
+  if(server->call_depth_ > 0)
+    --server->call_depth_;
+
+  if (server->call_depth_ == server->stepout_to_call_depth_) {
+    server->ClearShouldBreakData();
+    server->stepout_break_at_next_line_ = true;
   }
-  assert(server->call_depth_ > 0);
-  --server->call_depth_;
 }
 
 void Server::Impl::CallEvent(VALUE tp_val, void* data) {
   EVENT_COMMON_CODE;
 
   ++server->call_depth_;
+  ProcessLine(server, file_path, line);
 }
 
-bool Server::Impl::ShouldBreak() {
-  return break_at_next_line_ ||
-         (break_at_call_depth_ != -1 && call_depth_ <= break_at_call_depth_);
-}
-
-// Performs necessary operations when a break point is hit.
-void Server::Impl::DoBreak(const std::string& file_path, size_t line) {
+void Server::Impl::ClearShouldBreakData() {
   break_at_next_line_ = false;
-  break_at_call_depth_ = -1;
+  stepout_break_at_next_line_ = false;
+  stepover_break_at_next_line_ = false;
+  stepout_to_call_depth_ = -1;
+  stepover_to_call_depth_ = -1;
+}
+
+// Performs necessary operations when a suspension point is hit.
+void Server::Impl::DoBreak(const std::string& file_path, size_t line) {
   frames_ = GetStackFrames();
   last_break_file_path_ = file_path;
   last_break_line_ = line;
   is_stopped_ = true;
   ui_->Break(file_path, line); // Blocked here until ui says continue
+  ClearBreakData();
+}
+
+// Performs necessary operations when a break point is hit.
+void Server::Impl::DoBreak(const BreakPoint& bp) {
+  frames_ = GetStackFrames();
+  last_break_file_path_ = bp.file;
+  last_break_line_ = bp.line;
+  is_stopped_ = true;
+  ui_->Break(bp); // Blocked here until ui says continue
   ClearBreakData();
 }
 
@@ -622,13 +663,16 @@ void Server::Step() {
 }
 
 void Server::StepOver() {
-  if (IsStopped())
-    impl_->break_at_call_depth_ = impl_->call_depth_;
+  if (IsStopped()) {
+    impl_->stepover_break_at_next_line_ = true;
+    impl_->stepover_to_call_depth_ = impl_->call_depth_;
+  }
 }
 
 void Server::StepOut() {
-  if (IsStopped())
-    impl_->break_at_call_depth_ = impl_->call_depth_ - 1;
+  if (IsStopped() && impl_->call_depth_ > 1) {
+    impl_->stepout_to_call_depth_ = impl_->call_depth_ - 1;
+  }
 }
 
 std::vector<std::pair<size_t, std::string>>
