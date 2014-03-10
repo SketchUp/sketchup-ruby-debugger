@@ -21,7 +21,7 @@ bool InitDebugger(const char* debugger) {
   std::string str_debugger(debugger);
   if (boost::iequals(str_debugger, "console"))
     ui.reset(new ConsoleUI);
-  else if(boost::starts_with(str_debugger, "rdip")) {
+  else if(boost::istarts_with(str_debugger, "ide")) {
       ui.reset(new RDIP);
   }
 
