@@ -18,8 +18,7 @@ namespace SketchUp {
 namespace RubyDebugger {
 // http://debug-commons.rubyforge.org/#ruby-debug-ide
 // ruby-debug-ide protocol implementation.
-class RDIP : public IDebuggerUI
-{
+class RDIP : public IDebuggerUI {
 public:
   RDIP();
   ~RDIP();
@@ -43,16 +42,16 @@ private:
     void HandleConnection(const boost::system::error_code& err);
 
 private:
-    boost::asio::io_service mService;
-    boost::asio::signal_set mSignalSet;
-    boost::thread mServiceThread;
-    boost::condition_variable mServerWaitCond;
-    boost::mutex mServerWaitMutex;
-    bool mServerCanContinue;
+    boost::asio::io_service io_service_;
+    boost::asio::signal_set signal_set_;
+    boost::thread service_thread_;
+    boost::condition_variable server_wait_cond_;
+    boost::mutex server_wait_mutex_;
+    bool server_can_continue_;
 
-    boost::shared_ptr<Connection> mConnection;
-    boost::function<void(void)> mServerResponse;
-    boost::function<void(void)> mProcessServerResponse;
+    boost::shared_ptr<Connection> connection_;
+    boost::function<void(void)> server_response_;
+    boost::function<void(void)> process_server_response_;
 };
 
 } // end namespace RubyDebugger
