@@ -66,6 +66,9 @@
     <ClInclude Include="UI\RDIP\Win\RDIP.h">
       <Filter>UI\RDIP</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -95,5 +98,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\postbuild.bat" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

@@ -99,6 +99,7 @@ call $(SolutionDir)postbuild.bat
     <ClInclude Include="DebuggerSettings.h" />
     <ClInclude Include="FindSubstringCaseInsensitive.h" />
     <ClInclude Include="IDebugServer.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Server.h" />
     <ClInclude Include="DebugServerExports.h" />
     <ClInclude Include="stdafx.h" />
@@ -130,6 +131,9 @@ call $(SolutionDir)postbuild.bat
   </ItemGroup>
   <ItemGroup>
     <None Include="..\postbuild.bat" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
