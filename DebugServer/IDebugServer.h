@@ -14,12 +14,23 @@ namespace RubyDebugger {
 struct BreakPoint;
 struct StackFrame;
 
+// Information about a local or global variable
+struct Variable {
+  Variable() : has_children(false), object_id(0) {}
+
+  std::string name;
+  std::string type;
+  std::string value;
+  bool has_children;
+  size_t object_id;
+};
+
 // Interface to the debugger server.
 class IDebugServer {
 public:
 
   // Adds the given breakpoint. Returns true on success.
-  virtual bool AddBreakPoint(BreakPoint& bp) = 0;
+  virtual bool AddBreakPoint(BreakPoint& bp, bool assume_resolved = false) = 0;
 
   // Removes the breakpoint at a given index. Returns true on success.
   virtual bool RemoveBreakPoint(size_t index) = 0;
@@ -32,7 +43,7 @@ public:
   virtual bool IsStopped() const = 0;
 
   // Evaluates the given Ruby expression and returns the result as a string.
-  virtual std::string EvaluateExpression(const std::string& expr) = 0;
+  virtual Variable EvaluateExpression(const std::string& expr) = 0;
 
   // Returns current stack frames. Execution must have stopped.
   virtual std::vector<StackFrame> GetStackFrames() const = 0;
@@ -42,6 +53,9 @@ public:
 
   // Returns the currently active stack frame index.
   virtual size_t GetActiveFrameIndex() const = 0;
+
+  // Returns the currently active stack frame index.
+  virtual void SetActiveFrameIndex(size_t index) const = 0;
 
   // Steps execution to the next line, stepping in methods.
   virtual void Step() = 0;
@@ -60,14 +74,16 @@ public:
   virtual size_t GetBreakLineNumber() const = 0;
 
   // Data structure to return Ruby variables.
-  // vector<variable name, variable value>
-  typedef std::vector<std::pair<std::string, std::string>> VariablesVector;
+  typedef std::vector<Variable> VariablesVector;
 
   // Returns a list of global variables
   virtual VariablesVector GetGlobalVariables() const = 0;
 
   // Returns a list of local variables. Execution must have stopped.
   virtual VariablesVector GetLocalVariables() const = 0;
+
+  // Returns the instance variables of a given object
+  virtual VariablesVector GetInstanceVariables(size_t object_id) const = 0;
 };
 
 } // end namespace RubyDebugger

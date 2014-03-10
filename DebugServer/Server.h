@@ -19,9 +19,9 @@ public:
 
   static Server& Instance();
 
-  void Start(std::unique_ptr<IDebuggerUI> ui);
+  void Start(std::unique_ptr<IDebuggerUI> ui, const std::string& str_debugger);
 
-  virtual bool AddBreakPoint(BreakPoint& bp);
+  virtual bool AddBreakPoint(BreakPoint& bp, bool assume_resolved);
 
   virtual bool RemoveBreakPoint(size_t index);
 
@@ -29,13 +29,15 @@ public:
 
   virtual bool IsStopped() const;
 
-  virtual std::string EvaluateExpression(const std::string& expr);
+  virtual Variable EvaluateExpression(const std::string& expr);
 
   virtual std::vector<StackFrame> GetStackFrames() const;
 
   virtual void ShiftActiveFrame(bool shift_up);
 
   virtual size_t GetActiveFrameIndex() const;
+
+  virtual void SetActiveFrameIndex(size_t index) const;
 
   virtual void Step();
 
@@ -51,6 +53,8 @@ public:
   virtual VariablesVector GetGlobalVariables() const;
 
   virtual VariablesVector GetLocalVariables() const;
+
+  virtual VariablesVector GetInstanceVariables(size_t object_id) const;
 
   class Impl; // Forward
 private:

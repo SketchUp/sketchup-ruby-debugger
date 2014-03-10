@@ -8,6 +8,7 @@
 
 #ifdef WIN32
 #include <DebugServer/UI/Console/Win/ConsoleUI.h>
+#include <DebugServer/UI/RDIP/Win/RDIP.h>
 #endif
 
 #include <boost/algorithm/string.hpp>
@@ -20,10 +21,13 @@ bool InitDebugger(const char* debugger) {
   std::string str_debugger(debugger);
   if (boost::iequals(str_debugger, "console"))
     ui.reset(new ConsoleUI);
+  else if(boost::istarts_with(str_debugger, "ide")) {
+      ui.reset(new RDIP);
+  }
 
   if (ui) {
     Server& server = Server::Instance();
-    server.Start(std::move(ui));
+    server.Start(std::move(ui), str_debugger);
     return true;
   } else {
     return false;

@@ -14,8 +14,9 @@
 #include <ruby/ruby/debug.h>
 #include <ruby/ruby/encoding.h>
 
-#include <boost/thread.hpp>
 #include <boost/atomic.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/thread.hpp>
 
 #include <string>
 #include <iostream>
@@ -143,9 +144,14 @@ VALUE EvaluateRubyExpressionAsValue(const std::string& expr, VALUE binding) {
   return val;
 }
 
-std::string EvaluateRubyExpression(const std::string& expr, VALUE binding) {
-  VALUE val = EvaluateRubyExpressionAsValue(expr, binding);
-  return GetRubyObjectAsString(val);
+Variable EvaluateRubyExpression(const std::string& expr, VALUE binding) {
+  Variable var;
+  var.name = expr;
+  var.object_id = EvaluateRubyExpressionAsValue(expr, binding);
+  var.has_children = rb_ivar_count(var.object_id) > 0;
+  var.type = rb_obj_classname(var.object_id);
+  var.value = GetRubyObjectAsString(var.object_id);
+  return var;
 }
 
 VALUE DebugInspectorFunc(const rb_debug_inspector_t* di, void* data) {
@@ -155,10 +161,11 @@ VALUE DebugInspectorFunc(const rb_debug_inspector_t* di, void* data) {
   for (int i=0; i < bt_count; ++i) {
     VALUE bt_val = RARRAY_PTR(bt)[i];
     std::string frame_str = GetRubyObjectAsString(bt_val);
-    VALUE binding_val = rb_debug_inspector_frame_binding_get(di, i);
     StackFrame frame;
     frame.name = frame_str;
-    frame.binding = binding_val;
+    frame.binding = rb_debug_inspector_frame_binding_get(di, i);
+    frame.self = rb_debug_inspector_frame_self_get(di, i);
+    frame.klass = rb_debug_inspector_frame_class_get(di, i);
     frames->push_back(frame);
   }
   return Qnil;
@@ -177,11 +184,15 @@ namespace RubyDebugger {
 class Server::Impl {
 public:
   Impl()
-    : last_breakpoint_index(0),
-      script_lines_hash_(0),
+    : save_breakpoints_(false),
+      last_breakpoint_index(0),
+      script_lines_hash_(Qnil),
       is_stopped_(false),
       break_at_next_line_(false),
-      break_at_call_depth_(-1),
+      stepout_break_at_next_line_(false),
+      stepover_break_at_next_line_(false),
+      stepout_to_call_depth_(-1),
+      stepover_to_call_depth_(-1),
       active_frame_index_(0),
       last_break_line_(0),
       call_depth_(0)
@@ -201,19 +212,29 @@ public:
 
   void ClearBreakData();
 
+  void ClearShouldBreakData();
+
   void SaveBreakPoints() const;
 
   void LoadBreakPoints();
 
   void DoBreak(const std::string& file_path, size_t line);
 
-  bool ShouldBreak();
+  void DoBreak(const BreakPoint& bp);
+
+  VALUE GetBinding(bool use_toplevel_binding);
 
   static std::vector<StackFrame> GetStackFrames();
 
-  static void TraceFunc(VALUE tp_val, void* data);
+  static void LineEvent(VALUE tp_val, void* data);
+
+  static void ReturnEvent(VALUE tp_val, void* data);
+
+  static void CallEvent(VALUE tp_val, void* data);
 
   std::unique_ptr<IDebuggerUI> ui_;
+
+  bool save_breakpoints_;
 
   // Breakpoints with yet-unresolved file paths
   std::vector<BreakPoint> unresolved_breakpoints_;
@@ -232,7 +253,13 @@ public:
 
   boost::atomic<bool> break_at_next_line_;
 
-  boost::atomic<size_t> break_at_call_depth_;
+  boost::atomic<bool> stepout_break_at_next_line_;
+
+  boost::atomic<bool> stepover_break_at_next_line_;
+
+  boost::atomic<size_t> stepout_to_call_depth_;
+
+  boost::atomic<size_t> stepover_to_call_depth_;
   
   std::vector<StackFrame> frames_;
 
@@ -248,14 +275,26 @@ public:
 void Server::Impl::ClearBreakData() {
   frames_.clear();
   is_stopped_ = false;
-  last_break_file_path_.clear();
-  last_break_line_ = 0;
+  //last_break_file_path_.clear();
+  //last_break_line_ = 0;
 }
 
 void Server::Impl::EnableTracePoint() {
-  VALUE tp = rb_tracepoint_new(Qnil, RUBY_EVENT_LINE | RUBY_EVENT_CALL |
-                               RUBY_EVENT_RETURN, &TraceFunc, this);
-  rb_tracepoint_enable(tp);
+  VALUE tp_line = rb_tracepoint_new(Qnil, RUBY_EVENT_LINE, &LineEvent, this);
+  rb_tracepoint_enable(tp_line);
+
+  VALUE tp_return = rb_tracepoint_new(Qnil, RUBY_EVENT_RETURN |
+      RUBY_EVENT_B_RETURN | RUBY_EVENT_C_RETURN | RUBY_EVENT_END,
+      &ReturnEvent, this);
+  rb_tracepoint_enable(tp_return);
+
+  VALUE tp_call = rb_tracepoint_new(Qnil, RUBY_EVENT_CALL | RUBY_EVENT_B_CALL |
+      RUBY_EVENT_C_CALL | RUBY_EVENT_CLASS, &CallEvent, this);
+  rb_tracepoint_enable(tp_call);
+  /*
+  tp_raise = rb_tracepoint_new(Qnil, RUBY_EVENT_RAISE, &RaiseEvent, this);
+  rb_tracepoint_enable(tp_raise);
+  */
 }
 
 const BreakPoint* Server::Impl::GetBreakPoint(const std::string& file,
@@ -272,77 +311,109 @@ const BreakPoint* Server::Impl::GetBreakPoint(const std::string& file,
 }
 
 void Server::Impl::SaveBreakPoints() const {
-  Settings::SaveBreakPoints(breakpoints_, unresolved_breakpoints_);
-}
-
-void Server::Impl::LoadBreakPoints() {
-  Settings::LoadBreakPoints(breakpoints_, unresolved_breakpoints_,
-                            last_breakpoint_index);
-}
-
-void Server::Impl::TraceFunc(VALUE tp_val, void* data) {
-  rb_trace_arg_t* trace_arg = rb_tracearg_from_tracepoint(tp_val);
-  Server::Impl* server = reinterpret_cast<Server::Impl*>(data);
-  server->ClearBreakData();
-  
-  VALUE event = rb_tracearg_event(trace_arg);
-  ID event_id = SYM2ID(event);
-  static const ID id_line = rb_intern("line");
-  static const ID id_class = rb_intern("class");
-  static const ID id_end = rb_intern("end");
-  static const ID id_call = rb_intern("call");
-  static const ID id_return = rb_intern("return");
-  static const ID id_c_call = rb_intern("c_call");
-  static const ID id_c_return = rb_intern("c_return");
-  static const ID id_raise = rb_intern("raise");
-
-  std::string file_path = GetRubyString(rb_tracearg_path(trace_arg));
-  int line = GetRubyInt(rb_tracearg_lineno(trace_arg));
-
-  if (event_id == id_line) {
-    if (server->ShouldBreak()) {
-      server->DoBreak(file_path, line);
-    } else {
-      // Try to resolve any unresolved breakpoints
-      if (!server->unresolved_breakpoints_.empty())
-        server->ResolveBreakPoints();
-
-      auto bp = server->GetBreakPoint(file_path, line);
-      if (bp != nullptr) {
-        // Breakpoint hit
-        server->frames_ = GetStackFrames();
-        server->last_break_file_path_ = file_path;
-        server->last_break_line_ = line;
-        server->is_stopped_ = true;
-        server->ui_->Break(*bp); // Blocked here until ui says continue
-        server->ClearBreakData();
-      }
-    }
-  } else if (event_id == id_call) {
-    ++server->call_depth_;
-  } else if (event_id == id_return) {
-    if (server->ShouldBreak()) {
-      server->DoBreak(file_path, line);
-    }
-    assert(server->call_depth_ > 0);
-    --server->call_depth_;
+  if (save_breakpoints_) {
+    Settings::SaveBreakPoints(breakpoints_, unresolved_breakpoints_);
   }
 }
 
-bool Server::Impl::ShouldBreak() {
-  return break_at_next_line_ ||
-         (break_at_call_depth_ != -1 && call_depth_ <= break_at_call_depth_);
+void Server::Impl::LoadBreakPoints() {
+  if (save_breakpoints_) {
+    Settings::LoadBreakPoints(breakpoints_, unresolved_breakpoints_,
+                              last_breakpoint_index);
+  }
 }
 
-// Performs necessary operations when a break point is hit.
-void Server::Impl::DoBreak(const std::string& file_path, size_t line) {
+#define EVENT_COMMON_CODE \
+  rb_trace_arg_t* trace_arg = rb_tracearg_from_tracepoint(tp_val);\
+  Server::Impl* server = reinterpret_cast<Server::Impl*>(data);\
+  server->ClearBreakData();\
+  std::string file_path = GetRubyString(rb_tracearg_path(trace_arg));\
+  int line = GetRubyInt(rb_tracearg_lineno(trace_arg));\
+  //VALUE event_id = rb_tracearg_event(trace_arg);\
+  //OutputDebugStringA(("\n*** Debugger event: " +\
+      //GetRubyString(rb_sym_to_s(event_id)) + ", " + file_path.c_str() + ":" +\
+      //boost::lexical_cast<std::string>(line).c_str() + "\n").c_str())
+
+static void ProcessLine(Server::Impl* server, const std::string& file_path,
+                        int line) {
+  if (server->call_depth_ == 0)
+    server->call_depth_ = 1;
+
+  if (server->last_break_file_path_ == file_path &&
+      server->last_break_line_ == line)
+    return;
+
+  if (server->break_at_next_line_ ||
+      (server->stepover_break_at_next_line_ &&
+       server->stepover_to_call_depth_ >= server->call_depth_) ||
+      (server->stepout_break_at_next_line_)) {
+    server->ClearShouldBreakData();
+    server->DoBreak(file_path, line);
+  } else {
+    // Try to resolve any unresolved breakpoints
+    if (!server->unresolved_breakpoints_.empty())
+      server->ResolveBreakPoints();
+
+    auto bp = server->GetBreakPoint(file_path, line);
+    if (bp != nullptr) {
+      // Breakpoint hit
+      server->DoBreak(*bp);
+    }
+  }
+}
+
+void Server::Impl::LineEvent(VALUE tp_val, void* data) {
+  EVENT_COMMON_CODE;
+
+  ProcessLine(server, file_path, line);
+}
+
+void Server::Impl::ReturnEvent(VALUE tp_val, void* data) {
+  EVENT_COMMON_CODE;
+
+  ProcessLine(server, file_path, line);
+
+  if(server->call_depth_ > 0)
+    --server->call_depth_;
+
+  if (server->call_depth_ == server->stepout_to_call_depth_) {
+    server->ClearShouldBreakData();
+    server->stepout_break_at_next_line_ = true;
+  }
+}
+
+void Server::Impl::CallEvent(VALUE tp_val, void* data) {
+  EVENT_COMMON_CODE;
+
+  ++server->call_depth_;
+  ProcessLine(server, file_path, line);
+}
+
+void Server::Impl::ClearShouldBreakData() {
   break_at_next_line_ = false;
-  break_at_call_depth_ = -1;
+  stepout_break_at_next_line_ = false;
+  stepover_break_at_next_line_ = false;
+  stepout_to_call_depth_ = -1;
+  stepover_to_call_depth_ = -1;
+}
+
+// Performs necessary operations when a suspension point is hit.
+void Server::Impl::DoBreak(const std::string& file_path, size_t line) {
   frames_ = GetStackFrames();
   last_break_file_path_ = file_path;
   last_break_line_ = line;
   is_stopped_ = true;
   ui_->Break(file_path, line); // Blocked here until ui says continue
+  ClearBreakData();
+}
+
+// Performs necessary operations when a break point is hit.
+void Server::Impl::DoBreak(const BreakPoint& bp) {
+  frames_ = GetStackFrames();
+  last_break_file_path_ = bp.file;
+  last_break_line_ = bp.line;
+  is_stopped_ = true;
+  ui_->Break(bp); // Blocked here until ui says continue
   ClearBreakData();
 }
 
@@ -368,7 +439,9 @@ static int EachKeyValFunc(VALUE key, VALUE val, VALUE data) {
 }
 
 void Server::Impl::ReadScriptLinesHash() {
-  rb_hash_foreach(script_lines_hash_, (int(*)(...))EachKeyValFunc, (VALUE)this);
+  if (script_lines_hash_ != Qnil) {
+    rb_hash_foreach(script_lines_hash_, (int(*)(...))EachKeyValFunc, (VALUE)this);
+  }
 }
 
 bool Server::Impl::ResolveBreakPoint(BreakPoint& bp) {
@@ -421,6 +494,19 @@ std::vector<StackFrame> Server::Impl::GetStackFrames() {
   return frames;
 }
 
+VALUE Server::Impl::GetBinding(bool use_toplevel_binding) {
+  VALUE binding = 0;
+  if (use_toplevel_binding) {
+    binding = rb_const_get(rb_cObject, rb_intern("TOPLEVEL_BINDING"));
+  } else if (!frames_.empty() && active_frame_index_ < frames_.size()) {
+    const auto& cur_frame = frames_[active_frame_index_];
+    binding = cur_frame.binding;
+  } else {
+    assert(false);
+  }
+  return binding;
+}
+
 Server::Server()
   : impl_(new Impl) {
 }
@@ -433,29 +519,37 @@ Server& Server::Instance() {
   return ds;
 }
 
-void Server::Start(std::unique_ptr<IDebuggerUI> ui) {
+void Server::Start(std::unique_ptr<IDebuggerUI> ui,
+                   const std::string& str_debugger) {
   impl_->EnableTracePoint();
 
-  // Let Ruby collect source files and code into this hash
-  impl_->script_lines_hash_ = rb_hash_new();
-  rb_define_global_const("SCRIPT_LINES__", impl_->script_lines_hash_);
+  bool is_ide = ui->IsIDE();
+
+  if (!is_ide) {
+    // Let Ruby collect source files and code into this hash
+    impl_->script_lines_hash_ = rb_hash_new();
+    rb_define_global_const("SCRIPT_LINES__", impl_->script_lines_hash_);
+  } else {
+    impl_->script_lines_hash_ = Qnil;
+  }
 
   impl_->LoadBreakPoints();
   impl_->ui_ = std::move(ui);
-  impl_->ui_->Initialize(this);
+  impl_->ui_->Initialize(this, str_debugger);
   impl_->is_stopped_ = true;
+  impl_->save_breakpoints_ = !is_ide;
   impl_->ui_->WaitForContinue();
   impl_->ClearBreakData();
 }
 
-bool Server::AddBreakPoint(BreakPoint& bp) {
+bool Server::AddBreakPoint(BreakPoint& bp, bool assume_resolved) {
   boost::lock_guard<boost::mutex> lock(impl_->break_point_mutex_);
   
   // Make sure we have the loaded files
   impl_->ReadScriptLinesHash();
 
   // Find a matching full file path for the given file.
-  bool file_resolved = impl_->ResolveBreakPoint(bp);
+  bool file_resolved = assume_resolved || impl_->ResolveBreakPoint(bp);
   impl_->AddBreakPoint(bp, file_resolved);
   impl_->SaveBreakPoints();
   return true;
@@ -527,14 +621,14 @@ bool Server::IsStopped() const {
   return impl_->is_stopped_;
 }
 
-std::string Server::EvaluateExpression(const std::string& expr) {
- std::string eval_res;
+Variable Server::EvaluateExpression(const std::string& expr) {
+ Variable eval_res;
  if (!impl_->frames_.empty() &&
      impl_->active_frame_index_ < impl_->frames_.size()) {
    const auto& cur_frame = impl_->frames_[impl_->active_frame_index_];
    eval_res = EvaluateRubyExpression(expr, cur_frame.binding);
  } else {
-   eval_res = "Expression cannot be evaluated";
+   eval_res.value = "Expression cannot be evaluated";
  }
  return eval_res;
 }
@@ -559,19 +653,26 @@ size_t Server::GetActiveFrameIndex() const {
   return impl_->active_frame_index_;
 }
 
+void Server::SetActiveFrameIndex(size_t index) const {
+  impl_->active_frame_index_ = index;
+}
+
 void Server::Step() {
   if (IsStopped())
     impl_->break_at_next_line_ = true;
 }
 
 void Server::StepOver() {
-  if (IsStopped())
-    impl_->break_at_call_depth_ = impl_->call_depth_;
+  if (IsStopped()) {
+    impl_->stepover_break_at_next_line_ = true;
+    impl_->stepover_to_call_depth_ = impl_->call_depth_;
+  }
 }
 
 void Server::StepOut() {
-  if (IsStopped())
-    impl_->break_at_call_depth_ = impl_->call_depth_ - 1;
+  if (IsStopped() && impl_->call_depth_ > 1) {
+    impl_->stepout_to_call_depth_ = impl_->call_depth_ - 1;
+  }
 }
 
 std::vector<std::pair<size_t, std::string>>
@@ -613,25 +714,22 @@ size_t Server::GetBreakLineNumber() const {
 IDebugServer::VariablesVector Server::GetVariables(const char* type,
     bool use_toplevel_binding) const {
   VariablesVector vec;
-  VALUE binding = 0;
-  if (use_toplevel_binding) {
-    binding = rb_const_get(rb_cObject, rb_intern("TOPLEVEL_BINDING"));
-  } else if (!impl_->frames_.empty() &&
-             impl_->active_frame_index_ < impl_->frames_.size()) {
-    const auto& cur_frame = impl_->frames_[impl_->active_frame_index_];
-    binding = cur_frame.binding;
-  }
+  VALUE binding = impl_->GetBinding(use_toplevel_binding);
   if (binding != 0) {
     VALUE arr_val = EvaluateRubyExpressionAsValue(type, binding);
     int count = RARRAY_LEN(arr_val);
     for (int i = 0; i < count; ++i) {
       VALUE var_val = RARRAY_PTR(arr_val)[i];
-      std::string var_str = GetRubyObjectAsString(var_val);
-      if (!var_str.empty()) {
+      Variable var;
+      var.name = GetRubyObjectAsString(var_val);
+      if (!var.name.empty()) {
         VALUE eval_val =
-            EvaluateRubyExpressionAsValue(var_str, binding);
-        std::string eval_str = GetRubyObjectAsString(eval_val);
-        vec.push_back(std::make_pair(var_str, eval_str));
+            EvaluateRubyExpressionAsValue(var.name, binding);
+        var.object_id = eval_val;
+        var.value = GetRubyObjectAsString(eval_val);
+        var.type = rb_obj_classname(eval_val);
+        var.has_children = rb_ivar_count(eval_val) > 0;
+        vec.push_back(var);
       }
     }
   }
@@ -644,6 +742,29 @@ IDebugServer::VariablesVector Server::GetGlobalVariables() const {
 
 IDebugServer::VariablesVector Server::GetLocalVariables() const {
   return GetVariables("local_variables", false);
+}
+
+IDebugServer::VariablesVector Server::GetInstanceVariables(size_t object_id) const {
+  VariablesVector vec;
+  //VALUE active_binding = impl_->GetBinding(false);
+  VALUE var_array = rb_obj_instance_variables(object_id);
+  size_t num_vars = RARRAY_LEN(var_array);
+  for (size_t i = 0; i < num_vars; ++i) {
+    VALUE var_val = RARRAY_PTR(var_array)[i];
+    Variable var;
+    var.name = GetRubyObjectAsString(var_val);
+    if (!var.name.empty()) {
+      //VALUE eval_val = EvaluateRubyExpressionAsValue(var.name, active_binding);
+      VALUE instance_str_val = GetRubyInterface(var.name.c_str());
+      VALUE eval_val = rb_obj_instance_eval(1, &instance_str_val, object_id);
+      var.object_id = eval_val;
+      var.value = GetRubyObjectAsString(eval_val);
+      var.type = rb_obj_classname(eval_val);
+      var.has_children = rb_ivar_count(eval_val) > 0;
+      vec.push_back(var);
+    }
+  }
+  return vec;
 }
 
 } // end namespace RubyDebugger

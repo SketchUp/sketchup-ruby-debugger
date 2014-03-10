@@ -19,7 +19,10 @@ class ConsoleUI : public IDebuggerUI
 public:
   ConsoleUI();
 
-  virtual void Initialize(IDebugServer* server);
+  virtual void Initialize(IDebugServer* server,
+                          const std::string& str_debugger);
+
+  virtual bool IsIDE() { return false; }
 
   virtual void WaitForContinue();
 

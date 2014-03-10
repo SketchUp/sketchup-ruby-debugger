@@ -102,7 +102,7 @@ void LoadBreakPoints(BreakPointsMap& resolved_bps,
         const ptree& pt_bp = it2->second;
         BreakPoint bp;
         Load(pt_bp, bp);
-        std::map<std::string, BreakPoint>& map = resolved_bps[bp.line];
+        auto& map = resolved_bps[bp.line];
         map[bp.file] = bp;
         last_breakpoint_index = std::max(last_breakpoint_index, bp.index);
       }
