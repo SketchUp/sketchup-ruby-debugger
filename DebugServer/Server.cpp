@@ -212,7 +212,7 @@ public:
 
   void ClearBreakData();
 
-  void ClearShouldBreakData();
+  void ClearSuspensionData();
 
   void SaveBreakPoints() const;
 
@@ -275,8 +275,6 @@ public:
 void Server::Impl::ClearBreakData() {
   frames_.clear();
   is_stopped_ = false;
-  //last_break_file_path_.clear();
-  //last_break_line_ = 0;
 }
 
 void Server::Impl::EnableTracePoint() {
@@ -329,25 +327,21 @@ void Server::Impl::LoadBreakPoints() {
   server->ClearBreakData();\
   std::string file_path = GetRubyString(rb_tracearg_path(trace_arg));\
   int line = GetRubyInt(rb_tracearg_lineno(trace_arg));\
-  //VALUE event_id = rb_tracearg_event(trace_arg);\
-  //OutputDebugStringA(("\n*** Debugger event: " +\
-      //GetRubyString(rb_sym_to_s(event_id)) + ", " + file_path.c_str() + ":" +\
-      //boost::lexical_cast<std::string>(line).c_str() + "\n").c_str())
+  VALUE event_sym = rb_tracearg_event(trace_arg);\
+//   OutputDebugStringA(("\n*** Debugger event: " +\
+//       GetRubyString(rb_sym_to_s(event_sym)) + ", " + file_path.c_str() + ":" +\
+//       boost::lexical_cast<std::string>(line).c_str() + "\n").c_str())
 
 static void ProcessLine(Server::Impl* server, const std::string& file_path,
                         int line) {
   if (server->call_depth_ == 0)
     server->call_depth_ = 1;
 
-  if (server->last_break_file_path_ == file_path &&
-      server->last_break_line_ == line)
-    return;
-
   if (server->break_at_next_line_ ||
       (server->stepover_break_at_next_line_ &&
        server->stepover_to_call_depth_ >= server->call_depth_) ||
       (server->stepout_break_at_next_line_)) {
-    server->ClearShouldBreakData();
+    server->ClearSuspensionData();
     server->DoBreak(file_path, line);
   } else {
     // Try to resolve any unresolved breakpoints
@@ -371,13 +365,16 @@ void Server::Impl::LineEvent(VALUE tp_val, void* data) {
 void Server::Impl::ReturnEvent(VALUE tp_val, void* data) {
   EVENT_COMMON_CODE;
 
-  ProcessLine(server, file_path, line);
+  // C returns complicate things, do not process their lines.
+  static const ID id_c_return = rb_intern("c_return");
+  if (SYM2ID(event_sym) != id_c_return)
+    ProcessLine(server, file_path, line);
 
   if(server->call_depth_ > 0)
     --server->call_depth_;
 
   if (server->call_depth_ == server->stepout_to_call_depth_) {
-    server->ClearShouldBreakData();
+    server->ClearSuspensionData();
     server->stepout_break_at_next_line_ = true;
   }
 }
@@ -386,10 +383,14 @@ void Server::Impl::CallEvent(VALUE tp_val, void* data) {
   EVENT_COMMON_CODE;
 
   ++server->call_depth_;
-  ProcessLine(server, file_path, line);
+
+  // C calls complicate things, do not process their lines.
+  static const ID id_c_call = rb_intern("c_call");
+  if (SYM2ID(event_sym) != id_c_call)
+    ProcessLine(server, file_path, line);
 }
 
-void Server::Impl::ClearShouldBreakData() {
+void Server::Impl::ClearSuspensionData() {
   break_at_next_line_ = false;
   stepout_break_at_next_line_ = false;
   stepover_break_at_next_line_ = false;
