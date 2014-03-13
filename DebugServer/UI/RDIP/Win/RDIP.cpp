@@ -181,7 +181,35 @@ static std::string encodeXml(const std::string& str) {
 }
 
 static bool isValidFileName(const std::string& file) {
-  return file.find("eval&apos;") == std::string::npos && file != "eval";
+  return file.find("eval&apos;") == std::string::npos &&
+         file.find("(eval)") == std::string::npos &&
+         file != "eval";
+}
+
+static bool parseFrameName(const std::string& frame, std::string& file, int& line)
+{
+  bool success = false;
+  try {
+    auto descStartPos = frame.find_last_of(":");
+    if(descStartPos != std::string::npos) {
+
+      auto lineStartPos = frame.find_last_of(":", descStartPos - 1);
+      if(lineStartPos != std::string::npos) {
+        std::string lineStr = frame.substr(lineStartPos + 1, descStartPos - lineStartPos - 1);
+
+        line = std::stoi(lineStr);
+        file = frame.substr(0, lineStartPos);
+
+        if(!file.empty()) {
+          success = true;
+        }
+      }
+    }
+  } catch(const std::exception&) {
+    success = false;
+  }
+
+  return success;
 }
 
 void RDIP::Connection::evaluateCommand(const std::string& cmd) {
@@ -245,32 +273,19 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd) {
 
     size_t activeFrameIdx = server_->GetActiveFrameIndex();
     for(size_t i = 0; i < frames.size(); ++i) {
-      std::vector<std::string> splitFrameInfo;
-      boost::split(splitFrameInfo, frames[i].name, boost::is_any_of(":"));
-
-      if (splitFrameInfo.size() < 3) {
-        // Most likely this is the <main> stack frame, e.g. when called
-        // from the ruby console.
-        continue;
-      }
-      std::string frameNo = splitFrameInfo[0];
-      std::string file = encodeXml(splitFrameInfo[1]);
-      std::string line = encodeXml(splitFrameInfo[2]);
-      // The top frame sometimes has a weird name with "call" or "eval"
-      // in it. Skip those to prevent IDE confusion.
-      if (line.find("call") != std::string::npos ||
-          line.find("eval") != std::string::npos ||
-          !isValidFileName(file))
-        continue;
-
-      if(activeFrameIdx != i) {
-        boost::format fmt("<frame no=\"%1%\" file=\"%2%\" line=\"%3%\"/>");
-        fmt % i % (frameNo + ":" + file) % line;
-        str_send += fmt.str();
-      } else {
-        boost::format fmt("<frame no=\"%1%\" file=\"%2%\" line=\"%3%\" current=\"yes\"/>");
-        fmt % i % (frameNo + ":" + file) % line;
-        str_send += fmt.str();
+      std::string file;
+      int line;
+      if(parseFrameName(frames[i].name, file, line) && isValidFileName(file)) {
+        file = encodeXml(file);
+        if(activeFrameIdx != i) {
+          boost::format fmt("<frame no=\"%1%\" file=\"%2%\" line=\"%3%\"/>");
+          fmt % i % file % line;
+          str_send += fmt.str();
+        } else {
+          boost::format fmt("<frame no=\"%1%\" file=\"%2%\" line=\"%3%\" current=\"yes\"/>");
+          fmt % i % file % line;
+          str_send += fmt.str();
+        }
       }
     }
     str_send += "</frames>\n";
