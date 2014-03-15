@@ -13,6 +13,8 @@ namespace RubyDebugger {
 
 struct StackFrame {
   std::string name;
+  std::string file;
+  int line;
   VALUE binding;
   VALUE self;
   VALUE klass;

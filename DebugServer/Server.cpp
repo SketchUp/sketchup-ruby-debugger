@@ -160,9 +160,14 @@ VALUE DebugInspectorFunc(const rb_debug_inspector_t* di, void* data) {
   int bt_count = RARRAY_LEN(bt);
   for (int i=0; i < bt_count; ++i) {
     VALUE bt_val = RARRAY_PTR(bt)[i];
-    std::string frame_str = GetRubyObjectAsString(bt_val);
+    VALUE path_val = rb_funcall(bt_val, rb_intern("path"), 0);
+    if (path_val == Qnil)
+      continue; // Probably the top stack when run from console
     StackFrame frame;
-    frame.name = frame_str;
+    frame.name = GetRubyObjectAsString(bt_val);;
+    VALUE line_val = rb_funcall(bt_val, rb_intern("lineno"), 0);
+    frame.file = RSTRING_PTR(path_val);
+    frame.line = FIX2INT(line_val);
     frame.binding = rb_debug_inspector_frame_binding_get(di, i);
     frame.self = rb_debug_inspector_frame_self_get(di, i);
     frame.klass = rb_debug_inspector_frame_class_get(di, i);
@@ -747,7 +752,6 @@ IDebugServer::VariablesVector Server::GetLocalVariables() const {
 
 IDebugServer::VariablesVector Server::GetInstanceVariables(size_t object_id) const {
   VariablesVector vec;
-  //VALUE active_binding = impl_->GetBinding(false);
   VALUE var_array = rb_obj_instance_variables(object_id);
   size_t num_vars = RARRAY_LEN(var_array);
   for (size_t i = 0; i < num_vars; ++i) {
@@ -755,7 +759,6 @@ IDebugServer::VariablesVector Server::GetInstanceVariables(size_t object_id) con
     Variable var;
     var.name = GetRubyObjectAsString(var_val);
     if (!var.name.empty()) {
-      //VALUE eval_val = EvaluateRubyExpressionAsValue(var.name, active_binding);
       VALUE instance_str_val = GetRubyInterface(var.name.c_str());
       VALUE eval_val = rb_obj_instance_eval(1, &instance_str_val, object_id);
       var.object_id = eval_val;

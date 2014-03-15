@@ -180,38 +180,6 @@ static std::string encodeXml(const std::string& str) {
   return encoded;
 }
 
-static bool isValidFileName(const std::string& file) {
-  return file.find("eval&apos;") == std::string::npos &&
-         file.find("(eval)") == std::string::npos &&
-         file != "eval";
-}
-
-static bool parseFrameName(const std::string& frame, std::string& file, int& line)
-{
-  bool success = false;
-  try {
-    auto descStartPos = frame.find_last_of(":");
-    if(descStartPos != std::string::npos) {
-
-      auto lineStartPos = frame.find_last_of(":", descStartPos - 1);
-      if(lineStartPos != std::string::npos) {
-        std::string lineStr = frame.substr(lineStartPos + 1, descStartPos - lineStartPos - 1);
-
-        line = std::stoi(lineStr);
-        file = frame.substr(0, lineStartPos);
-
-        if(!file.empty()) {
-          success = true;
-        }
-      }
-    }
-  } catch(const std::exception&) {
-    success = false;
-  }
-
-  return success;
-}
-
 void RDIP::Connection::evaluateCommand(const std::string& cmd) {
   static const boost::regex reg_brk("^\\s*b(?:reak)?\\s+(?:(.+):)?([^.:]+)$");
   static const boost::regex reg_brk_del("^\\s*del(?:ete)?(?:\\s+(\\d+))?$");
@@ -273,19 +241,16 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd) {
 
     size_t activeFrameIdx = server_->GetActiveFrameIndex();
     for(size_t i = 0; i < frames.size(); ++i) {
-      std::string file;
-      int line;
-      if(parseFrameName(frames[i].name, file, line) && isValidFileName(file)) {
-        file = encodeXml(file);
-        if(activeFrameIdx != i) {
-          boost::format fmt("<frame no=\"%1%\" file=\"%2%\" line=\"%3%\"/>");
-          fmt % i % file % line;
-          str_send += fmt.str();
-        } else {
-          boost::format fmt("<frame no=\"%1%\" file=\"%2%\" line=\"%3%\" current=\"yes\"/>");
-          fmt % i % file % line;
-          str_send += fmt.str();
-        }
+      const StackFrame& frame = frames[i];
+      std::string file = encodeXml(frame.file);
+      if(activeFrameIdx != i) {
+        boost::format fmt("<frame no=\"%1%\" file=\"%2%\" line=\"%3%\"/>");
+        fmt % i % file % frame.line;
+        str_send += fmt.str();
+      } else {
+        boost::format fmt("<frame no=\"%1%\" file=\"%2%\" line=\"%3%\" current=\"yes\"/>");
+        fmt % i % file % frame.line;
+        str_send += fmt.str();
       }
     }
     str_send += "</frames>\n";
@@ -361,15 +326,6 @@ void RDIP::Connection::stopAtBreakpoint(BreakPoint bp) {
 }
 
 void RDIP::Connection::suspendAt(const std::string& file, size_t line) {
-  if (!isValidFileName(file)) {
-    // Stepped out into a top-level invalid frame. Must send continue
-    // otherwise we get a deadlock.
-    boost::mutex::scoped_lock lock(server_wait_mutex_);
-    server_can_continue_ = true;
-    server_wait_cond_.notify_all();
-    return;
-  }
-
   std::ostringstream ss;
   ss << "<suspended file=\"" << file << "\" line=\"" << line << "\" threadId=\"1\" frames=\"1\"/>\n";
   OutputDebugStringA("sending suspendAt => ");
