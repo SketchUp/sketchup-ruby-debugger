@@ -2,7 +2,6 @@
 // Authors:
 // - Bugra Barin
 //
-#include "stdafx.h"
 #include "./ConsoleUI.h"
 #include "./ConsoleInputBuffer.h"
 

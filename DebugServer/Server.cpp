@@ -2,7 +2,6 @@
 // Authors:
 // - Bugra Barin
 //
-#include "stdafx.h"
 #include "./Server.h"
 #include "./DebuggerSettings.h"
 #include "./FindSubstringCaseInsensitive.h"

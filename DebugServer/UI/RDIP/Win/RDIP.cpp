@@ -3,7 +3,6 @@
 // - Orhun Birsoy
 // - Bugra Barin
 //
-#include "stdafx.h"
 #include "./RDIP.h"
 
 #include <DebugServer/IDebugServer.h>

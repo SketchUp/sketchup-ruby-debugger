@@ -8,7 +8,7 @@ namespace SketchUp {
 namespace RubyDebugger {
 
 inline void Log(const char* str) {
-#ifdef _WIN32
+#ifdef WIN32
   OutputDebugStringA(str);
 #endif
 }

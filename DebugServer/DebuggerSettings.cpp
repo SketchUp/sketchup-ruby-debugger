@@ -2,7 +2,6 @@
 // Authors:
 // - Bugra Barin
 //
-#include "stdafx.h"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>

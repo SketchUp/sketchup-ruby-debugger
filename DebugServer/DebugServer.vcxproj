@@ -55,6 +55,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)ThirdParty/include;$(SolutionDir)ThirdParty/include/ruby/;$(SolutionDir)ThirdParty/include/ruby/i386-mswin32_120</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -78,6 +79,7 @@ call $(SolutionDir)postbuild.bat
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;DEBUGSERVER_EXPORTS;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)ThirdParty/include;$(SolutionDir)ThirdParty/include/ruby/;$(SolutionDir)ThirdParty/include/ruby/i386-mswin32_120</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
