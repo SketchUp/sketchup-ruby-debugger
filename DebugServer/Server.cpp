@@ -6,6 +6,7 @@
 #include "./Server.h"
 #include "./DebuggerSettings.h"
 #include "./FindSubstringCaseInsensitive.h"
+#include "./Log.h"
 
 #include <Common/BreakPoint.h>
 #include <Common/StackFrame.h>
@@ -334,7 +335,7 @@ void Server::Impl::LoadBreakPoints() {
   std::string file_path = GetRubyString(rb_tracearg_path(trace_arg));\
   int line = GetRubyInt(rb_tracearg_lineno(trace_arg));\
   VALUE event_sym = rb_tracearg_event(trace_arg);\
-//   OutputDebugStringA(("\n*** Debugger event: " +\
+//   Log(("\n*** Debugger event: " +\
 //       GetRubyString(rb_sym_to_s(event_sym)) + ", " + file_path.c_str() + ":" +\
 //       boost::lexical_cast<std::string>(line).c_str() + "\n").c_str())
 

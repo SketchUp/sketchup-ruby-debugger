@@ -7,6 +7,7 @@
 #include "./RDIP.h"
 
 #include <DebugServer/IDebugServer.h>
+#include <DebugServer/Log.h>
 #include <Common/BreakPoint.h>
 #include <Common/StackFrame.h>
 #include <boost/asio/ip/tcp.hpp>
@@ -98,7 +99,7 @@ void RDIP::WaitForContinue() {
     }
     server_wait_cond_.wait(lock);
   }
-  ::OutputDebugStringA("Let SketchUp start\n");
+  Log("Let SketchUp start\n");
 }
 
 void RDIP::Break(BreakPoint bp) {
@@ -156,8 +157,8 @@ void RDIP::Connection::handleCommand(const boost::system::error_code& err) {
     std::ostringstream out;
     out << &read_buffer_;
     std::string str = out.str();
-    ::OutputDebugStringA("\nCommand from IDE => ");
-    ::OutputDebugStringA(str.c_str());
+    Log("\nCommand from IDE => ");
+    Log(str.c_str());
     std::vector<std::string> commands;
     boost::split(commands, str, boost::is_any_of(";"));
     for(const auto& cmd : commands) {
@@ -168,7 +169,7 @@ void RDIP::Connection::handleCommand(const boost::system::error_code& err) {
   } else {
     std::ostringstream os;
     os << err;
-    ::OutputDebugStringA(os.str().c_str());
+    Log(os.str().c_str());
   }
 }
 
@@ -211,10 +212,10 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd) {
         std::ostringstream reply;
         reply << "<breakpointAdded no=\"" << bp.index << "\" location=\"" << bp.file << ":" << bp.line << "\"/>\n";
         write(socket_, boost::asio::buffer(reply.str()));
-        ::OutputDebugStringA(reply.str().c_str());
-        ::OutputDebugStringA("    => Breakpoint added\n");
+        Log(reply.str().c_str());
+        Log("    => Breakpoint added\n");
       } else {
-        ::OutputDebugStringA("Adding breakpoint failed\n.");
+        Log("Adding breakpoint failed\n.");
       }
     }
   } else if (regex_match(cmd, what, reg_brk_del)) {
@@ -224,10 +225,10 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd) {
         std::ostringstream reply;
         reply << "<breakpointDeleted no=\"" << bp_index << "\" />\n";
         write(socket_, boost::asio::buffer(reply.str()));
-        ::OutputDebugStringA(reply.str().c_str());
-        ::OutputDebugStringA("    => Breakpoint deleted\n");
+        Log(reply.str().c_str());
+        Log("    => Breakpoint deleted\n");
       } else {
-        OutputDebugStringA("Breakpoint could not be deleted\n");
+        Log("Breakpoint could not be deleted\n");
       }
     }
   } else if(regex_match(cmd, what, reg_start) || 
@@ -255,7 +256,7 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd) {
       }
     }
     str_send += "</frames>\n";
-    ::OutputDebugStringA(str_send.c_str());
+    Log(str_send.c_str());
     write(socket_, boost::asio::buffer(str_send));
   } else if(regex_match(cmd, what, reg_thr_lst)) {
     std::string str_send = "<threads>\n";
@@ -310,29 +311,29 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd) {
     process_server_response_ = std::bind(&RDIP::Connection::sendVariables, this, "instance");
     server_wait_cond_.notify_all();
   } else {
-    OutputDebugStringA("Unknown command : ");
-    OutputDebugStringA(cmd.c_str());
-    OutputDebugStringA("\n");
+    Log("Unknown command : ");
+    Log(cmd.c_str());
+    Log("\n");
   }
 }
 
 void RDIP::Connection::stopAtBreakpoint(BreakPoint bp) {
   std::ostringstream ss;
   ss << "<breakpoint file=\"" << bp.file << "\" line=\"" << bp.line << "\" threadId=\"1\"/>\n";
-  OutputDebugStringA("sending stopAtBreakpoint => ");
+  Log("sending stopAtBreakpoint => ");
 
   auto str = ss.str();
-  OutputDebugStringA(str.c_str());
+  Log(str.c_str());
   write(socket_, boost::asio::buffer(str));
 }
 
 void RDIP::Connection::suspendAt(const std::string& file, size_t line) {
   std::ostringstream ss;
   ss << "<suspended file=\"" << file << "\" line=\"" << line << "\" threadId=\"1\" frames=\"1\"/>\n";
-  OutputDebugStringA("sending suspendAt => ");
+  Log("sending suspendAt => ");
 
   auto str = ss.str();
-  OutputDebugStringA(str.c_str());
+  Log(str.c_str());
   write(socket_, boost::asio::buffer(str));
 }
 
@@ -349,7 +350,7 @@ void RDIP::Connection::getInstanceVariables(size_t object_id) {
 
 void RDIP::Connection::sendVariables(std::string kind) {
   std::lock_guard<std::mutex> lock(variables_to_send_mutex_);
-  OutputDebugStringA("sending variables\n");
+  Log("sending variables\n");
   std::string send_str = "<variables>\n";
   for(const auto var : variables_to_send_) {
     boost::format fmt("<variable name=\"%s\" kind=\"%s\" value=\"%s\" type=\"%s\" hasChildren=\"%s\" objectId=\"%x\"/>\n");
@@ -360,7 +361,7 @@ void RDIP::Connection::sendVariables(std::string kind) {
     send_str += fmt.str();
   }
   send_str += "</variables>\n";
-  OutputDebugStringA(send_str.c_str());
+  Log(send_str.c_str());
   write(socket_, boost::asio::buffer(send_str));
   variables_to_send_.clear();
 }
