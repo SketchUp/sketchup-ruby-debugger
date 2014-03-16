@@ -7,8 +7,10 @@
 
 #include <DebugServer/UI/IDebuggerUI.h>
 
-#include <boost/thread.hpp>
-#include <boost/atomic.hpp>
+#include <atomic>
+#include <condition_variable>
+#include <mutex>
+#include <thread>
 
 namespace SketchUp {
 namespace RubyDebugger {
@@ -39,16 +41,16 @@ private:
   void WriteCurrentLine();
 
 private:
-  boost::thread console_thread_;
+  std::thread console_thread_;
   bool server_will_continue_;
 
-  boost::mutex console_output_mutex_;
+  std::mutex console_output_mutex_;
 
-  boost::condition_variable server_wait_cv_;
-  boost::mutex server_wait_mutex_;
+  std::condition_variable server_wait_cv_;
+  std::mutex server_wait_mutex_;
   bool server_can_continue_;
 
-  boost::atomic<bool> need_server_response_;
+  std::atomic<bool> need_server_response_;
   enum { NEED_NOTHING, NEED_EVAL, NEED_GLOBAL_VARS, NEED_LOCAL_VARS }
       need_what_from_server_;
   std::string expression_to_evaluate_;

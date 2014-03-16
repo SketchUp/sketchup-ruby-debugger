@@ -10,13 +10,14 @@
 #include <Common/BreakPoint.h>
 #include <Common/StackFrame.h>
 
-#include <boost/regex.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include <iostream>
-#include <stdio.h>
-#include <io.h>
 #include <fcntl.h>
+#include <io.h>
+#include <iomanip>
+#include <iostream>
+#include <regex>
+#include <stdio.h>
 
 namespace {
 
@@ -100,7 +101,7 @@ void ConsoleUI::Initialize(IDebugServer* server,
                            const std::string& /*str_debugger*/) {
   server_ = server;
   console_thread_ =
-      boost::thread(std::bind(&ConsoleUI::ConsoleThreadFunc, this));
+      std::thread(std::bind(&ConsoleUI::ConsoleThreadFunc, this));
 }
 
 void ConsoleUI::WritePrompt() {
@@ -151,22 +152,22 @@ bool ConsoleUI::EvaluateCommand(const std::string& str_command) {
   need_what_from_server_ = NEED_NOTHING;
   expression_to_evaluate_.clear();
 
-  static const boost::regex reg_brk_list("^\\s*b(?:reak)?$");
-  static const boost::regex reg_brk("^\\s*b(?:reak)?\\s+(?:(.+):)?([^.:]+)$");
-  static const boost::regex reg_brk_del("^\\s*del(?:ete)?(?:\\s+(\\d+))?$");
-  static const boost::regex reg_cont("^\\s*c(?:ont)?$");
-  static const boost::regex reg_help("^\\s*h(?:elp)?$");
-  static const boost::regex reg_where("^\\s*w(?:here)?$");
-  static const boost::regex reg_frame("^\\s*f(?:rame)?$");
-  static const boost::regex reg_step("^\\s*s(?:tep)?\\s?");
-  static const boost::regex reg_next("^\\s*n(?:ext)?$");
-  static const boost::regex reg_list("^\\s*l(?:ist)?$");
-  static const boost::regex reg_up("^\\s*up?$");
-  static const boost::regex reg_down("^\\s*down?$");
-  static const boost::regex reg_eval("^\\s*p\\s+");
-  static const boost::regex reg_var("^\\s*v(ar)?\\s+");
+  static const std::regex reg_brk_list("^\\s*b(?:reak)?$");
+  static const std::regex reg_brk("^\\s*b(?:reak)?\\s+(?:(.+):)?([^.:]+)$");
+  static const std::regex reg_brk_del("^\\s*del(?:ete)?(?:\\s+(\\d+))?$");
+  static const std::regex reg_cont("^\\s*c(?:ont)?$");
+  static const std::regex reg_help("^\\s*h(?:elp)?$");
+  static const std::regex reg_where("^\\s*w(?:here)?$");
+  static const std::regex reg_frame("^\\s*f(?:rame)?$");
+  static const std::regex reg_step("^\\s*s(?:tep)?\\s?");
+  static const std::regex reg_next("^\\s*n(?:ext)?$");
+  static const std::regex reg_list("^\\s*l(?:ist)?$");
+  static const std::regex reg_up("^\\s*up?$");
+  static const std::regex reg_down("^\\s*down?$");
+  static const std::regex reg_eval("^\\s*p\\s+");
+  static const std::regex reg_var("^\\s*v(ar)?\\s+");
 
-  boost::smatch what;
+  std::smatch what;
   if (regex_match(str_command, reg_brk_list)) {
     // List breakpoints
     std::vector<BreakPoint> bps = server_->GetBreakPoints();
@@ -203,7 +204,7 @@ bool ConsoleUI::EvaluateCommand(const std::string& str_command) {
     is_legal_command = true;
   } else if (regex_search(str_command, what, reg_step)) {
     std::string suffix = what.suffix();
-    static const boost::regex reg_out("^o(ut)?$");
+    static const std::regex reg_out("^o(ut)?$");
     if (regex_match(suffix, reg_out)) {
       server_->StepOut();
     } else {
@@ -241,8 +242,8 @@ bool ConsoleUI::EvaluateCommand(const std::string& str_command) {
     need_server_response_ = true;
   } else if (regex_search(str_command, what, reg_var)) {
     std::string suffix = what.suffix();
-    static const boost::regex reg_global("^g(lobal)?$");
-    static const boost::regex reg_local("^l(ocal)?$");
+    static const std::regex reg_global("^g(lobal)?$");
+    static const std::regex reg_local("^l(ocal)?$");
     if (regex_match(suffix, reg_global)) {
       need_what_from_server_ = NEED_GLOBAL_VARS;
     } else if (regex_match(suffix, reg_local)) {
@@ -271,14 +272,14 @@ bool ConsoleUI::EvaluateCommand(const std::string& str_command) {
   }
   if (signal_server_can_continue) {
     {
-      boost::lock_guard<boost::mutex> lock(server_wait_mutex_);
+      std::lock_guard<std::mutex> lock(server_wait_mutex_);
       server_can_continue_ = true;
     }
     server_wait_cv_.notify_one();
     server_will_continue_ = true;
   }
   if (write_prompt) {
-    boost::unique_lock<boost::mutex> lock(console_output_mutex_);
+    std::unique_lock<std::mutex> lock(console_output_mutex_);
     WritePrompt();
   }
   server_will_continue_ = false;
@@ -296,7 +297,7 @@ void ConsoleUI::WriteFrames() {
 }
 
 void ConsoleUI::WaitForContinue() {
-  boost::unique_lock<boost::mutex> lock(server_wait_mutex_);
+  std::unique_lock<std::mutex> lock(server_wait_mutex_);
   server_can_continue_ = false;
   while (!server_can_continue_) {
     server_wait_cv_.wait(lock);
@@ -304,7 +305,7 @@ void ConsoleUI::WaitForContinue() {
     if (need_server_response_) {
       if (need_what_from_server_ == NEED_EVAL) {
         Variable eval_res = server_->EvaluateExpression(expression_to_evaluate_);
-        boost::unique_lock<boost::mutex> lock(console_output_mutex_);
+        std::unique_lock<std::mutex> lock(console_output_mutex_);
         WriteText(eval_res.value.c_str());
       } else if (need_what_from_server_ == NEED_GLOBAL_VARS) {
         IDebugServer::VariablesVector var_vec = server_->GetGlobalVariables();
@@ -320,7 +321,7 @@ void ConsoleUI::WaitForContinue() {
 
 void ConsoleUI::Break(BreakPoint bp) {
   {
-    boost::unique_lock<boost::mutex> lock(console_output_mutex_);
+    std::unique_lock<std::mutex> lock(console_output_mutex_);
     std::cout << std::endl << "BreakPoint " << bp.index << " at " << bp.file
               << ":" << bp.line;
     WriteCurrentLine();
@@ -331,7 +332,7 @@ void ConsoleUI::Break(BreakPoint bp) {
 
 void ConsoleUI::Break(const std::string& file, size_t line) {
   {
-    boost::unique_lock<boost::mutex> lock(console_output_mutex_);
+    std::unique_lock<std::mutex> lock(console_output_mutex_);
     std::cout << std::endl << "Stopped at " << file << ":" << line;
     WriteCurrentLine();
     WritePrompt();

@@ -60,7 +60,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)ThirdParty/lib/Debug</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libboost_thread-mt-sgd.lib;libboost_system-mt-sgd.lib;libboost_regex-mt-sgd.lib;msvcrt-ruby200.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libboost_system-mt-sgd.lib;msvcrt-ruby200.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>set TARGETDIR=$(TargetDir)
@@ -85,7 +85,7 @@ call $(SolutionDir)postbuild.bat
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)ThirdParty/lib/Release</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libboost_thread-mt-s.lib;libboost_system-mt-s.lib;libboost_regex-mt-s.lib;msvcrt-ruby200.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libboost_system-mt-s.lib;msvcrt-ruby200.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>set TARGETDIR=$(TargetDir)

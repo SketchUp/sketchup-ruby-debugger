@@ -10,26 +10,27 @@
 #include <Common/BreakPoint.h>
 #include <Common/StackFrame.h>
 #include <boost/asio/ip/tcp.hpp>
-#include <boost/make_shared.hpp>
 #include <boost/asio/streambuf.hpp>
 #include <boost/asio.hpp>
-#include <boost/regex.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
+
 #include <cassert>
+#include <memory>
+#include <regex>
 
 namespace SketchUp {
 namespace RubyDebugger {
 
-class RDIP::Connection : public boost::enable_shared_from_this<RDIP::Connection> {
+class RDIP::Connection : public std::enable_shared_from_this<RDIP::Connection> {
 public:
   Connection(boost::asio::io_service& service, int port, IDebugServer* server,
-             boost::condition_variable& serverWaitCond,
-             boost::mutex& serverWaitMutex,
+             std::condition_variable& serverWaitCond,
+             std::mutex& serverWaitMutex,
              bool& serverCanContinue,
-             boost::function<void(void)>& serverResponse,
-             boost::function<void(void)>& processServerResponse);
+             std::function<void(void)>& serverResponse,
+             std::function<void(void)>& processServerResponse);
 
   void wait();
   void stopAtBreakpoint(BreakPoint bp);
@@ -50,13 +51,13 @@ private:
   boost::asio::streambuf read_buffer_;
   boost::asio::streambuf write_buffer_;
   IDebugServer* server_;
-  boost::condition_variable &server_wait_cond_;
-  boost::mutex &server_wait_mutex_;
+  std::condition_variable &server_wait_cond_;
+  std::mutex &server_wait_mutex_;
   bool &server_can_continue_;
-  boost::function<void(void)>& server_response_;
-  boost::function<void(void)>& process_server_response_;
+  std::function<void(void)>& server_response_;
+  std::function<void(void)>& process_server_response_;
   std::string expression_to_eval_;
-  boost::mutex variables_to_send_mutex_;
+  std::mutex variables_to_send_mutex_;
   IDebugServer::VariablesVector variables_to_send_;
 };
 
@@ -75,25 +76,25 @@ void RDIP::Initialize(IDebugServer* server, const std::string& str_debugger) {
   
   // Parse the port number if given.
   int port = 1234;
-  const boost::regex reg_port("port=(\\d+)");
-  boost::smatch match;
+  const std::regex reg_port("port=(\\d+)");
+  std::smatch match;
   if (regex_search(str_debugger, match, reg_port)) {
     port = boost::lexical_cast<int>(match[1]);
   }
 
   // Start the i/o service thread.
-  service_thread_ = boost::thread(boost::bind(&RDIP::RunService, this, port));
+  service_thread_ = std::thread(std::bind(&RDIP::RunService, this, port));
 }
 
 void RDIP::WaitForContinue() {
-  boost::mutex::scoped_lock lock(server_wait_mutex_);
+  std::unique_lock<std::mutex> lock(server_wait_mutex_);
   server_can_continue_ = false;
   while(!server_can_continue_) {
     if (server_response_) {
       server_response_();
       if (process_server_response_)
         io_service_.post(process_server_response_);
-      server_response_.clear();
+      server_response_ = nullptr;
     }
     server_wait_cond_.wait(lock);
   }
@@ -101,18 +102,18 @@ void RDIP::WaitForContinue() {
 }
 
 void RDIP::Break(BreakPoint bp) {
-  io_service_.post(boost::bind(&RDIP::Connection::stopAtBreakpoint, connection_.get(), bp));
+  io_service_.post(std::bind(&RDIP::Connection::stopAtBreakpoint, connection_.get(), bp));
   WaitForContinue();
 }
 
 void RDIP::Break(const std::string& file, size_t line) {
-  io_service_.post(boost::bind(&RDIP::Connection::suspendAt, connection_.get(), file, line));
+  io_service_.post(std::bind(&RDIP::Connection::suspendAt, connection_.get(), file, line));
   WaitForContinue();
 }
 
 void RDIP::RunService(int port) {
   signal_set_.async_wait(std::bind(&RDIP::HandleFatalFailure, this, std::placeholders::_1, std::placeholders::_2));
-  connection_ = boost::make_shared<Connection>(io_service_, port, server_,
+  connection_ = std::make_shared<Connection>(io_service_, port, server_,
       server_wait_cond_, server_wait_mutex_, server_can_continue_, server_response_,
       process_server_response_);
   connection_->wait();
@@ -127,11 +128,11 @@ using boost::asio::ip::address;
 
 RDIP::Connection::Connection(boost::asio::io_service& service, int port,
                              IDebugServer* server,
-                             boost::condition_variable& serverWaitCond,
-                             boost::mutex& serverWaitMutex,
+                             std::condition_variable& serverWaitCond,
+                             std::mutex& serverWaitMutex,
                              bool& serverCanContinue,
-                             boost::function<void(void)>& serverResponse,
-                             boost::function<void(void)>& processServerResponse)
+                             std::function<void(void)>& serverResponse,
+                             std::function<void(void)>& processServerResponse)
   : socket_(service)
   , acceptor_(service, tcp::endpoint(tcp::v4(), port))
   , server_(server)
@@ -143,11 +144,11 @@ RDIP::Connection::Connection(boost::asio::io_service& service, int port,
 {}
 
 void RDIP::Connection::wait() {
-  acceptor_.async_accept(socket_, boost::bind(&Connection::start, this, _1));
+  acceptor_.async_accept(socket_, std::bind(&Connection::start, this, std::placeholders::_1));
 }
 
 void RDIP::Connection::start(const boost::system::error_code& err) {
-  async_read_until(socket_, read_buffer_, "\n", boost::bind(&Connection::handleCommand, this, _1));
+  async_read_until(socket_, read_buffer_, "\n", std::bind(&Connection::handleCommand, this, std::placeholders::_1));
 }
 
 void RDIP::Connection::handleCommand(const boost::system::error_code& err) {
@@ -163,7 +164,7 @@ void RDIP::Connection::handleCommand(const boost::system::error_code& err) {
       evaluateCommand(boost::trim_copy(cmd));
     }
     //assert(write(mSocket, boost::asio::buffer("<message>some text</message>\n")) > 0);
-    async_read_until(socket_, read_buffer_, "\n", boost::bind(&Connection::handleCommand, this, _1));
+    async_read_until(socket_, read_buffer_, "\n", std::bind(&Connection::handleCommand, this, std::placeholders::_1));
   } else {
     std::ostringstream os;
     os << err;
@@ -181,23 +182,23 @@ static std::string encodeXml(const std::string& str) {
 }
 
 void RDIP::Connection::evaluateCommand(const std::string& cmd) {
-  static const boost::regex reg_brk("^\\s*b(?:reak)?\\s+(?:(.+):)?([^.:]+)$");
-  static const boost::regex reg_brk_del("^\\s*del(?:ete)?(?:\\s+(\\d+))?$");
-  static const boost::regex reg_start("^\\s*start$");
-  static const boost::regex reg_exit("^\\s*exit?$");
-  static const boost::regex reg_cont("^\\s*c(?:ont)?$");
-  static const boost::regex reg_where("^\\s*w(?:here)?$");
-  static const boost::regex reg_frame("^\\s*f(?:rame)? ([0-9]+)$");
-  static const boost::regex reg_step("^\\s*s(?:tep)?\\s?");
-  static const boost::regex reg_next("^\\s*n(?:ext)?$");
-  static const boost::regex reg_finish("^\\s*finish?$");
-  static const boost::regex reg_var_inspect("v inspect\\s+");
-  static const boost::regex reg_thr_lst("^\\s*th(?:read)? l(?:ist)?$");
-  static const boost::regex reg_var_local("^\\s*v(?:ar)? l(?:ocal)?$");
-  static const boost::regex reg_var_global("^\\s*v(?:ar)? g(?:lobal)?$");
-  static const boost::regex reg_var_instance("^\\s*v(?:ar)? i(?:nstance)? (.+)*$");
+  static const std::regex reg_brk("^\\s*b(?:reak)?\\s+(?:(.+):)?([^.:]+)$");
+  static const std::regex reg_brk_del("^\\s*del(?:ete)?(?:\\s+(\\d+))?$");
+  static const std::regex reg_start("^\\s*start$");
+  static const std::regex reg_exit("^\\s*exit?$");
+  static const std::regex reg_cont("^\\s*c(?:ont)?$");
+  static const std::regex reg_where("^\\s*w(?:here)?$");
+  static const std::regex reg_frame("^\\s*f(?:rame)? ([0-9]+)$");
+  static const std::regex reg_step("^\\s*s(?:tep)?\\s?");
+  static const std::regex reg_next("^\\s*n(?:ext)?$");
+  static const std::regex reg_finish("^\\s*finish?$");
+  static const std::regex reg_var_inspect("v inspect\\s+");
+  static const std::regex reg_thr_lst("^\\s*th(?:read)? l(?:ist)?$");
+  static const std::regex reg_var_local("^\\s*v(?:ar)? l(?:ocal)?$");
+  static const std::regex reg_var_global("^\\s*v(?:ar)? g(?:lobal)?$");
+  static const std::regex reg_var_instance("^\\s*v(?:ar)? i(?:nstance)? (.+)$");
 
-  boost::smatch what;
+  std::smatch what;
   if(regex_match(cmd, what, reg_brk)) {
     if(what.size() == 3) {
       BreakPoint bp;
@@ -232,7 +233,7 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd) {
   } else if(regex_match(cmd, what, reg_start) || 
             regex_match(cmd, what, reg_exit) ||
             regex_match(cmd, what, reg_cont)) {
-    boost::mutex::scoped_lock lock(server_wait_mutex_);
+    std::lock_guard<std::mutex> lock(server_wait_mutex_);
     server_can_continue_ = true;
     server_wait_cond_.notify_all();
   } else if(regex_match(cmd, what, reg_where)) {
@@ -271,42 +272,42 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd) {
   }
   else if(regex_match(cmd, what, reg_step)) {
     server_->Step();
-    boost::mutex::scoped_lock lock(server_wait_mutex_);
+    std::lock_guard<std::mutex> lock(server_wait_mutex_);
     server_can_continue_ = true;
     server_wait_cond_.notify_all();
   } else if(regex_match(cmd, what, reg_finish)) {
     server_->StepOut();
-    boost::mutex::scoped_lock lock(server_wait_mutex_);
+    std::lock_guard<std::mutex> lock(server_wait_mutex_);
     server_can_continue_ = true;
     server_wait_cond_.notify_all();
   } else if(regex_match(cmd, what, reg_next)) {
     server_->StepOver();
-    boost::mutex::scoped_lock lock(server_wait_mutex_);
+    std::lock_guard<std::mutex> lock(server_wait_mutex_);
     server_can_continue_ = true;
     server_wait_cond_.notify_all();
   } else if(regex_search(cmd, what, reg_var_inspect)) {
     expression_to_eval_ = what.suffix();
-    server_response_ = boost::bind(&RDIP::Connection::evalExpression, this);
-    process_server_response_ = boost::bind(&RDIP::Connection::sendVariables, this, "watch");
+    server_response_ = std::bind(&RDIP::Connection::evalExpression, this);
+    process_server_response_ = std::bind(&RDIP::Connection::sendVariables, this, "watch");
     server_wait_cond_.notify_all();
   } else if(regex_match(cmd, what, reg_var_local)) {
     // Local variables must be retrieved in the server thread. Wake it up
     // and have it call us.
-    server_response_ = boost::bind(&RDIP::Connection::getVariables, this, true);
-    process_server_response_ = boost::bind(&RDIP::Connection::sendVariables, this, "local");
+    server_response_ = std::bind(&RDIP::Connection::getVariables, this, true);
+    process_server_response_ = std::bind(&RDIP::Connection::sendVariables, this, "local");
     server_wait_cond_.notify_all();
   } else if(regex_match(cmd, what, reg_var_global)) {
     // Global variables must be retrieved in the server thread. Wake it up
     // and have it call us.
-    server_response_ = boost::bind(&RDIP::Connection::getVariables, this, false);
-    process_server_response_ = boost::bind(&RDIP::Connection::sendVariables, this, "global");
+    server_response_ = std::bind(&RDIP::Connection::getVariables, this, false);
+    process_server_response_ = std::bind(&RDIP::Connection::sendVariables, this, "global");
     server_wait_cond_.notify_all();
   } else if(regex_match(cmd, what, reg_var_instance)) {
     size_t objectID = 0;
     std::string str_what = what[1];
     sscanf(str_what.c_str(), "%x", &objectID);
-    server_response_ = boost::bind(&RDIP::Connection::getInstanceVariables, this, objectID);
-    process_server_response_ = boost::bind(&RDIP::Connection::sendVariables, this, "instance");
+    server_response_ = std::bind(&RDIP::Connection::getInstanceVariables, this, objectID);
+    process_server_response_ = std::bind(&RDIP::Connection::sendVariables, this, "instance");
     server_wait_cond_.notify_all();
   } else {
     OutputDebugStringA("Unknown command : ");
@@ -336,18 +337,18 @@ void RDIP::Connection::suspendAt(const std::string& file, size_t line) {
 }
 
 void RDIP::Connection::getVariables(bool local) {
-  boost::mutex::scoped_lock lock(variables_to_send_mutex_);
+  std::lock_guard<std::mutex> lock(variables_to_send_mutex_);
   variables_to_send_ = local ? server_->GetLocalVariables() :
                              server_->GetGlobalVariables();
 }
 
 void RDIP::Connection::getInstanceVariables(size_t object_id) {
-  boost::mutex::scoped_lock lock(variables_to_send_mutex_);
+  std::lock_guard<std::mutex> lock(variables_to_send_mutex_);
   variables_to_send_ = server_->GetInstanceVariables(object_id);
 }
 
 void RDIP::Connection::sendVariables(std::string kind) {
-  boost::mutex::scoped_lock lock(variables_to_send_mutex_);
+  std::lock_guard<std::mutex> lock(variables_to_send_mutex_);
   OutputDebugStringA("sending variables\n");
   std::string send_str = "<variables>\n";
   for(const auto var : variables_to_send_) {
@@ -365,7 +366,7 @@ void RDIP::Connection::sendVariables(std::string kind) {
 }
 
 void RDIP::Connection::evalExpression() {
-  boost::mutex::scoped_lock lock(variables_to_send_mutex_);
+  std::lock_guard<std::mutex> lock(variables_to_send_mutex_);
   variables_to_send_.clear();
   if (!expression_to_eval_.empty()) {
     Variable var = server_->EvaluateExpression(expression_to_eval_);

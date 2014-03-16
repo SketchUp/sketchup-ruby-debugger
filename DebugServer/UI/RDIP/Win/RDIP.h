@@ -8,9 +8,12 @@
 
 #include <DebugServer/UI/IDebuggerUI.h>
 
-#include <boost/thread.hpp>
-#include <boost/atomic.hpp>
-#include <boost/function.hpp>
+#include <atomic>
+#include <functional>
+#include <condition_variable>
+#include <mutex>
+#include <thread>
+
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/signal_set.hpp>
 
@@ -44,14 +47,14 @@ private:
 private:
     boost::asio::io_service io_service_;
     boost::asio::signal_set signal_set_;
-    boost::thread service_thread_;
-    boost::condition_variable server_wait_cond_;
-    boost::mutex server_wait_mutex_;
+    std::thread service_thread_;
+    std::condition_variable server_wait_cond_;
+    std::mutex server_wait_mutex_;
     bool server_can_continue_;
 
-    boost::shared_ptr<Connection> connection_;
-    boost::function<void(void)> server_response_;
-    boost::function<void(void)> process_server_response_;
+    std::shared_ptr<Connection> connection_;
+    std::function<void(void)> server_response_;
+    std::function<void(void)> process_server_response_;
 };
 
 } // end namespace RubyDebugger

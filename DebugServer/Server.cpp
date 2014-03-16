@@ -14,13 +14,14 @@
 #include <ruby/ruby/debug.h>
 #include <ruby/ruby/encoding.h>
 
-#include <boost/atomic.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/thread.hpp>
 
+#include <atomic>
 #include <string>
 #include <iostream>
 #include <map>
+#include <mutex>
+#include <thread>
 
 using namespace SketchUp::RubyDebugger;
 
@@ -248,23 +249,23 @@ public:
 
   size_t last_breakpoint_index;
 
-  boost::mutex break_point_mutex_;
+  std::mutex break_point_mutex_;
 
   VALUE script_lines_hash_;
 
   std::map<std::string, std::vector<std::string>> script_lines_;
 
-  boost::atomic<bool> is_stopped_;
+  std::atomic<bool> is_stopped_;
 
-  boost::atomic<bool> break_at_next_line_;
+  std::atomic<bool> break_at_next_line_;
 
-  boost::atomic<bool> stepout_break_at_next_line_;
+  std::atomic<bool> stepout_break_at_next_line_;
 
-  boost::atomic<bool> stepover_break_at_next_line_;
+  std::atomic<bool> stepover_break_at_next_line_;
 
-  boost::atomic<size_t> stepout_to_call_depth_;
+  std::atomic<size_t> stepout_to_call_depth_;
 
-  boost::atomic<size_t> stepover_to_call_depth_;
+  std::atomic<size_t> stepover_to_call_depth_;
   
   std::vector<StackFrame> frames_;
 
@@ -549,7 +550,7 @@ void Server::Start(std::unique_ptr<IDebuggerUI> ui,
 }
 
 bool Server::AddBreakPoint(BreakPoint& bp, bool assume_resolved) {
-  boost::lock_guard<boost::mutex> lock(impl_->break_point_mutex_);
+  std::lock_guard<std::mutex> lock(impl_->break_point_mutex_);
   
   // Make sure we have the loaded files
   impl_->ReadScriptLinesHash();
