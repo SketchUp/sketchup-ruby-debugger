@@ -10,9 +10,9 @@
 #include <Common/BreakPoint.h>
 #include <Common/StackFrame.h>
 
-#include <ruby/ruby.h>
-#include <ruby/ruby/debug.h>
-#include <ruby/ruby/encoding.h>
+#include <ruby.h>
+#include <ruby/debug.h>
+#include <ruby/encoding.h>
 
 #include <boost/lexical_cast.hpp>
 

@@ -5,3 +5,6 @@ Release/
 *.sdf
 ipch/
 *.opensdf
+.DS_Store
+SURubyDebugger.xcodeproj/xcuserdata
+SURubyDebugger.xcworkspace/xcuserdata

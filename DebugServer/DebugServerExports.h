@@ -9,10 +9,18 @@
 // that uses this DLL. This way any other project whose source files include this file see 
 // DEBUGSERVER_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
+#ifdef WIN32
+
 #ifdef DEBUGSERVER_EXPORTS
 #define DEBUGSERVER_API __declspec(dllexport)
 #else
 #define DEBUGSERVER_API __declspec(dllimport)
+#endif
+
+#else // Mac
+
+#define DEBUGSERVER_API __attribute__ ((visibility("default")))
+
 #endif
 
 extern "C" {

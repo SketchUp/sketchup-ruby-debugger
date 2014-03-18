@@ -10,6 +10,10 @@
 #include <map>
 #include <vector>
 
+#ifdef __APPLE__
+#define _stricmp strcasecmp
+#endif
+
 namespace SketchUp {
 namespace RubyDebugger {
 

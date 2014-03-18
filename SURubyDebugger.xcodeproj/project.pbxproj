@@ -1,0 +1,317 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		33B5057D18D65A33000C89F1 /* DebugServerExports.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33B5057B18D65A33000C89F1 /* DebugServerExports.cpp */; };
+		33B5057E18D65A33000C89F1 /* DebugServerExports.h in Headers */ = {isa = PBXBuildFile; fileRef = 33B5057C18D65A33000C89F1 /* DebugServerExports.h */; };
+		33CC242418D57B9C0079FC3E /* DebuggerSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33CC241D18D57B9C0079FC3E /* DebuggerSettings.cpp */; };
+		33CC242518D57B9C0079FC3E /* DebuggerSettings.h in Headers */ = {isa = PBXBuildFile; fileRef = 33CC241E18D57B9C0079FC3E /* DebuggerSettings.h */; };
+		33CC242618D57B9C0079FC3E /* FindSubstringCaseInsensitive.h in Headers */ = {isa = PBXBuildFile; fileRef = 33CC241F18D57B9C0079FC3E /* FindSubstringCaseInsensitive.h */; };
+		33CC242718D57B9C0079FC3E /* IDebugServer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33CC242018D57B9C0079FC3E /* IDebugServer.h */; };
+		33CC242818D57B9C0079FC3E /* Log.h in Headers */ = {isa = PBXBuildFile; fileRef = 33CC242118D57B9C0079FC3E /* Log.h */; };
+		33CC242918D57B9C0079FC3E /* Server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33CC242218D57B9C0079FC3E /* Server.cpp */; };
+		33CC242A18D57B9C0079FC3E /* Server.h in Headers */ = {isa = PBXBuildFile; fileRef = 33CC242318D57B9C0079FC3E /* Server.h */; };
+		33CC242E18D57BCC0079FC3E /* RDIP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33CC242C18D57BCC0079FC3E /* RDIP.cpp */; };
+		33CC242F18D57BCC0079FC3E /* RDIP.h in Headers */ = {isa = PBXBuildFile; fileRef = 33CC242D18D57BCC0079FC3E /* RDIP.h */; };
+		33CC243318D57BE30079FC3E /* BreakPoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 33CC243118D57BE30079FC3E /* BreakPoint.h */; };
+		33CC243418D57BE30079FC3E /* StackFrame.h in Headers */ = {isa = PBXBuildFile; fileRef = 33CC243218D57BE30079FC3E /* StackFrame.h */; };
+		33CC243B18D5808E0079FC3E /* Ruby.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33CC243918D5808E0079FC3E /* Ruby.framework */; };
+		33CC243D18D5893B0079FC3E /* libboost_system.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33CC243C18D5893B0079FC3E /* libboost_system.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		33B5057B18D65A33000C89F1 /* DebugServerExports.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DebugServerExports.cpp; path = DebugServer/DebugServerExports.cpp; sourceTree = "<group>"; };
+		33B5057C18D65A33000C89F1 /* DebugServerExports.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebugServerExports.h; path = DebugServer/DebugServerExports.h; sourceTree = "<group>"; };
+		33CC241118D57AB80079FC3E /* SURubyDebugger.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = SURubyDebugger.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		33CC241D18D57B9C0079FC3E /* DebuggerSettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DebuggerSettings.cpp; path = DebugServer/DebuggerSettings.cpp; sourceTree = "<group>"; };
+		33CC241E18D57B9C0079FC3E /* DebuggerSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebuggerSettings.h; path = DebugServer/DebuggerSettings.h; sourceTree = "<group>"; };
+		33CC241F18D57B9C0079FC3E /* FindSubstringCaseInsensitive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FindSubstringCaseInsensitive.h; path = DebugServer/FindSubstringCaseInsensitive.h; sourceTree = "<group>"; };
+		33CC242018D57B9C0079FC3E /* IDebugServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IDebugServer.h; path = DebugServer/IDebugServer.h; sourceTree = "<group>"; };
+		33CC242118D57B9C0079FC3E /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Log.h; path = DebugServer/Log.h; sourceTree = "<group>"; };
+		33CC242218D57B9C0079FC3E /* Server.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Server.cpp; path = DebugServer/Server.cpp; sourceTree = "<group>"; };
+		33CC242318D57B9C0079FC3E /* Server.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Server.h; path = DebugServer/Server.h; sourceTree = "<group>"; };
+		33CC242C18D57BCC0079FC3E /* RDIP.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RDIP.cpp; path = DebugServer/UI/RDIP/Win/RDIP.cpp; sourceTree = "<group>"; };
+		33CC242D18D57BCC0079FC3E /* RDIP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RDIP.h; path = DebugServer/UI/RDIP/Win/RDIP.h; sourceTree = "<group>"; };
+		33CC243118D57BE30079FC3E /* BreakPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BreakPoint.h; path = Common/BreakPoint.h; sourceTree = "<group>"; };
+		33CC243218D57BE30079FC3E /* StackFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StackFrame.h; path = Common/StackFrame.h; sourceTree = "<group>"; };
+		33CC243918D5808E0079FC3E /* Ruby.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Ruby.framework; path = ThirdParty/lib/Mac/Ruby.framework; sourceTree = "<group>"; };
+		33CC243C18D5893B0079FC3E /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_system.a; path = ThirdParty/lib/Mac/libboost_system.a; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		33CC240E18D57AB80079FC3E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				33CC243B18D5808E0079FC3E /* Ruby.framework in Frameworks */,
+				33CC243D18D5893B0079FC3E /* libboost_system.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		33CC240618D57AB80079FC3E = {
+			isa = PBXGroup;
+			children = (
+				33CC243018D57BD80079FC3E /* Common */,
+				33CC242B18D57BAA0079FC3E /* UI */,
+				33CC241B18D57B610079FC3E /* Server */,
+				33CC243518D57C050079FC3E /* Libraries */,
+				33CC241218D57AB80079FC3E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		33CC241218D57AB80079FC3E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				33CC241118D57AB80079FC3E /* SURubyDebugger.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		33CC241B18D57B610079FC3E /* Server */ = {
+			isa = PBXGroup;
+			children = (
+				33B5057B18D65A33000C89F1 /* DebugServerExports.cpp */,
+				33B5057C18D65A33000C89F1 /* DebugServerExports.h */,
+				33CC241D18D57B9C0079FC3E /* DebuggerSettings.cpp */,
+				33CC241E18D57B9C0079FC3E /* DebuggerSettings.h */,
+				33CC241F18D57B9C0079FC3E /* FindSubstringCaseInsensitive.h */,
+				33CC242018D57B9C0079FC3E /* IDebugServer.h */,
+				33CC242118D57B9C0079FC3E /* Log.h */,
+				33CC242218D57B9C0079FC3E /* Server.cpp */,
+				33CC242318D57B9C0079FC3E /* Server.h */,
+			);
+			name = Server;
+			sourceTree = "<group>";
+		};
+		33CC242B18D57BAA0079FC3E /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				33CC242C18D57BCC0079FC3E /* RDIP.cpp */,
+				33CC242D18D57BCC0079FC3E /* RDIP.h */,
+			);
+			name = UI;
+			sourceTree = "<group>";
+		};
+		33CC243018D57BD80079FC3E /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				33CC243118D57BE30079FC3E /* BreakPoint.h */,
+				33CC243218D57BE30079FC3E /* StackFrame.h */,
+			);
+			name = Common;
+			sourceTree = "<group>";
+		};
+		33CC243518D57C050079FC3E /* Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				33CC243C18D5893B0079FC3E /* libboost_system.a */,
+				33CC243918D5808E0079FC3E /* Ruby.framework */,
+			);
+			name = Libraries;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		33CC240F18D57AB80079FC3E /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				33CC242518D57B9C0079FC3E /* DebuggerSettings.h in Headers */,
+				33CC242618D57B9C0079FC3E /* FindSubstringCaseInsensitive.h in Headers */,
+				33CC242718D57B9C0079FC3E /* IDebugServer.h in Headers */,
+				33CC242818D57B9C0079FC3E /* Log.h in Headers */,
+				33CC242A18D57B9C0079FC3E /* Server.h in Headers */,
+				33CC242F18D57BCC0079FC3E /* RDIP.h in Headers */,
+				33CC243318D57BE30079FC3E /* BreakPoint.h in Headers */,
+				33CC243418D57BE30079FC3E /* StackFrame.h in Headers */,
+				33B5057E18D65A33000C89F1 /* DebugServerExports.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		33CC241018D57AB80079FC3E /* SURubyDebugger */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 33CC241518D57AB80079FC3E /* Build configuration list for PBXNativeTarget "SURubyDebugger" */;
+			buildPhases = (
+				33CC240D18D57AB80079FC3E /* Sources */,
+				33CC240E18D57AB80079FC3E /* Frameworks */,
+				33CC240F18D57AB80079FC3E /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SURubyDebugger;
+			productName = SURubyDebugger;
+			productReference = 33CC241118D57AB80079FC3E /* SURubyDebugger.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		33CC240818D57AB80079FC3E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0450;
+				ORGANIZATIONNAME = "Bugra Barin";
+			};
+			buildConfigurationList = 33CC240B18D57AB80079FC3E /* Build configuration list for PBXProject "SURubyDebugger" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 33CC240618D57AB80079FC3E;
+			productRefGroup = 33CC241218D57AB80079FC3E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				33CC241018D57AB80079FC3E /* SURubyDebugger */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		33CC240D18D57AB80079FC3E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				33CC242418D57B9C0079FC3E /* DebuggerSettings.cpp in Sources */,
+				33CC242918D57B9C0079FC3E /* Server.cpp in Sources */,
+				33CC242E18D57BCC0079FC3E /* RDIP.cpp in Sources */,
+				33B5057D18D65A33000C89F1 /* DebugServerExports.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		33CC241318D57AB80079FC3E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		33CC241418D57AB80079FC3E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		33CC241618D57AB80079FC3E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/ThirdParty/lib/Mac\"",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)",
+					"$(SRCROOT)/ThirdParty/include",
+					"$(SRCROOT)/ThirdParty/include/ruby/mac",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/ThirdParty/lib/Mac\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		33CC241718D57AB80079FC3E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/ThirdParty/lib/Mac\"",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)",
+					"$(SRCROOT)/ThirdParty/include",
+					"$(SRCROOT)/ThirdParty/include/ruby/mac",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/ThirdParty/lib/Mac\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		33CC240B18D57AB80079FC3E /* Build configuration list for PBXProject "SURubyDebugger" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				33CC241318D57AB80079FC3E /* Debug */,
+				33CC241418D57AB80079FC3E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		33CC241518D57AB80079FC3E /* Build configuration list for PBXNativeTarget "SURubyDebugger" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				33CC241618D57AB80079FC3E /* Debug */,
+				33CC241718D57AB80079FC3E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 33CC240818D57AB80079FC3E /* Project object */;
+}

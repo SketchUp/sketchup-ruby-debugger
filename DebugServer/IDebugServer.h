@@ -6,6 +6,7 @@
 #define RDEBUGGER_DEBUGSERVER_IDEBUGSERVER_H_
 
 #include <vector>
+#include <string>
 
 namespace SketchUp {
 namespace RubyDebugger {
