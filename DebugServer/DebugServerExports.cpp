@@ -2,7 +2,6 @@
 // Authors:
 // - Bugra Barin
 //
-//#include "stdafx.h"
 #include "./DebugServerExports.h"
 #include "./Server.h"
 
