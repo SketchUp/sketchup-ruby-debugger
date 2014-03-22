@@ -8,3 +8,4 @@ ipch/
 .DS_Store
 SURubyDebugger.xcodeproj/xcuserdata
 SURubyDebugger.xcworkspace/xcuserdata
+!SURubyDebugger.dll
