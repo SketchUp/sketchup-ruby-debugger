@@ -231,11 +231,18 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd) {
       }
     }
   } else if(regex_match(cmd, what, reg_start) || 
-            regex_match(cmd, what, reg_exit) ||
             regex_match(cmd, what, reg_cont)) {
     std::lock_guard<std::mutex> lock(server_wait_mutex_);
     server_can_continue_ = true;
     server_wait_cond_.notify_all();
+  } else if(regex_match(cmd, what, reg_exit)) {
+    // Stop debugging. First let SU continue in case it's at a breakpoint.
+    std::lock_guard<std::mutex> lock(server_wait_mutex_);
+    server_can_continue_ = true;
+    server_wait_cond_.notify_all();
+    // Now call Stop. It's unclear if it is ok to do this from the RDIP thread
+    // but it appears to work.
+    server_->Stop();
   } else if(regex_match(cmd, what, reg_where)) {
     auto frames = server_->GetStackFrames();
     std::string str_send = "<frames>\n";

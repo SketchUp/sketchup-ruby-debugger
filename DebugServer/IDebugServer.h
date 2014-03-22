@@ -30,6 +30,9 @@ struct Variable {
 class IDebugServer {
 public:
 
+  // Stops the server
+  virtual void Stop() = 0;
+
   // Adds the given breakpoint. Returns true on success.
   virtual bool AddBreakPoint(BreakPoint& bp, bool assume_resolved = false) = 0;
 

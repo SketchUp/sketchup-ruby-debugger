@@ -191,6 +191,9 @@ class Server::Impl {
 public:
   Impl()
     : save_breakpoints_(false),
+      tp_line_(Qnil),
+      tp_return_(Qnil),
+      tp_call_(Qnil),
       last_breakpoint_index(0),
       script_lines_hash_(Qnil),
       is_stopped_(false),
@@ -205,6 +208,8 @@ public:
   {}
 
   void EnableTracePoint();
+
+  void DisableTracePoint();
 
   const BreakPoint* GetBreakPoint(const std::string& file, size_t line) const;
 
@@ -241,6 +246,12 @@ public:
   std::unique_ptr<IDebuggerUI> ui_;
 
   bool save_breakpoints_;
+
+  VALUE tp_line_;
+
+  VALUE tp_return_;
+
+  VALUE tp_call_;
 
   // Breakpoints with yet-unresolved file paths
   std::vector<BreakPoint> unresolved_breakpoints_;
@@ -284,21 +295,36 @@ void Server::Impl::ClearBreakData() {
 }
 
 void Server::Impl::EnableTracePoint() {
-  VALUE tp_line = rb_tracepoint_new(Qnil, RUBY_EVENT_LINE, &LineEvent, this);
-  rb_tracepoint_enable(tp_line);
+  tp_line_ = rb_tracepoint_new(Qnil, RUBY_EVENT_LINE, &LineEvent, this);
+  rb_tracepoint_enable(tp_line_);
 
-  VALUE tp_return = rb_tracepoint_new(Qnil, RUBY_EVENT_RETURN |
+  tp_return_ = rb_tracepoint_new(Qnil, RUBY_EVENT_RETURN |
       RUBY_EVENT_B_RETURN | RUBY_EVENT_C_RETURN | RUBY_EVENT_END,
       &ReturnEvent, this);
-  rb_tracepoint_enable(tp_return);
+  rb_tracepoint_enable(tp_return_);
 
-  VALUE tp_call = rb_tracepoint_new(Qnil, RUBY_EVENT_CALL | RUBY_EVENT_B_CALL |
+  tp_call_ = rb_tracepoint_new(Qnil, RUBY_EVENT_CALL | RUBY_EVENT_B_CALL |
       RUBY_EVENT_C_CALL | RUBY_EVENT_CLASS, &CallEvent, this);
-  rb_tracepoint_enable(tp_call);
+  rb_tracepoint_enable(tp_call_);
   /*
-  tp_raise = rb_tracepoint_new(Qnil, RUBY_EVENT_RAISE, &RaiseEvent, this);
-  rb_tracepoint_enable(tp_raise);
+  tp_raise_ = rb_tracepoint_new(Qnil, RUBY_EVENT_RAISE, &RaiseEvent, this);
+  rb_tracepoint_enable(tp_raise_);
   */
+}
+
+void Server::Impl::DisableTracePoint() {
+  if (tp_line_ != Qnil) {
+    rb_tracepoint_disable(tp_line_);
+    tp_line_ = Qnil;
+  }
+  if (tp_return_ != Qnil) {
+    rb_tracepoint_disable(tp_return_);
+    tp_return_ = Qnil;
+  }
+  if (tp_call_ != Qnil) {
+    rb_tracepoint_disable(tp_call_);
+    tp_call_ = Qnil;
+  }
 }
 
 const BreakPoint* Server::Impl::GetBreakPoint(const std::string& file,
@@ -547,6 +573,10 @@ void Server::Start(std::unique_ptr<IDebuggerUI> ui,
   impl_->save_breakpoints_ = !is_ide;
   impl_->ui_->WaitForContinue();
   impl_->ClearBreakData();
+}
+
+void Server::Stop() {
+  impl_->DisableTracePoint();
 }
 
 bool Server::AddBreakPoint(BreakPoint& bp, bool assume_resolved) {

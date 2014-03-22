@@ -21,6 +21,8 @@ public:
 
   void Start(std::unique_ptr<IDebuggerUI> ui, const std::string& str_debugger);
 
+  virtual void Stop();
+
   virtual bool AddBreakPoint(BreakPoint& bp, bool assume_resolved);
 
   virtual bool RemoveBreakPoint(size_t index);
