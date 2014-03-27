@@ -3,6 +3,7 @@ Release/
 !ThirdParty/**/*
 *.suo
 *.sdf
+*.vcxproj.user
 ipch/
 *.opensdf
 .DS_Store
