@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DebugServer", "DebugServer\DebugServer.vcxproj", "{7B075580-72E8-4DFC-A33A-B5345BC99266}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DebugServer", "..\DebugServer\DebugServer.vcxproj", "{7B075580-72E8-4DFC-A33A-B5345BC99266}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

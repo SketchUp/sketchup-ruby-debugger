@@ -100,11 +100,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\postbuild.bat" />
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="Resource.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Build\postbuild.bat" />
   </ItemGroup>
 </Project>
