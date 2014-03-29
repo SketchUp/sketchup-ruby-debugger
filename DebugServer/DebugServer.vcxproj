@@ -110,7 +110,7 @@ call $(SolutionDir)postbuild.bat
     <ClInclude Include="UI\Console\Win\ConsoleInputBuffer.h" />
     <ClInclude Include="UI\Console\Win\ConsoleUI.h" />
     <ClInclude Include="UI\IDebuggerUI.h" />
-    <ClInclude Include="UI\RDIP\Win\RDIP.h" />
+    <ClInclude Include="UI\RDIP\RDIP.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DebuggerSettings.cpp" />
@@ -130,7 +130,7 @@ call $(SolutionDir)postbuild.bat
     </ClCompile>
     <ClCompile Include="UI\Console\Win\ConsoleInputBuffer.cpp" />
     <ClCompile Include="UI\Console\Win\ConsoleUI.cpp" />
-    <ClCompile Include="UI\RDIP\Win\RDIP.cpp" />
+    <ClCompile Include="UI\RDIP\RDIP.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

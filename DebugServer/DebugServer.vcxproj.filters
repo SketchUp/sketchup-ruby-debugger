@@ -63,14 +63,14 @@
     <ClInclude Include="DebuggerSettings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UI\RDIP\Win\RDIP.h">
-      <Filter>UI\RDIP</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Log.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\RDIP\RDIP.h">
+      <Filter>UI\RDIP</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -95,7 +95,7 @@
     <ClCompile Include="DebuggerSettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UI\RDIP\Win\RDIP.cpp">
+    <ClCompile Include="UI\RDIP\RDIP.cpp">
       <Filter>UI\RDIP</Filter>
     </ClCompile>
   </ItemGroup>
