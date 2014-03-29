@@ -17,8 +17,8 @@ SketchUp.exe -rdebug "ide port=7000"
 - Launch remote debugging in the IDE, SketchUp should continue running. You should see any breakpoints hit when the Ruby code execution reaches the specified line.
 
 Most common debugging functionality has been implemented but there are few TODOs:
-- Multi-thread debugging
-- Breakpoint conditions
+- Debugging of multi-threaded execution
+- Conditional breakpoints
 - What else are we missing ? Please report and contribute!
 
 To contribute, please fork the repository, make your changes and submit a pull request.
