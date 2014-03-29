@@ -25,22 +25,22 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		33B5057B18D65A33000C89F1 /* DebugServerExports.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DebugServerExports.cpp; path = DebugServer/DebugServerExports.cpp; sourceTree = "<group>"; };
-		33B5057C18D65A33000C89F1 /* DebugServerExports.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebugServerExports.h; path = DebugServer/DebugServerExports.h; sourceTree = "<group>"; };
+		33B5057B18D65A33000C89F1 /* DebugServerExports.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DebugServerExports.cpp; path = ../DebugServer/DebugServerExports.cpp; sourceTree = "<group>"; };
+		33B5057C18D65A33000C89F1 /* DebugServerExports.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebugServerExports.h; path = ../DebugServer/DebugServerExports.h; sourceTree = "<group>"; };
 		33CC241118D57AB80079FC3E /* SURubyDebugger.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = SURubyDebugger.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
-		33CC241D18D57B9C0079FC3E /* DebuggerSettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DebuggerSettings.cpp; path = DebugServer/DebuggerSettings.cpp; sourceTree = "<group>"; };
-		33CC241E18D57B9C0079FC3E /* DebuggerSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebuggerSettings.h; path = DebugServer/DebuggerSettings.h; sourceTree = "<group>"; };
-		33CC241F18D57B9C0079FC3E /* FindSubstringCaseInsensitive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FindSubstringCaseInsensitive.h; path = DebugServer/FindSubstringCaseInsensitive.h; sourceTree = "<group>"; };
-		33CC242018D57B9C0079FC3E /* IDebugServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IDebugServer.h; path = DebugServer/IDebugServer.h; sourceTree = "<group>"; };
-		33CC242118D57B9C0079FC3E /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Log.h; path = DebugServer/Log.h; sourceTree = "<group>"; };
-		33CC242218D57B9C0079FC3E /* Server.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Server.cpp; path = DebugServer/Server.cpp; sourceTree = "<group>"; };
-		33CC242318D57B9C0079FC3E /* Server.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Server.h; path = DebugServer/Server.h; sourceTree = "<group>"; };
-		33CC242C18D57BCC0079FC3E /* RDIP.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RDIP.cpp; path = DebugServer/UI/RDIP/Win/RDIP.cpp; sourceTree = "<group>"; };
-		33CC242D18D57BCC0079FC3E /* RDIP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RDIP.h; path = DebugServer/UI/RDIP/Win/RDIP.h; sourceTree = "<group>"; };
-		33CC243118D57BE30079FC3E /* BreakPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BreakPoint.h; path = Common/BreakPoint.h; sourceTree = "<group>"; };
-		33CC243218D57BE30079FC3E /* StackFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StackFrame.h; path = Common/StackFrame.h; sourceTree = "<group>"; };
-		33CC243918D5808E0079FC3E /* Ruby.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Ruby.framework; path = ThirdParty/lib/Mac/Ruby.framework; sourceTree = "<group>"; };
-		33CC243C18D5893B0079FC3E /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_system.a; path = ThirdParty/lib/Mac/libboost_system.a; sourceTree = "<group>"; };
+		33CC241D18D57B9C0079FC3E /* DebuggerSettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DebuggerSettings.cpp; path = ../DebugServer/DebuggerSettings.cpp; sourceTree = "<group>"; };
+		33CC241E18D57B9C0079FC3E /* DebuggerSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebuggerSettings.h; path = ../DebugServer/DebuggerSettings.h; sourceTree = "<group>"; };
+		33CC241F18D57B9C0079FC3E /* FindSubstringCaseInsensitive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FindSubstringCaseInsensitive.h; path = ../DebugServer/FindSubstringCaseInsensitive.h; sourceTree = "<group>"; };
+		33CC242018D57B9C0079FC3E /* IDebugServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IDebugServer.h; path = ../DebugServer/IDebugServer.h; sourceTree = "<group>"; };
+		33CC242118D57B9C0079FC3E /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Log.h; path = ../DebugServer/Log.h; sourceTree = "<group>"; };
+		33CC242218D57B9C0079FC3E /* Server.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Server.cpp; path = ../DebugServer/Server.cpp; sourceTree = "<group>"; };
+		33CC242318D57B9C0079FC3E /* Server.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Server.h; path = ../DebugServer/Server.h; sourceTree = "<group>"; };
+		33CC242C18D57BCC0079FC3E /* RDIP.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RDIP.cpp; path = ../DebugServer/UI/RDIP/RDIP.cpp; sourceTree = "<group>"; };
+		33CC242D18D57BCC0079FC3E /* RDIP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RDIP.h; path = ../DebugServer/UI/RDIP/RDIP.h; sourceTree = "<group>"; };
+		33CC243118D57BE30079FC3E /* BreakPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BreakPoint.h; path = ../Common/BreakPoint.h; sourceTree = "<group>"; };
+		33CC243218D57BE30079FC3E /* StackFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StackFrame.h; path = ../Common/StackFrame.h; sourceTree = "<group>"; };
+		33CC243918D5808E0079FC3E /* Ruby.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Ruby.framework; path = ../ThirdParty/lib/Mac/Ruby.framework; sourceTree = "<group>"; };
+		33CC243C18D5893B0079FC3E /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_system.a; path = ../ThirdParty/lib/Mac/libboost_system.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -257,17 +257,17 @@
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/ThirdParty/lib/Mac\"",
+					"\"$(SRCROOT)/../ThirdParty/lib/Mac\"",
 				);
 				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)",
-					"$(SRCROOT)/ThirdParty/include",
-					"$(SRCROOT)/ThirdParty/include/ruby/mac",
-					"$(SRCROOT)/ThirdParty/include/ruby/mac/i386-darwin12.4.0",
+					"$(SRCROOT)/..",
+					"$(SRCROOT)/../ThirdParty/include",
+					"$(SRCROOT)/../ThirdParty/include/ruby/mac",
+					"$(SRCROOT)/../ThirdParty/include/ruby/mac/i386-darwin12.4.0",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/ThirdParty/lib/Mac\"",
+					"\"$(SRCROOT)/../ThirdParty/lib/Mac\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -278,17 +278,17 @@
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/ThirdParty/lib/Mac\"",
+					"\"$(SRCROOT)/../ThirdParty/lib/Mac\"",
 				);
 				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)",
-					"$(SRCROOT)/ThirdParty/include",
-					"$(SRCROOT)/ThirdParty/include/ruby/mac",
-					"$(SRCROOT)/ThirdParty/include/ruby/mac/i386-darwin12.4.0",
+					"$(SRCROOT)/..",
+					"$(SRCROOT)/../ThirdParty/include",
+					"$(SRCROOT)/../ThirdParty/include/ruby/mac",
+					"$(SRCROOT)/../ThirdParty/include/ruby/mac/i386-darwin12.4.0",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/ThirdParty/lib/Mac\"",
+					"\"$(SRCROOT)/../ThirdParty/lib/Mac\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

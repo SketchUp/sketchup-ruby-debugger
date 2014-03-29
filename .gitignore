@@ -7,6 +7,6 @@ Release/
 ipch/
 *.opensdf
 .DS_Store
-SURubyDebugger.xcodeproj/xcuserdata
-SURubyDebugger.xcworkspace/xcuserdata
+Build/SURubyDebugger.xcodeproj/xcuserdata
+Build/SURubyDebugger.xcworkspace/xcuserdata
 !SURubyDebugger.dll

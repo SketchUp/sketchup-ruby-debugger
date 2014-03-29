@@ -9,7 +9,7 @@
 #include <DebugServer/UI/Console/Win/ConsoleUI.h>
 #endif
 
-#include <DebugServer/UI/RDIP/Win/RDIP.h>
+#include <DebugServer/UI/RDIP/RDIP.h>
 
 #include <boost/algorithm/string.hpp>
 
