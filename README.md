@@ -1,5 +1,5 @@
-sketchup-ruby-debugger
-======================
+SketchUp Ruby API Debugger
+==========================
 
 This is a Ruby debugger framework for SketchUp 2014 and later. We currently support Windows only but Mac OS X support will be added soon. The ruby-debug-ide protocol has been mostly implemented so any Ruby IDE that supports this protocol should work. We have tested with Aptana RadRails, NetBeans (with Ruby community plugin) and RubyMine.
 
