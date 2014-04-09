@@ -18,6 +18,7 @@ SketchUp.exe -rdebug "ide port=7000"
 
 Most common debugging functionality has been implemented but there are few TODOs:
 - Debugging of multi-threaded execution
+- Exception breakpoints
 - Conditional breakpoints
 - What else are we missing ? Please report and contribute!
 
