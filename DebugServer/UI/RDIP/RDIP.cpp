@@ -335,7 +335,7 @@ void RDIP::Connection::stopAtBreakpoint(BreakPoint bp) {
 
 void RDIP::Connection::suspendAt(const std::string& file, size_t line) {
   std::ostringstream ss;
-  ss << "<suspended file=\"" << file << "\" line=\"" << line << "\" threadId=\"1\" frames=\"1\"/>\n";
+  ss << "<suspended file=\"" << encodeXml(file) << "\" line=\"" << line << "\" threadId=\"1\" frames=\"1\"/>\n";
   Log("sending suspendAt => ");
 
   auto str = ss.str();
