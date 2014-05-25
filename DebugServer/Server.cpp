@@ -165,9 +165,11 @@ VALUE DebugInspectorFunc(const rb_debug_inspector_t* di, void* data) {
     if (path_val == Qnil)
       continue; // Probably the top stack when run from console
     StackFrame frame;
-    frame.name = GetRubyObjectAsString(bt_val);;
-    VALUE line_val = rb_funcall(bt_val, rb_intern("lineno"), 0);
     frame.file = RSTRING_PTR(path_val);
+    if (frame.file == "<main>")
+      continue; // Top frame when called from Ruby Console
+    frame.name = GetRubyObjectAsString(bt_val);
+    VALUE line_val = rb_funcall(bt_val, rb_intern("lineno"), 0);
     frame.line = FIX2INT(line_val);
     frame.binding = rb_debug_inspector_frame_binding_get(di, i);
     frame.self = rb_debug_inspector_frame_self_get(di, i);
