@@ -15,9 +15,9 @@ SketchUp.exe -rdebug "ide port=7000"
 
 Instructions for Mac OS X:
 - Install SketchUp 2014 Maintenance 1 Release (version 14.1.1283) or later
-- Copy SURubyDebugger.dylib into the Frameworks directory of the app bundle:
+- Download SURubyDebugger.dylib into the Frameworks directory of the app bundle:
 ```
-SketchUp.app/Contents/Frameworks
+curl https://github.com/SketchUp/sketchup-ruby-debugger/releases/download/1.0.1.2/SURubyDebugger.dylib -o /Applications/SketchUp\ 2014/SketchUp.app/Contents/Frameworks/SURubyDebugger.dylib
 ```
 - Run SketchUp from the command line:
 ```
