@@ -115,7 +115,7 @@ VALUE ProtectFuncall(VALUE obj, ID func, int argc, ...) {
   // Allocate the array and push on the object and the method ID
   VALUE data = rb_ary_new2(argc + 2);
   rb_ary_push(data, obj);
-  rb_ary_push(data, LONG2NUM(func));
+  rb_ary_push(data, SIZET2NUM(func));
 
   // Now push on all of the arguments.
   if (argc > 0) {

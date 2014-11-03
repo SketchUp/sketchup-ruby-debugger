@@ -85,10 +85,11 @@ void ConsoleInputBuffer::AddPendingInputToBuffer() {
           // Clear first
           std::wstring clearStr(buffer_.size(), L' ');
           COORD pos = info.dwCursorPosition;
-          pos.X -= clearStr.size();
+          pos.X -= static_cast<short>(clearStr.size());
           DWORD dwWritten;
           ::WriteConsoleOutputCharacter(hStdOut, clearStr.c_str(),
-                                        clearStr.size(), pos, &dwWritten);
+                                        static_cast<DWORD>(clearStr.size()),
+                                        pos, &dwWritten);
           // Set cursor to the beginning
           SetConsoleCursorPosition(hStdOut, pos);
           // Write the new line

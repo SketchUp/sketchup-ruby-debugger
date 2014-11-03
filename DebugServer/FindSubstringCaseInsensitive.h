@@ -31,7 +31,7 @@ int FindSubstringCaseInsensitive(const T& str1, const T& str2,
     typename T::const_iterator it = std::search(str1.begin(), str1.end(),
         str2.begin(), str2.end(), EqualPred<typename T::value_type>(loc));
     if (it != str1.end())
-      return it - str1.begin();
+      return static_cast<int>(it - str1.begin());
     else return -1; // not found
 }
 
