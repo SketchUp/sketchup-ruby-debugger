@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>873413FF-4FE4-49C6-B91B-1F2BA345EB49</string>
+	<key>IDESourceControlProjectName</key>
+	<string>SURubyDebugger</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>841B843A-9D2E-4756-B217-7F0F7979D26A</key>
+		<string>https://github.com/SketchUp/sketchup-ruby-debugger.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>Build/SURubyDebugger.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>841B843A-9D2E-4756-B217-7F0F7979D26A</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/SketchUp/sketchup-ruby-debugger.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>841B843A-9D2E-4756-B217-7F0F7979D26A</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>841B843A-9D2E-4756-B217-7F0F7979D26A</string>
+			<key>IDESourceControlWCCName</key>
+			<string>sketchup-ruby-debugger</string>
+		</dict>
+	</array>
+</dict>
+</plist>
