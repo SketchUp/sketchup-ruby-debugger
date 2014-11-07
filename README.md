@@ -6,7 +6,7 @@ This is a Ruby debugger framework for SketchUp 2014 and later. The ruby-debug-id
 Instructions for Windows:
 - Download the pre-built dynamic library (SURubyDebugger.dll) from the latest release. Copy this DLL into the SketchUp installation directory:
 ```
-C:\Program Files \SketchUp\SketchUp 2015\
+C:\Program Files\SketchUp\SketchUp 2015\
 ```
 or for 32-bit SketchUp (including SketchUp 2014):
 ```
