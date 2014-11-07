@@ -6,7 +6,11 @@ This is a Ruby debugger framework for SketchUp 2014 and later. The ruby-debug-id
 Instructions for Windows:
 - Download the pre-built dynamic library (SURubyDebugger.dll) from the latest release. Copy this DLL into the SketchUp installation directory:
 ```
-C:\Program Files (x86)\SketchUp\SketchUp 2014\
+C:\Program Files \SketchUp\SketchUp 2015\
+```
+or for 32-bit SketchUp (including SketchUp 2014):
+```
+C:\Program Files (x86)\SketchUp\SketchUp 2015\
 ```
 - Run SketchUp with the following command line arguments:
 ```
@@ -17,11 +21,11 @@ Instructions for Mac OS X:
 - Install SketchUp 2014 Maintenance 1 Release (version 14.1.1283) or later
 - Download SURubyDebugger.dylib into the Frameworks directory of the app bundle:
 ```
-curl https://github.com/SketchUp/sketchup-ruby-debugger/releases/download/1.0.1.2/SURubyDebugger.dylib -o /Applications/SketchUp\ 2014/SketchUp.app/Contents/Frameworks/SURubyDebugger.dylib
+curl https://github.com/SketchUp/sketchup-ruby-debugger/releases/download/1.0.2.0/SURubyDebugger.dylib -o /Applications/SketchUp\ 2015/SketchUp.app/Contents/Frameworks/SURubyDebugger.dylib
 ```
 - Run SketchUp from the command line:
 ```
-open -a /Applications/SketchUp\ 2014/SketchUp.app --args -rdebug "ide port=7000"
+open -a /Applications/SketchUp\ 2015/SketchUp.app --args -rdebug "ide port=7000"
 ```
 
 Notes:
