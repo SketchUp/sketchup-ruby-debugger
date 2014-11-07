@@ -84,7 +84,7 @@ VALUE WrapFuncall(VALUE data) {
   if (!(TYPE(data) == T_ARRAY)) {
     return Qnil;
   }
-  int argc = RARRAY_LEN(data);
+  int argc = (int)RARRAY_LEN(data);
   if (argc < 2) {
     return Qnil;
   }
@@ -158,7 +158,7 @@ Variable EvaluateRubyExpression(const std::string& expr, VALUE binding) {
 VALUE DebugInspectorFunc(const rb_debug_inspector_t* di, void* data) {
   auto frames = reinterpret_cast<std::vector<StackFrame>*>(data);
   VALUE bt = rb_debug_inspector_backtrace_locations(di);
-  int bt_count = RARRAY_LEN(bt);
+  int bt_count = (int)RARRAY_LEN(bt);
   for (int i=0; i < bt_count; ++i) {
     VALUE bt_val = RARRAY_PTR(bt)[i];
     VALUE path_val = rb_funcall(bt_val, rb_intern("path"), 0);
@@ -392,6 +392,7 @@ static void ProcessLine(Server::Impl* server, const std::string& file_path,
 
 void Server::Impl::LineEvent(VALUE tp_val, void* data) {
   EVENT_COMMON_CODE;
+  (void)event_sym; // Suppress unused warning
 
   ProcessLine(server, file_path, line);
 }
@@ -462,7 +463,7 @@ static int EachKeyValFunc(VALUE key, VALUE val, VALUE data) {
     // Add the source lines vector
     auto& lines_vec = impl->script_lines_[file_path];
     // Add the source code
-    int n = RARRAY_LEN(val);
+    int n = (int)RARRAY_LEN(val);
     lines_vec.reserve(n);
     for (int i = 0; i < n; ++i) {
       VALUE arr_val = RARRAY_PTR(val)[i];
@@ -756,7 +757,7 @@ IDebugServer::VariablesVector Server::GetVariables(const char* type,
   VALUE binding = impl_->GetBinding(use_toplevel_binding);
   if (binding != 0) {
     VALUE arr_val = EvaluateRubyExpressionAsValue(type, binding);
-    int count = RARRAY_LEN(arr_val);
+    int count = (int)RARRAY_LEN(arr_val);
     for (int i = 0; i < count; ++i) {
       VALUE var_val = RARRAY_PTR(arr_val)[i];
       Variable var;

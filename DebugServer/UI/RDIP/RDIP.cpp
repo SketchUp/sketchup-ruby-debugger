@@ -312,7 +312,7 @@ void RDIP::Connection::evaluateCommand(const std::string& cmd) {
   } else if(regex_match(cmd, what, reg_var_instance)) {
     size_t objectID = 0;
     std::string str_what = what[1];
-    sscanf(str_what.c_str(), "%x", &objectID);
+    sscanf(str_what.c_str(), "%zx", &objectID);
     server_response_ = std::bind(&RDIP::Connection::getInstanceVariables, this, objectID);
     process_server_response_ = std::bind(&RDIP::Connection::sendVariables, this, "instance");
     server_wait_cond_.notify_all();
