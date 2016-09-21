@@ -3,7 +3,7 @@
   missing.h - prototype for *.c in ./missing, and
   	      for missing timeval struct
 
-  $Author: nagachika $
+  $Author: nobu $
   created at: Sat May 11 23:46:03 JST 2002
 
 ************************************************/
@@ -21,6 +21,9 @@ extern "C" {
 #include "ruby/config.h"
 #include <stddef.h>
 #include <math.h> /* for INFINITY and NAN */
+#ifdef RUBY_ALTERNATIVE_MALLOC_HEADER
+# include RUBY_ALTERNATIVE_MALLOC_HEADER
+#endif
 #ifdef RUBY_EXTCONF_H
 #include RUBY_EXTCONF_H
 #endif
@@ -32,6 +35,11 @@ extern "C" {
 #if defined(HAVE_SYS_TIME_H)
 # include <sys/time.h>
 #endif
+#endif
+
+#ifndef RUBY_SYMBOL_EXPORT_BEGIN
+# define RUBY_SYMBOL_EXPORT_BEGIN /* begin */
+# define RUBY_SYMBOL_EXPORT_END   /* end */
 #endif
 
 #if !defined(HAVE_STRUCT_TIMEVAL)
@@ -62,9 +70,7 @@ struct timezone {
 #define RUBY_EXTERN extern
 #endif
 
-#if defined __GNUC__ && __GNUC__ >= 4
-#pragma GCC visibility push(default)
-#endif
+RUBY_SYMBOL_EXPORT_BEGIN
 
 #ifndef HAVE_ACOSH
 RUBY_EXTERN double acosh(double);
@@ -165,6 +171,10 @@ RUBY_EXTERN int isnan(double);
 # endif
 #endif
 
+#ifndef HAVE_NEXTAFTER
+RUBY_EXTERN double nextafter(double x, double y);
+#endif
+
 /*
 #ifndef HAVE_MEMCMP
 RUBY_EXTERN int memcmp(const void *, const void *, size_t);
@@ -229,9 +239,7 @@ RUBY_EXTERN int ruby_close(int);
 RUBY_EXTERN void setproctitle(const char *fmt, ...);
 #endif
 
-#if defined __GNUC__ && __GNUC__ >= 4
-#pragma GCC visibility pop
-#endif
+RUBY_SYMBOL_EXPORT_END
 
 #if defined(__cplusplus)
 #if 0

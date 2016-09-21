@@ -2,8 +2,8 @@
 
   rubysig.h -
 
-  $Author: nobu $
-  $Date: 2012-06-19 18:43:53 +0900 (Tue, 19 Jun 2012) $
+  $Author: akr $
+  $Date: 2014-02-15 00:16:31 +0900 (Sat, 15 Feb 2014) $
   created at: Wed Aug 16 01:15:38 JST 1995
 
   Copyright (C) 1993-2008 Yukihiro Matsumoto
@@ -27,24 +27,15 @@ extern "C" {
 #endif
 #endif
 
-#if defined __GNUC__ && __GNUC__ >= 4
-#pragma GCC visibility push(default)
-#endif
+RUBY_SYMBOL_EXPORT_BEGIN
 
-struct rb_blocking_region_buffer;
-DEPRECATED(RUBY_EXTERN struct rb_blocking_region_buffer *rb_thread_blocking_region_begin(void));
-DEPRECATED(RUBY_EXTERN void rb_thread_blocking_region_end(struct rb_blocking_region_buffer *));
-#define TRAP_BEG do {struct rb_blocking_region_buffer *__region = rb_thread_blocking_region_begin();
-#define TRAP_END rb_thread_blocking_region_end(__region);} while (0)
 #define RUBY_CRITICAL(statements) do {statements;} while (0)
 #define DEFER_INTS (0)
 #define ENABLE_INTS (1)
 #define ALLOW_INTS do {CHECK_INTS;} while (0)
 #define CHECK_INTS rb_thread_check_ints()
 
-#if defined __GNUC__ && __GNUC__ >= 4
-#pragma GCC visibility pop
-#endif
+RUBY_SYMBOL_EXPORT_END
 
 #if defined(__cplusplus)
 #if 0
