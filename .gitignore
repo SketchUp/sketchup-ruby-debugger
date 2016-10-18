@@ -5,6 +5,7 @@ Release/
 *.sdf
 *.vcxproj.user
 ipch/
+*.VC*
 *.opensdf
 .DS_Store
 Build/SURubyDebugger.xcodeproj/xcuserdata

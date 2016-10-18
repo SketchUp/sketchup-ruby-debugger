@@ -109,7 +109,7 @@ call $(SolutionDir)postbuild.bat
       <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;DEBUGSERVER_EXPORTS;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)../;$(SolutionDir)../ThirdParty/include;$(SolutionDir)../ThirdParty/include/ruby/win32_x64;$(SolutionDir)../ThirdParty/include/ruby/win32_x64/x64-mswin64_120</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)../;$(SolutionDir)../ThirdParty/include;$(SolutionDir)../ThirdParty/include/ruby/win32_x64;$(SolutionDir)../ThirdParty/include/ruby/win32_x64/x64-mswin64_140</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
@@ -118,7 +118,7 @@ call $(SolutionDir)postbuild.bat
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)../ThirdParty/lib/Debug/x64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libboost_system-mt-sgd.lib;x64-msvcrt-ruby200.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libboost_system-mt-sgd.lib;x64-msvcrt-ruby220.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>set TARGETDIR=$(TargetDir)
@@ -160,7 +160,7 @@ call $(SolutionDir)postbuild.bat
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;DEBUGSERVER_EXPORTS;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)../;$(SolutionDir)../ThirdParty/include;$(SolutionDir)../ThirdParty/include/ruby/win32_x64;$(SolutionDir)../ThirdParty/include/ruby/win32_x64/x64-mswin64_120</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)../;$(SolutionDir)../ThirdParty/include;$(SolutionDir)../ThirdParty/include/ruby/win32_x64;$(SolutionDir)../ThirdParty/include/ruby/win32_x64/x64-mswin64_140</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
@@ -170,7 +170,7 @@ call $(SolutionDir)postbuild.bat
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)../ThirdParty/lib/Release/x64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libboost_system-mt-s.lib;x64-msvcrt-ruby200.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libboost_system-mt-s.lib;x64-msvcrt-ruby220.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>set TARGETDIR=$(TargetDir)

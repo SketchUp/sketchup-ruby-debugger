@@ -1,5 +1,8 @@
 #ifndef INCLUDE_RUBY_CONFIG_H
 #define INCLUDE_RUBY_CONFIG_H 1
+#if _MSC_VER != 1600
+//#error MSC version unmatch: _MSC_VER: 1600 is expected.
+#endif
 #define RUBY_MSVCRT_VERSION 100
 #define STDC_HEADERS 1
 #define HAVE_SYS_TYPES_H 1
@@ -17,7 +20,7 @@
 #define SIZEOF___INT64 8
 #define _INTEGRAL_MAX_BITS 64
 #define SIZEOF_OFF_T 8
-#define SIZEOF_VOIDP 4
+#define SIZEOF_VOIDP 8
 #define SIZEOF_FLOAT 4
 #define SIZEOF_DOUBLE 8
 #define SIGNEDNESS_OF_TIME_T -1
@@ -28,10 +31,10 @@
 #define NUM2CLOCKID(v) NUM2INT(v)
 #define SIZEOF_CLOCK_T 4
 #define SIZEOF_RLIM_T 0
-#define SIZEOF_SIZE_T 4
-#define SIZEOF_PTRDIFF_T 4
-#define SIZEOF_INTPTR_T 4
-#define SIZEOF_UINTPTR_T 4
+#define SIZEOF_SIZE_T 8
+#define SIZEOF_PTRDIFF_T 8
+#define SIZEOF_INTPTR_T 8
+#define SIZEOF_UINTPTR_T 8
 #define HAVE_PROTOTYPES 1
 #define TOKEN_PASTE(x,y) x##y
 #define HAVE_STDARG_PROTOTYPES 1
@@ -43,7 +46,7 @@
 #define FUNC_FASTCALL(x) __fastcall x
 #define RUBY_FUNCTION_NAME_STRING __FUNCTION__
 #define PACKED_STRUCT(x) __pragma(pack(push, 1)) x __pragma(pack(pop))
-#define PACKED_STRUCT_UNALIGNED(x) x
+#define PACKED_STRUCT_UNALIGNED(x) PACKED_STRUCT(x)
 #define RUBY_EXTERN extern __declspec(dllimport)
 #define HAVE_DECL_SYS_NERR 1
 #define HAVE_LIMITS_H 1
@@ -77,7 +80,7 @@
 #define HAVE_INTPTR_T 1
 #define HAVE_UINTPTR_T 1
 #define HAVE_SSIZE_T 1
-#define ssize_t int
+#define ssize_t __int64
 #define PRI_LL_PREFIX "I64"
 #define PRI_PIDT_PREFIX PRI_INT_PREFIX
 #define GETGROUPS_T int
@@ -127,14 +130,13 @@
 #define HAVE_DAYLIGHT 1
 #define HAVE_GMTIME_R 1
 #define HAVE_TYPE_NET_LUID 1
-#define HAVE_STRUCT_TIMESPEC 1
 #define SETPGRP_VOID 1
 #define RSHIFT(x,y) ((x)>>(int)y)
 #define HAVE_RB_FD_INIT 1
 #define RUBY_SETJMP(env) _setjmp(env)
 #define RUBY_LONGJMP(env,val) longjmp(env,val)
 #define RUBY_JMP_BUF jmp_buf
-#define inline __inline
+//#define inline __inline
 #define NEED_IO_SEEK_BETWEEN_RW 1
 #define STACK_GROW_DIRECTION -1
 #define CANONICALIZATION_FOR_MATHN 1
@@ -143,11 +145,11 @@
 #define DLEXT ".so"
 #define EXECUTABLE_EXTS ".exe",".com",".cmd",".bat"
 #define RUBY_COREDLL "msvcr100"
-#define LIBRUBY_SO "msvcrt-ruby220.dll"
-#define RUBY_PLATFORM "i386-mswin32_100"
-#define RUBY_SITEARCH "i386-msvcr100"
+#define LIBRUBY_SO "x64-msvcrt-ruby220.dll"
+#define RUBY_PLATFORM "x64-mswin64_100"
+#define RUBY_SITEARCH "x64-msvcr100"
 #if 0
-!if "msvcrt-ruby220"!="$(RUBY_SO_NAME)" || "i386-mswin32_100"!="$(ARCH)-$(PLATFORM)"
+!if "x64-msvcrt-ruby220"!="$(RUBY_SO_NAME)" || "x64-mswin64_100"!="$(ARCH)-$(PLATFORM)"
 config.h: nul
 !endif
 #endif

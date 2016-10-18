@@ -19,3 +19,16 @@
 #include <Shlobj.h>
 
 #define BOOST_ALL_NO_LIB = 1
+
+// Ruby was configured for /Md builds. These macros are needed to
+// prevent compiler errors with Visual Studio when builds are compiled with MT.
+
+// Ruby 2.0
+#define HAVE_ACOSH 1
+#define HAVE_CBRT 1
+#define HAVE_ERF 1
+#define HAVE_TGAMMA 1
+#define HAVE_ROUND 1
+
+// Ruby 2.2
+#define HAVE_NEXTAFTER 1
