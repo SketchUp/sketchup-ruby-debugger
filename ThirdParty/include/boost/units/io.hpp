@@ -41,7 +41,7 @@ namespace serialization {
 
 /// Boost Serialization library support for units.
 template<class Archive,class System,class Dim>
-inline void serialize(Archive& ar,boost::units::unit<Dim,System>&,const unsigned int /*version*/)
+inline void serialize(Archive& /*ar*/,boost::units::unit<Dim,System>&,const unsigned int /*version*/)
 { }
 
 /// Boost Serialization library support for quantities.
@@ -761,7 +761,9 @@ typedef list<scale<2, static_rational<10> >,
         list<scale<2, static_rational<50> >,
         list<scale<2, static_rational<60> >,
         list<scale<2, static_rational<70> >,
-        dimensionless_type> > > > > > > binary_prefixes;
+        list<scale<2, static_rational<80> >,
+        list<scale<2, static_rational<90> >,
+        dimensionless_type> > > > > > > > > binary_prefixes;
 
 template<class Os, class Quantity>
 struct print_default_t {

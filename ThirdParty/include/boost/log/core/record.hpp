@@ -1,5 +1,5 @@
 /*
- *          Copyright Andrey Semashev 2007 - 2013.
+ *          Copyright Andrey Semashev 2007 - 2015.
  * Distributed under the Boost Software License, Version 1.0.
  *    (See accompanying file LICENSE_1_0.txt or copy at
  *          http://www.boost.org/LICENSE_1_0.txt)
@@ -55,6 +55,10 @@ private:
     //! A pointer to the log record implementation
     public_data* m_impl;
 
+private:
+    //  A private constructor, accessible from core
+    BOOST_CONSTEXPR explicit record(public_data* impl) BOOST_NOEXCEPT : m_impl(impl) {}
+
 #endif // BOOST_LOG_DOXYGEN_PASS
 
 public:
@@ -63,7 +67,7 @@ public:
      *
      * \post <tt>!*this == true</tt>
      */
-    record() : m_impl(NULL) {}
+    BOOST_CONSTEXPR record() BOOST_NOEXCEPT : m_impl(NULL) {}
 
     /*!
      * Move constructor. Source record contents unspecified after the operation.
@@ -115,7 +119,7 @@ public:
      *
      * \return \c true, if the <tt>*this</tt> identifies a log record, \c false, if the <tt>*this</tt> is not valid
      */
-    BOOST_EXPLICIT_OPERATOR_BOOL()
+    BOOST_EXPLICIT_OPERATOR_BOOL_NOEXCEPT()
 
     /*!
      * Inverted conversion to an unspecified boolean type
@@ -153,6 +157,17 @@ public:
             public_data::destroy(m_impl);
             m_impl = NULL;
         }
+    }
+
+    /*!
+     * Attribute value lookup.
+     *
+     * \param name Attribute name.
+     * \return An \c attribute_value, non-empty if it is found, empty otherwise.
+     */
+    attribute_value_set::mapped_type operator[] (attribute_value_set::key_type name) const
+    {
+        return m_impl->m_attribute_values[name];
     }
 
     /*!

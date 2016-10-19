@@ -29,9 +29,6 @@
 # endif
 
 # if defined(BOOST_MSVC)
-#  if _MSC_VER < 1300
-#   define BOOST_MSVC6_OR_EARLIER 1
-#  endif
 
 #  pragma warning (disable : 4786) // disable truncated debug symbols
 #  pragma warning (disable : 4251) // disable exported dll function
@@ -136,6 +133,10 @@
 
 #ifndef BOOST_PYTHON_NO_PY_SIGNATURES
 #define BOOST_PYTHON_SUPPORTS_PY_SIGNATURES // enables smooth transition
+#endif
+
+#if !defined(BOOST_ATTRIBUTE_UNUSED) && defined(__GNUC__) && (__GNUC__ >= 4)
+#  define BOOST_ATTRIBUTE_UNUSED __attribute__((unused))
 #endif
 
 #endif // CONFIG_DWA052200_H_
