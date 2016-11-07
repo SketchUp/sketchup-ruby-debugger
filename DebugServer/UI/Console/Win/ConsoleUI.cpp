@@ -24,7 +24,7 @@ using namespace SketchUp::RubyDebugger;
 
 void RedirectStdStreamToConsole(DWORD stdHandle, FILE* stdFile,
                                 bool openModeRead) {
-  long lStdHandle = (long)GetStdHandle(stdHandle);
+  auto lStdHandle = reinterpret_cast<intptr_t>(GetStdHandle(stdHandle));
   int hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
   FILE* fp = _fdopen(hConHandle, (openModeRead ? "r" : "w"));
   *stdFile = *fp;

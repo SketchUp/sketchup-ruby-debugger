@@ -9,14 +9,12 @@
 #ifndef BOOST_UNORDERED_UNORDERED_SET_HPP_INCLUDED
 #define BOOST_UNORDERED_UNORDERED_SET_HPP_INCLUDED
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
+#include <boost/config.hpp>
+#if defined(BOOST_HAS_PRAGMA_ONCE)
+#pragma once
 #endif
 
-#include <boost/unordered/unordered_set_fwd.hpp>
-#include <boost/unordered/detail/equivalent.hpp>
-#include <boost/unordered/detail/unique.hpp>
-#include <boost/unordered/detail/util.hpp>
+#include <boost/unordered/detail/set.hpp>
 #include <boost/functional/hash.hpp>
 #include <boost/move/move.hpp>
 

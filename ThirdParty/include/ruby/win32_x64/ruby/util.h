@@ -2,7 +2,7 @@
 
   util.h -
 
-  $Author: tadf $
+  $Author: glass $
   created at: Thu Mar  9 11:55:53 JST 1995
 
   Copyright (C) 1993-2007 Yukihiro Matsumoto
@@ -45,17 +45,22 @@ extern "C" {
 #endif
 #endif
 
-#if defined __GNUC__ && __GNUC__ >= 4
-#pragma GCC visibility push(default)
-#endif
+RUBY_SYMBOL_EXPORT_BEGIN
+
+#define DECIMAL_SIZE_OF_BITS(n) (((n) * 3010 + 9998) / 9999)
+/* an approximation of ceil(n * log10(2)), upto 65536 at least */
 
 #define scan_oct(s,l,e) ((int)ruby_scan_oct((s),(l),(e)))
 unsigned long ruby_scan_oct(const char *, size_t, size_t *);
 #define scan_hex(s,l,e) ((int)ruby_scan_hex((s),(l),(e)))
 unsigned long ruby_scan_hex(const char *, size_t, size_t *);
 
+#ifdef HAVE_GNU_QSORT_R
+# define ruby_qsort qsort_r
+#else
 void ruby_qsort(void *, const size_t, const size_t,
 		int (*)(const void *, const void *, void *), void *);
+#endif
 
 void ruby_setenv(const char *, const char *);
 void ruby_unsetenv(const char *);
@@ -85,9 +90,7 @@ double ruby_strtod(const char *, char **);
 
 void ruby_each_words(const char *, void (*)(const char*, int, void*), void *);
 
-#if defined __GNUC__ && __GNUC__ >= 4
-#pragma GCC visibility pop
-#endif
+RUBY_SYMBOL_EXPORT_END
 
 #if defined(__cplusplus)
 #if 0

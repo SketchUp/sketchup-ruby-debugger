@@ -7,7 +7,7 @@
  * Boost Software License, Version 1.0. (See accompanying
  * file LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt)
  * Author:  Martin Andrian, Jeff Garland, Bart Garst
- * $Date: 2013-10-15 08:22:02 -0700 (Tue, 15 Oct 2013) $
+ * $Date$
  */
 
 #include <cctype>
@@ -1131,9 +1131,10 @@ namespace date_time {
                     if(sec == -1){
                        return check_special_value(sitr, stream_end, t, c);
                     }
-                    if (*itr == 'S')
+                    if (*itr == 'S' || sitr == stream_end)
                       break;
-                    // %s is the same as %S%f so we drop through into %f
+                    // %s is the same as %S%f so we drop through into %f if we are
+                    // not at the end of the stream
                   }
                 case 'f':
                   {

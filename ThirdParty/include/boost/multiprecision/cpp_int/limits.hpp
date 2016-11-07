@@ -12,6 +12,11 @@ namespace std{
 
 namespace detail{
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4307)
+#endif
+
 template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
 inline boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>
    get_min(const boost::mpl::true_&, const boost::mpl::true_&)
@@ -131,7 +136,7 @@ public:
    static number_type lowest() { return (min)(); }
    BOOST_STATIC_CONSTEXPR int digits = boost::multiprecision::backends::max_precision<backend_type>::value == UINT_MAX ? INT_MAX : boost::multiprecision::backends::max_precision<backend_type>::value;
    BOOST_STATIC_CONSTEXPR int digits10 = (digits > INT_MAX / 301) ? (digits / 1000) * 301L : (digits * 301) / 1000;
-   BOOST_STATIC_CONSTEXPR int max_digits10 = digits10 + 2;
+   BOOST_STATIC_CONSTEXPR int max_digits10 = digits10 + 3;
    BOOST_STATIC_CONSTEXPR bool is_signed = boost::multiprecision::is_signed_number<backend_type>::value;
    BOOST_STATIC_CONSTEXPR bool is_integer = true;
    BOOST_STATIC_CONSTEXPR bool is_exact = true;
@@ -209,6 +214,9 @@ BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost
 template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST float_round_style numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>  >::round_style;
 
+#endif
+#ifdef _MSC_VER
+#pragma warning(pop)
 #endif
 
 } // namespace std
