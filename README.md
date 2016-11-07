@@ -21,7 +21,7 @@ Instructions for Mac OS X:
 - Install SketchUp 2014 Maintenance 1 Release (version 14.1.1283) or later
 - Download SURubyDebugger.dylib into the Frameworks directory of the app bundle:
 ```
-curl https://github.com/SketchUp/sketchup-ruby-debugger/releases/download/1.0.2.0/SURubyDebugger.dylib -o /Applications/SketchUp\ 2015/SketchUp.app/Contents/Frameworks/SURubyDebugger.dylib
+curl https://github.com/SketchUp/sketchup-ruby-debugger/releases/download/1.0.3.0/SURubyDebugger.dylib -o /Applications/SketchUp\ 2017/SketchUp.app/Contents/Frameworks/SURubyDebugger.dylib
 ```
 - Run SketchUp from the command line:
 ```
