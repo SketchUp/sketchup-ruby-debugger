@@ -27,6 +27,12 @@ public:
 
   virtual bool RemoveBreakPoint(size_t index);
 
+  virtual bool RemoveAllBreakPoints();
+
+  virtual bool EnableBreakPoint(size_t index, bool enable);
+
+  virtual bool ConditionBreakPoint(size_t index, const std::string& condition);
+
   virtual std::vector<BreakPoint> GetBreakPoints() const;
 
   virtual bool IsStopped() const;

@@ -39,6 +39,15 @@ public:
   // Removes the breakpoint at a given index. Returns true on success.
   virtual bool RemoveBreakPoint(size_t index) = 0;
 
+  // Removes all breakpoints. Returns true on success.
+  virtual bool RemoveAllBreakPoints() = 0;
+
+  // Enables (or disables) the breakpoint at the given index. Returns true on success.
+  virtual bool EnableBreakPoint(size_t index, bool enable) = 0;
+
+  // Sets the condition for the breakpoint at the given index. Returns true on success.
+  virtual bool ConditionBreakPoint(size_t index, const std::string& condition) = 0;
+
   // Returns all breakpoints.
   virtual std::vector<BreakPoint> GetBreakPoints() const = 0;
 

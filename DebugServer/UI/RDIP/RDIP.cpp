@@ -2,384 +2,450 @@
 // Authors:
 // - Orhun Birsoy
 // - Bugra Barin
+// - Aaron Hill (@Seraku) - Refactored ruby-debug-ide protocol implementation.
 //
 #include "./RDIP.h"
+
+#include <condition_variable>
+#include <functional>
+#include <mutex>
+#include <regex>
+#include <queue>
+#include <thread>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/asio.hpp>
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/signal_set.hpp>
+#include <boost/asio/streambuf.hpp>
+#include <boost/asio/ip/tcp.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <DebugServer/IDebugServer.h>
 #include <DebugServer/Log.h>
 #include <Common/BreakPoint.h>
 #include <Common/StackFrame.h>
-#include <boost/asio/ip/tcp.hpp>
-#include <boost/asio/streambuf.hpp>
-#include <boost/asio.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
-
-#include <cassert>
-#include <memory>
-#include <regex>
 
 namespace SketchUp {
 namespace RubyDebugger {
 
-class RDIP::Connection : public std::enable_shared_from_this<RDIP::Connection> {
+static const int DefaultPort = 1234;
+
+class RDIP::Impl : std::enable_shared_from_this<Impl> {
 public:
-  Connection(boost::asio::io_service& service, int port, IDebugServer* server,
-             std::condition_variable& serverWaitCond,
-             std::mutex& serverWaitMutex,
-             bool& serverCanContinue,
-             std::function<void(void)>& serverResponse,
-             std::function<void(void)>& processServerResponse);
+  Impl(IDebugServer *server, int port);
+  ~Impl();
 
+  bool isClientConnected() const { return socket_.is_open(); }
+
+  void postResponse(const std::string &response);
   void wait();
-  void stopAtBreakpoint(BreakPoint bp);
-  void suspendAt(const std::string& file, size_t line);
 
 private:
-  void start(const boost::system::error_code& err);
-  void handleCommand(const boost::system::error_code& err);
-  void evaluateCommand(const std::string& cmd);
-  void getVariables(bool local);
-  void getInstanceVariables(size_t object_id);
-  void evalExpression();
-  void sendVariables(std::string kind);
+  void handleError(const boost::system::error_code &err, int signal);
+  void closeConnection();
+  
+  void doAccept();
+  void handleAccept(const boost::system::error_code &err);
+  
+  void doReadUntil();
+  void handleReadUntil(const boost::system::error_code &err, size_t bytes);
+  
+  void evaluateCommand(const std::string &command);
+  void sendResponse(const std::string &response);
+  void sendVariables(const std::string &kind, const std::vector<Variable> &variables);
 
-private:
+  void notifyWait(bool stop_waiting);
+  void queueWork(const std::function<void(void)> &work);
+  void processWorkQueue();
+
+  void doCheckWorkQueue();
+  void handleCheckWorkQueue(const boost::system::error_code &err);
+
+  IDebugServer *server_;
+
+  boost::asio::io_service io_service_;
+  boost::asio::signal_set signal_set_;
+  std::thread service_thread_;
+
   boost::asio::ip::tcp::socket socket_;
   boost::asio::ip::tcp::acceptor acceptor_;
   boost::asio::streambuf read_buffer_;
-  boost::asio::streambuf write_buffer_;
-  IDebugServer* server_;
-  std::condition_variable &server_wait_cond_;
-  std::mutex &server_wait_mutex_;
-  bool &server_can_continue_;
-  std::function<void(void)>& server_response_;
-  std::function<void(void)>& process_server_response_;
-  std::string expression_to_eval_;
-  std::mutex variables_to_send_mutex_;
-  IDebugServer::VariablesVector variables_to_send_;
+
+  bool stop_waiting_;
+  std::mutex wait_mutex_;
+  std::condition_variable wait_cond_;
+
+  std::queue<std::function<void(void)>> work_queue_;
+  std::mutex work_queue_mutex_;
+  boost::asio::deadline_timer work_queue_timer_;
 };
 
-RDIP::RDIP()
-  : signal_set_(io_service_, SIGINT, SIGTERM, SIGSEGV)
-  , server_can_continue_(false)
-{}
+RDIP::Impl::Impl(IDebugServer *server, int port)
+  : server_(server)
+  , signal_set_(io_service_, SIGINT, SIGTERM, SIGSEGV)
+  , socket_(io_service_)
+  , acceptor_(io_service_, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port))
+  , work_queue_timer_(io_service_) {
+  signal_set_.async_wait(std::bind(&RDIP::Impl::handleError, this, std::placeholders::_1, std::placeholders::_2));
 
-RDIP::~RDIP() {
-  io_service_.stop();
-  service_thread_.join();
+  service_thread_ = std::thread([this](){
+    doAccept();
+    io_service_.run();
+  });
 }
 
-void RDIP::Initialize(IDebugServer* server, const std::string& str_debugger) {
-  server_ = server;
-  
-  // Parse the port number if given.
-  int port = 1234;
-  const std::regex reg_port("port=(\\d+)");
+RDIP::Impl::~Impl() {
+  closeConnection();
+  if (!io_service_.stopped()) io_service_.stop();
+  if (service_thread_.joinable()) service_thread_.join();
+}
+
+void RDIP::Impl::postResponse(const std::string &response) {
+  io_service_.post(std::bind(&RDIP::Impl::sendResponse, this, response));
+}
+
+void RDIP::Impl::wait() {
+  std::unique_lock<std::mutex> lock(wait_mutex_);
+
+  stop_waiting_ = false;
+  do {
+    wait_cond_.wait(lock);
+    processWorkQueue();
+  } while (!stop_waiting_);
+}
+
+void RDIP::Impl::handleError(const boost::system::error_code &err, int signal) {
+  LOG(FMT("boost::system::error_code: " << err << ", signal: " << signal));
+}
+
+void RDIP::Impl::closeConnection() {
+  if (socket_.is_open()) {
+    LOG("Closing connection to ruby-debug-ide client.");
+    socket_.shutdown(boost::asio::socket_base::shutdown_both);
+    socket_.close();
+
+    server_->RemoveAllBreakPoints();
+  }
+}
+
+void RDIP::Impl::doAccept() {
+  if (socket_.is_open()) return;
+
+  LOG("Waiting for connection from ruby-debug-ide client.");
+  acceptor_.async_accept(socket_, std::bind(&RDIP::Impl::handleAccept, this, std::placeholders::_1));
+}
+
+void RDIP::Impl::handleAccept(const boost::system::error_code &err) {
+  if (err) {
+    LOG(FMT("boost::system::error_code: " << err));
+    closeConnection();
+    doAccept();
+    return;
+  }
+
+  LOG("Accepted connection from ruby-debug-ide client.");
+  doReadUntil();
+}
+
+void RDIP::Impl::doReadUntil() {
+  boost::asio::async_read_until(socket_, read_buffer_, "\n", std::bind(&RDIP::Impl::handleReadUntil, this, std::placeholders::_1, std::placeholders::_2));
+}
+
+void RDIP::Impl::handleReadUntil(const boost::system::error_code &err, size_t bytes) {
+  if (err) {
+    LOG(FMT("boost::system::error_code: " << err));
+    closeConnection();
+    doAccept();
+    return;
+  }
+
+  std::istream is(&read_buffer_);
+  std::vector<char> chars(bytes);
+  is.read(chars.data(), bytes);
+  std::string commands(chars.data(), bytes);
+
+  static const std::regex separator_regex("[;\r\n]+");
+  static const std::sregex_token_iterator end;
+  for (std::sregex_token_iterator iter(commands.begin(), commands.end(), separator_regex, -1); iter != end; ++iter) {
+    evaluateCommand(boost::trim_copy(iter->str()));
+  }
+
+  doReadUntil();
+}
+
+static std::string escapeXml(const std::string& str) {
+  std::ostringstream escaped;
+  std::for_each(str.begin(), str.end(), [&](char ch){
+    switch (ch) {
+      case '"': escaped << "&quot;"; break;
+      case '\'': escaped << "&apos;"; break;
+      case '<': escaped << "&lt;"; break;
+      case '>': escaped << "&gt;"; break;
+      case '&': escaped << "&amp;"; break;
+      default: escaped << ch; break;
+    }
+  });
+  return escaped.str();
+}
+
+void RDIP::Impl::evaluateCommand(const std::string &command) {
+  LOG(FMT("Command from ruby-debug-ide client: " << command));
   std::smatch match;
-  if (regex_search(str_debugger, match, reg_port)) {
+  std::ostringstream response;
+
+  // This represents only a subset of all commands defined by ruby-debug-ide.
+  //
+  // For reference, here are the commands that are not yet supported:
+  //    catch, restart, interrupt, detach, pp, expression_info,
+  //    include, exclude, file-filter, up, down, jump, load, pause,
+  //    set_type, thread switch, thread inspect, thread stop,
+  //    thread current, thread resume, var constant
+
+  // Breakpoint-related commands.
+  static const std::regex add_breakpoint_regex("^b(?:reak)?\\s+(.+?):(\\d+)(?:\\s+if\\s+(.+))?$", std::regex_constants::icase);
+  static const std::regex breakpoints_regex("^(?:info\\s*)?b(?:reak)?$", std::regex_constants::icase);
+  static const std::regex condition_regex("^cond(?:ition)?\\s+(\\d+)(?:\\s+(.+))?$", std::regex_constants::icase);
+  static const std::regex delete_breakpoint_regex("^del(?:ete)?(?:\\s+(\\d+))?$", std::regex_constants::icase);
+  static const std::regex enable_breakpoint_regex("^(en|dis)(?:able)?\\s+breakpoints((?:\\s+\\d+)+)$", std::regex_constants::icase);
+
+  if (std::regex_match(command, match, add_breakpoint_regex)) {
+    BreakPoint bp;
+    bp.file = match[1];
+    boost::replace_all(bp.file, "\\", "/");
+    bp.line = boost::lexical_cast<size_t>(match[2]);
+    bp.enabled = true;
+    if (match[3].matched) bp.condition = match[3];
+    if (server_->AddBreakPoint(bp, true)) {
+      response << "<breakpointAdded no=\"" << bp.index << "\" location=\"" << escapeXml(bp.file) << ':' << bp.line << "\" />";
+    }
+  } else if (std::regex_match(command, match, breakpoints_regex)) {
+    response << "<breakpoints>";
+    auto &bps = server_->GetBreakPoints();
+    std::for_each(bps.begin(), bps.end(), [&](auto &bp){
+      response << "<breakpoint n=\"" << bp.index << "\" file=\"" << escapeXml(bp.file) << "\" line=\"" << bp.line << "\" />";
+    });
+    response << "</breakpoints>";
+  } else if (std::regex_match(command, match, condition_regex)) {
+    size_t index = boost::lexical_cast<size_t>(match[1]);
+    std::string condition;
+    if (match[2].matched) condition = match[2];
+    if (server_->ConditionBreakPoint(index, condition)) {
+      response << "<conditionSet bp_id=\"" << index << "\" />";
+    }
+  } else if (std::regex_match(command, match, delete_breakpoint_regex)) {
+    if (match[1].matched) {
+      size_t index = boost::lexical_cast<size_t>(match[1]);
+      if (server_->RemoveBreakPoint(index)) {
+        response << "<breakpointDeleted no=\"" << index << "\" />";
+      }
+    } else {
+      server_->RemoveAllBreakPoints();
+    }
+  } else if (std::regex_match(command, match, enable_breakpoint_regex)) {
+    bool enable = std::tolower(match.str(1)[0]) == 'e';
+    std::string indices = match[2];
+    static const std::regex index_regex("\\d+");
+    static const std::sregex_token_iterator end;
+    for (std::sregex_token_iterator iter(indices.begin(), indices.end(), index_regex, 0); iter != end; ++iter) {
+      size_t index = boost::lexical_cast<size_t>(iter->str());
+      if (server_->EnableBreakPoint(index, enable)) {
+        response << "<breakpoint" << (enable ? "Enabled" : "Disabled") << " bp_id=\"" << index << "\" />";
+      }
+    }
+  }
+
+  // Control-related commands.
+  static const std::regex continue_regex("^c(?:ont)?$", std::regex_constants::icase);
+  static const std::regex finish_regex("^fin(?:ish)?$", std::regex_constants::icase);
+  static const std::regex next_regex("^n(?:ext)?$", std::regex_constants::icase);
+  static const std::regex quit_regex("^(?:q(?:uit)?|exit)$", std::regex_constants::icase);
+  static const std::regex start_regex("^start$", std::regex_constants::icase);
+  static const std::regex step_regex("^s(?:tep)?$", std::regex_constants::icase);
+
+  if (std::regex_match(command, match, continue_regex)) {
+    notifyWait(true);
+  } else if (std::regex_match(command, match, finish_regex)) {
+    server_->StepOut();
+    notifyWait(true);
+  } else if (std::regex_match(command, match, next_regex)) {
+    server_->StepOver();
+    notifyWait(true);
+  } else if (std::regex_match(command, match, quit_regex)) {
+    notifyWait(true);
+    closeConnection();
+    doAccept();
+  } else if (std::regex_match(command, match, start_regex)) {
+    notifyWait(true);
+  } else if (std::regex_match(command, match, step_regex)) {
+    server_->Step();
+    notifyWait(true);
+  }
+
+  // State-related commands.
+  static const std::regex frame_regex("^f(?:rame)?\\s+(\\d+)$", std::regex_constants::icase);
+  static const std::regex thread_list_regex("^th(?:read)?\\s+l(?:ist)?$", std::regex_constants::icase);
+  static const std::regex where_regex("^(?:w(?:here)?|bt|backtrace)$", std::regex_constants::icase);
+
+  if (std::regex_match(command, match, frame_regex)) {
+    auto &frames = server_->GetStackFrames();
+    size_t index = boost::lexical_cast<size_t>(match[1]) - 1;
+    if (index >= 0 && index < frames.size()) server_->SetActiveFrameIndex(index);
+  } else if (std::regex_match(command, match, thread_list_regex)) {
+    response << "<threads><thread id=\"1\" status=\"run\" /></threads>";
+  } else if (std::regex_match(command, match, where_regex)) {
+    response << "<frames>";
+    auto &frames = server_->GetStackFrames();
+    size_t activeIndex = server_->GetActiveFrameIndex();
+    for (size_t index = 0; index < frames.size(); ++index) {
+      auto &frame = frames[index];
+      response << "<frame no=\"" << (index + 1) << "\" file=\"" << escapeXml(frame.file) << "\" line=\"" << frame.line << "\"";
+      if (activeIndex == index) response << " current=\"yes\"";
+      response << " />";
+    }
+    response << "</frames>";
+  }
+
+  // Variable-related commands.
+  static const std::regex eval_regex("^(?:p|e(?:val)?)\\s+(.+)$", std::regex_constants::icase);
+  static const std::regex inspect_regex("^v(?:ar)?\\s+inspect\\s+(.+)$", std::regex_constants::icase);
+  static const std::regex var_global_regex("^v(?:ar)?\\s+g(?:lobal)?$", std::regex_constants::icase);
+  static const std::regex var_instance_regex("^v(?:ar)?\\s+i(?:nstance)?\\s+(?:0x)?([\\da-f]+)$", std::regex_constants::icase);
+  static const std::regex var_local_regex("^v(?:ar)?\\s+l(?:ocal)?$", std::regex_constants::icase);
+
+  if (std::regex_match(command, match, eval_regex)) {
+    std::string expression = match[1];
+    queueWork([=](){
+      auto &var = server_->EvaluateExpression(expression);
+      std::ostringstream response;
+      response << "<eval expression=\"" << escapeXml(var.name) << "\" value=\"" << escapeXml(var.value) << "\" />";
+      postResponse(response.str());
+    });
+  } else if (std::regex_match(command, match, inspect_regex)) {
+    std::string expression = match[1];
+    queueWork([=](){
+      std::vector<Variable> variables;
+      variables.push_back(server_->EvaluateExpression(expression));
+      sendVariables("watch", variables);
+    });
+  } else if (std::regex_match(command, match, var_global_regex)) {
+    queueWork([=](){ sendVariables("global", server_->GetGlobalVariables()); });
+  } else if (std::regex_match(command, match, var_instance_regex)) {
+    std::istringstream iss(match[1]);
+    size_t object_id;
+    iss >> std::hex >> object_id;
+    queueWork([=](){ sendVariables("instance", server_->GetInstanceVariables(object_id)); });
+  } else if (std::regex_match(command, match, var_local_regex)) {
+    queueWork([=](){ sendVariables("local", server_->GetLocalVariables()); });
+  }
+
+  sendResponse(response.str());
+}
+
+void RDIP::Impl::sendResponse(const std::string &response) {
+  std::string str = boost::trim_copy(response);
+  if (str.empty()) return;
+  str.append("\r\n");
+
+  if (socket_.is_open()) {
+    LOG(FMT("Sending response to ruby-debug-ide client:\r\n" << str));
+    boost::asio::write(socket_, boost::asio::buffer(str));
+  } else {
+    LOG(FMT("No ruby-debug-ide client connected.  Unable to send response:\r\n" << str));
+  }
+}
+
+void RDIP::Impl::sendVariables(const std::string &kind, const std::vector<Variable> &variables) {
+  std::ostringstream response;
+  response << "<variables>";
+  for (const auto &var : variables) {
+    response << "<variable name=\"" << escapeXml(var.name) << "\" kind=\"" << kind << "\" value=\"" << escapeXml(var.value) << "\" type=\"" << var.type << "\" hasChildren=\"" << (var.has_children ? "true" : "false") << "\" objectId=\"0x" << std::hex << var.object_id << "\" />";
+  }
+  response << "</variables>";
+  postResponse(response.str());
+}
+
+void RDIP::Impl::notifyWait(bool stop_waiting) {
+  std::lock_guard<std::mutex> lock(wait_mutex_);
+  if (stop_waiting) stop_waiting_ = true;
+  wait_cond_.notify_all();
+}
+
+void RDIP::Impl::queueWork(const std::function<void(void)> &work) {
+  std::lock_guard<std::mutex> lock(work_queue_mutex_);
+  work_queue_.push(work);
+  notifyWait(false);
+  doCheckWorkQueue();
+}
+
+void RDIP::Impl::processWorkQueue() {
+  std::lock_guard<std::mutex> lock(work_queue_mutex_);
+  while (!work_queue_.empty()) {
+    work_queue_.front()();
+    work_queue_.pop();
+  }
+}
+
+void RDIP::Impl::doCheckWorkQueue() {
+  work_queue_timer_.expires_from_now(boost::posix_time::seconds(1));
+  work_queue_timer_.async_wait(std::bind(&RDIP::Impl::handleCheckWorkQueue, this, std::placeholders::_1));
+}
+
+void RDIP::Impl::handleCheckWorkQueue(const boost::system::error_code &err) {
+  if (err) return;
+
+  std::lock_guard<std::mutex> lock(work_queue_mutex_);
+  if (!work_queue_.empty()) {
+    notifyWait(false);
+    doCheckWorkQueue();
+  }
+}
+
+RDIP::RDIP() : wait_for_client_(false) { }
+RDIP::~RDIP() { }
+
+void RDIP::Initialize(IDebugServer* server, const std::string& str_debugger) {
+  LOG(FMT("Initializing ruby-debug-ide protocol: -rdebug \"" << str_debugger << '"'));
+
+  server_ = server;
+  std::smatch match;
+
+  int port = DefaultPort;
+  static const std::regex port_regex("\\bport\\s*=\\s*(\\d+)\\b", std::regex_constants::icase);
+  if (std::regex_search(str_debugger, match, port_regex)) {
     port = boost::lexical_cast<int>(match[1]);
   }
 
-  // Start the i/o service thread.
-  service_thread_ = std::thread(std::bind(&RDIP::RunService, this, port));
+  static const std::regex wait_regex("\\bwait\\b", std::regex_constants::icase);
+  wait_for_client_ = std::regex_search(str_debugger, match, wait_regex);
+
+  impl_ = std::make_shared<Impl>(server_, port);
 }
 
 void RDIP::WaitForContinue() {
-  std::unique_lock<std::mutex> lock(server_wait_mutex_);
-  server_can_continue_ = false;
-  while(!server_can_continue_) {
-    if (server_response_) {
-      server_response_();
-      if (process_server_response_)
-        io_service_.post(process_server_response_);
-      server_response_ = nullptr;
-    }
-    server_wait_cond_.wait(lock);
-  }
-  Log("Let SketchUp start\n");
+  if (!wait_for_client_ && !impl_->isClientConnected()) return;
+
+  LOG("Pausing SketchUp/Ruby execution.");
+  impl_->wait();
+  LOG("Resuming SketchUp/Ruby execution.");
 }
 
 void RDIP::Break(BreakPoint bp) {
-  io_service_.post(std::bind(&RDIP::Connection::stopAtBreakpoint, connection_.get(), bp));
+  if (!impl_->isClientConnected()) return;
+
+  std::ostringstream response;
+  response << "<breakpoint file=\"" << escapeXml(bp.file) << "\" line=\"" << bp.line << "\" threadId=\"1\" />";
+  impl_->postResponse(response.str());
   WaitForContinue();
 }
 
 void RDIP::Break(const std::string& file, size_t line) {
-  io_service_.post(std::bind(&RDIP::Connection::suspendAt, connection_.get(), file, line));
+  if (!impl_->isClientConnected()) return;
+
+  std::ostringstream response;
+  response << "<suspended file=\"" << escapeXml(file) << "\" line=\"" << line << "\" threadId=\"1\" frames=\"1\" />";
+  impl_->postResponse(response.str());
   WaitForContinue();
-}
-
-void RDIP::RunService(int port) {
-  signal_set_.async_wait(std::bind(&RDIP::HandleFatalFailure, this, std::placeholders::_1, std::placeholders::_2));
-  connection_ = std::make_shared<Connection>(io_service_, port, server_,
-      server_wait_cond_, server_wait_mutex_, server_can_continue_, server_response_,
-      process_server_response_);
-  connection_->wait();
-  io_service_.run();
-}
-
-void RDIP::HandleFatalFailure(const boost::system::error_code& err, int signal)
-{}
-
-using boost::asio::ip::tcp;
-using boost::asio::ip::address;
-
-RDIP::Connection::Connection(boost::asio::io_service& service, int port,
-                             IDebugServer* server,
-                             std::condition_variable& serverWaitCond,
-                             std::mutex& serverWaitMutex,
-                             bool& serverCanContinue,
-                             std::function<void(void)>& serverResponse,
-                             std::function<void(void)>& processServerResponse)
-  : socket_(service)
-  , acceptor_(service, tcp::endpoint(tcp::v4(), port))
-  , server_(server)
-  , server_wait_cond_(serverWaitCond)
-  , server_wait_mutex_(serverWaitMutex)
-  , server_can_continue_(serverCanContinue)
-  , server_response_(serverResponse)
-  , process_server_response_(processServerResponse)
-{}
-
-void RDIP::Connection::wait() {
-  acceptor_.async_accept(socket_, std::bind(&Connection::start, this, std::placeholders::_1));
-}
-
-void RDIP::Connection::start(const boost::system::error_code& err) {
-  async_read_until(socket_, read_buffer_, "\n", std::bind(&Connection::handleCommand, this, std::placeholders::_1));
-}
-
-void RDIP::Connection::handleCommand(const boost::system::error_code& err) {
-  if(!err) {
-    std::ostringstream out;
-    out << &read_buffer_;
-    std::string str = out.str();
-    Log("\nCommand from IDE => ");
-    Log(str.c_str());
-    std::vector<std::string> commands;
-    boost::split(commands, str, boost::is_any_of(";"));
-    for(const auto& cmd : commands) {
-      evaluateCommand(boost::trim_copy(cmd));
-    }
-    //assert(write(mSocket, boost::asio::buffer("<message>some text</message>\n")) > 0);
-    async_read_until(socket_, read_buffer_, "\n", std::bind(&Connection::handleCommand, this, std::placeholders::_1));
-  } else {
-    std::ostringstream os;
-    os << err;
-    Log(os.str().c_str());
-  }
-}
-
-static std::string encodeXml(const std::string& str) {
-  std::string encoded = boost::replace_all_copy(str, "&", "&amp;");
-  boost::replace_all(encoded, "\"", "&quot;");
-  boost::replace_all(encoded, "<", "&lt;");
-  boost::replace_all(encoded, ">", "&gt;");
-  boost::replace_all(encoded, "'", "&apos;");
-  return encoded;
-}
-
-void RDIP::Connection::evaluateCommand(const std::string& cmd) {
-  static const std::regex reg_brk("^\\s*b(?:reak)?\\s+(?:(.+):)?([^.:]+)$");
-  static const std::regex reg_brk_del("^\\s*del(?:ete)?(?:\\s+(\\d+))?$");
-  static const std::regex reg_start("^\\s*start$");
-  static const std::regex reg_exit("^\\s*exit?$");
-  static const std::regex reg_cont("^\\s*c(?:ont)?$");
-  static const std::regex reg_where("^\\s*w(?:here)?$");
-  static const std::regex reg_frame("^\\s*f(?:rame)? ([0-9]+)$");
-  static const std::regex reg_step("^\\s*s(?:tep)?\\s?");
-  static const std::regex reg_next("^\\s*n(?:ext)?$");
-  static const std::regex reg_finish("^\\s*finish?$");
-  static const std::regex reg_var_inspect("v inspect\\s+");
-  static const std::regex reg_thr_lst("^\\s*th(?:read)? l(?:ist)?$");
-  static const std::regex reg_var_local("^\\s*v(?:ar)? l(?:ocal)?$");
-  static const std::regex reg_var_global("^\\s*v(?:ar)? g(?:lobal)?$");
-  static const std::regex reg_var_instance("^\\s*v(?:ar)? i(?:nstance)? (.+)$");
-
-  std::smatch what;
-  if(regex_match(cmd, what, reg_brk)) {
-    if(what.size() == 3) {
-      BreakPoint bp;
-      bp.file = what[1];
-      boost::replace_all(bp.file, "\\", "/");
-      std::string s2 = what[2];
-      bp.line = std::atoi(s2.c_str());
-      bp.enabled = true;
-      if(server_->AddBreakPoint(bp, true)) {
-        std::ostringstream reply;
-        reply << "<breakpointAdded no=\"" << bp.index << "\" location=\"" << bp.file << ":" << bp.line << "\"/>\n";
-        write(socket_, boost::asio::buffer(reply.str()));
-        Log(reply.str().c_str());
-        Log("    => Breakpoint added\n");
-      } else {
-        Log("Adding breakpoint failed\n.");
-      }
-    }
-  } else if (regex_match(cmd, what, reg_brk_del)) {
-    if (what.size() == 2) {
-      size_t bp_index = boost::lexical_cast<size_t>(what[1]);
-      if (server_->RemoveBreakPoint(bp_index)) {
-        std::ostringstream reply;
-        reply << "<breakpointDeleted no=\"" << bp_index << "\" />\n";
-        write(socket_, boost::asio::buffer(reply.str()));
-        Log(reply.str().c_str());
-        Log("    => Breakpoint deleted\n");
-      } else {
-        Log("Breakpoint could not be deleted\n");
-      }
-    }
-  } else if(regex_match(cmd, what, reg_start) || 
-            regex_match(cmd, what, reg_cont)) {
-    std::lock_guard<std::mutex> lock(server_wait_mutex_);
-    server_can_continue_ = true;
-    server_wait_cond_.notify_all();
-  } else if(regex_match(cmd, what, reg_exit)) {
-    // Stop debugging. First let SU continue in case it's at a breakpoint.
-    std::lock_guard<std::mutex> lock(server_wait_mutex_);
-    server_can_continue_ = true;
-    server_wait_cond_.notify_all();
-    // Now call Stop. It's unclear if it is ok to do this from the RDIP thread
-    // but it appears to work.
-    server_->Stop();
-  } else if(regex_match(cmd, what, reg_where)) {
-    auto frames = server_->GetStackFrames();
-    std::string str_send = "<frames>\n";
-
-    size_t activeFrameIdx = server_->GetActiveFrameIndex();
-    for(size_t i = 0; i < frames.size(); ++i) {
-      const StackFrame& frame = frames[i];
-      std::string file = encodeXml(frame.file);
-      if(activeFrameIdx != i) {
-        boost::format fmt("<frame no=\"%1%\" file=\"%2%\" line=\"%3%\"/>");
-        fmt % i % file % frame.line;
-        str_send += fmt.str();
-      } else {
-        boost::format fmt("<frame no=\"%1%\" file=\"%2%\" line=\"%3%\" current=\"yes\"/>");
-        fmt % i % file % frame.line;
-        str_send += fmt.str();
-      }
-    }
-    str_send += "</frames>\n";
-    Log(str_send.c_str());
-    write(socket_, boost::asio::buffer(str_send));
-  } else if(regex_match(cmd, what, reg_thr_lst)) {
-    std::string str_send = "<threads>\n";
-    std::ostringstream reply;
-    reply << "<thread id=\"1\" status=\"run\"/>\n";
-    reply << "</threads>\n";
-    str_send += reply.str();
-    write(socket_, boost::asio::buffer(str_send));
-  } else if(regex_match(cmd, what, reg_frame)) {
-    if(what.size() == 2) {
-      size_t frameIndex = boost::lexical_cast<size_t>(what[1]);
-      server_->SetActiveFrameIndex(frameIndex);
-    }
-  }
-  else if(regex_match(cmd, what, reg_step)) {
-    server_->Step();
-    std::lock_guard<std::mutex> lock(server_wait_mutex_);
-    server_can_continue_ = true;
-    server_wait_cond_.notify_all();
-  } else if(regex_match(cmd, what, reg_finish)) {
-    server_->StepOut();
-    std::lock_guard<std::mutex> lock(server_wait_mutex_);
-    server_can_continue_ = true;
-    server_wait_cond_.notify_all();
-  } else if(regex_match(cmd, what, reg_next)) {
-    server_->StepOver();
-    std::lock_guard<std::mutex> lock(server_wait_mutex_);
-    server_can_continue_ = true;
-    server_wait_cond_.notify_all();
-  } else if(regex_search(cmd, what, reg_var_inspect)) {
-    expression_to_eval_ = what.suffix();
-    server_response_ = std::bind(&RDIP::Connection::evalExpression, this);
-    process_server_response_ = std::bind(&RDIP::Connection::sendVariables, this, "watch");
-    server_wait_cond_.notify_all();
-  } else if(regex_match(cmd, what, reg_var_local)) {
-    // Local variables must be retrieved in the server thread. Wake it up
-    // and have it call us.
-    server_response_ = std::bind(&RDIP::Connection::getVariables, this, true);
-    process_server_response_ = std::bind(&RDIP::Connection::sendVariables, this, "local");
-    server_wait_cond_.notify_all();
-  } else if(regex_match(cmd, what, reg_var_global)) {
-    // Global variables must be retrieved in the server thread. Wake it up
-    // and have it call us.
-    server_response_ = std::bind(&RDIP::Connection::getVariables, this, false);
-    process_server_response_ = std::bind(&RDIP::Connection::sendVariables, this, "global");
-    server_wait_cond_.notify_all();
-  } else if(regex_match(cmd, what, reg_var_instance)) {
-    size_t objectID = 0;
-    std::string str_what = what[1];
-    sscanf(str_what.c_str(), "%zx", &objectID);
-    server_response_ = std::bind(&RDIP::Connection::getInstanceVariables, this, objectID);
-    process_server_response_ = std::bind(&RDIP::Connection::sendVariables, this, "instance");
-    server_wait_cond_.notify_all();
-  } else {
-    Log("Unknown command : ");
-    Log(cmd.c_str());
-    Log("\n");
-  }
-}
-
-void RDIP::Connection::stopAtBreakpoint(BreakPoint bp) {
-  std::ostringstream ss;
-  ss << "<breakpoint file=\"" << bp.file << "\" line=\"" << bp.line << "\" threadId=\"1\"/>\n";
-  Log("sending stopAtBreakpoint => ");
-
-  auto str = ss.str();
-  Log(str.c_str());
-  write(socket_, boost::asio::buffer(str));
-}
-
-void RDIP::Connection::suspendAt(const std::string& file, size_t line) {
-  std::ostringstream ss;
-  ss << "<suspended file=\"" << encodeXml(file) << "\" line=\"" << line << "\" threadId=\"1\" frames=\"1\"/>\n";
-  Log("sending suspendAt => ");
-
-  auto str = ss.str();
-  Log(str.c_str());
-  write(socket_, boost::asio::buffer(str));
-}
-
-void RDIP::Connection::getVariables(bool local) {
-  std::lock_guard<std::mutex> lock(variables_to_send_mutex_);
-  variables_to_send_ = local ? server_->GetLocalVariables() :
-                             server_->GetGlobalVariables();
-}
-
-void RDIP::Connection::getInstanceVariables(size_t object_id) {
-  std::lock_guard<std::mutex> lock(variables_to_send_mutex_);
-  variables_to_send_ = server_->GetInstanceVariables(object_id);
-}
-
-void RDIP::Connection::sendVariables(std::string kind) {
-  std::lock_guard<std::mutex> lock(variables_to_send_mutex_);
-  Log("sending variables\n");
-  std::string send_str = "<variables>\n";
-  for(const auto var : variables_to_send_) {
-    boost::format fmt("<variable name=\"%s\" kind=\"%s\" value=\"%s\" type=\"%s\" hasChildren=\"%s\" objectId=\"%x\"/>\n");
-    std::string value = encodeXml(var.value);
-    std::string name = encodeXml(var.name);
-    fmt % name % kind % value % var.type %
-          (var.has_children ? "true" : "false") % var.object_id;
-    send_str += fmt.str();
-  }
-  send_str += "</variables>\n";
-  Log(send_str.c_str());
-  write(socket_, boost::asio::buffer(send_str));
-  variables_to_send_.clear();
-}
-
-void RDIP::Connection::evalExpression() {
-  std::lock_guard<std::mutex> lock(variables_to_send_mutex_);
-  variables_to_send_.clear();
-  if (!expression_to_eval_.empty()) {
-    Variable var = server_->EvaluateExpression(expression_to_eval_);
-    variables_to_send_.push_back(var);
-    expression_to_eval_.clear();
-  }
 }
 
 } // end namespace RubyDebugger

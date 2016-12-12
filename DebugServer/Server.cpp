@@ -21,6 +21,7 @@
 #include <iostream>
 #include <map>
 #include <mutex>
+#include <regex>
 #include <thread>
 
 using namespace SketchUp::RubyDebugger;
@@ -215,6 +216,10 @@ public:
 
   const BreakPoint* GetBreakPoint(const std::string& file, size_t line) const;
 
+  BreakPoint* GetBreakPoint(size_t index);
+
+  bool IsBreakPointActive(const BreakPoint &bp);
+
   void ReadScriptLinesHash();
 
   bool ResolveBreakPoint(BreakPoint& bp);
@@ -342,6 +347,37 @@ const BreakPoint* Server::Impl::GetBreakPoint(const std::string& file,
   return bp;
 }
 
+BreakPoint* Server::Impl::GetBreakPoint(size_t index) {
+  // Check resolved breakpoints
+  for (auto it = breakpoints_.begin(), ite = breakpoints_.end(); it != ite; ++it) {
+    auto& map = it->second;
+    for (auto itm = map.begin(), itme = map.end(); itm != itme; ++itm) {
+      if (itm->second.index == index) return &(itm->second);
+    }
+  }
+
+  // Check unresolved breakpoints
+  for (auto it = unresolved_breakpoints_.begin(),
+      ite = unresolved_breakpoints_.end(); it != ite; ++it) {
+    if (index == it->index) return &(*it);
+  }
+
+  return nullptr;
+}
+
+bool Server::Impl::IsBreakPointActive(const BreakPoint &bp) {
+  if (!bp.enabled) return false;
+  if (bp.condition.empty()) return true;
+  
+  VALUE binding = GetBinding(false);
+  if (binding != Qnil) {
+    VALUE condition_value = EvaluateRubyExpressionAsValue(bp.condition, binding);
+    return RTEST(condition_value);
+  }
+  
+  return true;
+}
+
 void Server::Impl::SaveBreakPoints() const {
   if (save_breakpoints_) {
     Settings::SaveBreakPoints(breakpoints_, unresolved_breakpoints_);
@@ -446,10 +482,14 @@ void Server::Impl::DoBreak(const std::string& file_path, size_t line) {
 // Performs necessary operations when a break point is hit.
 void Server::Impl::DoBreak(const BreakPoint& bp) {
   frames_ = GetStackFrames();
-  last_break_file_path_ = bp.file;
-  last_break_line_ = bp.line;
-  is_stopped_ = true;
-  ui_->Break(bp); // Blocked here until ui says continue
+  
+  // NOTE: This check can only be performed after calling `GetStackFrames`.
+  if (IsBreakPointActive(bp)) {
+    last_break_file_path_ = bp.file;
+    last_break_line_ = bp.line;
+    is_stopped_ = true;
+    ui_->Break(bp); // Blocked here until ui says continue
+  }
   ClearBreakData();
 }
 
@@ -633,6 +673,45 @@ bool Server::RemoveBreakPoint(size_t index) {
   return removed;
 }
 
+bool Server::RemoveAllBreakPoints() {
+  bool removed = false;
+
+  if (!impl_->breakpoints_.empty()) {
+    impl_->breakpoints_.clear();
+    removed = true;
+  }
+
+  if (!impl_->unresolved_breakpoints_.empty()) {
+    impl_->unresolved_breakpoints_.clear();
+    removed = true;
+  }
+
+  if (removed) {
+    impl_->SaveBreakPoints();
+  }
+  return removed;
+}
+
+bool Server::EnableBreakPoint(size_t index, bool enable) {
+  auto bp = impl_->GetBreakPoint(index);
+  if (bp) {
+    bp->enabled = enable;
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool Server::ConditionBreakPoint(size_t index, const std::string& condition) {
+  auto bp = impl_->GetBreakPoint(index);
+  if (bp) {
+    bp->condition = condition;
+    return true;
+  } else {
+    return false;
+  }
+}
+
 std::vector<BreakPoint> Server::GetBreakPoints() const {
   // Try to resolve any unresolved breakpoints
   impl_->ResolveBreakPoints();
@@ -753,6 +832,9 @@ size_t Server::GetBreakLineNumber() const {
 
 IDebugServer::VariablesVector Server::GetVariables(const char* type,
     bool use_toplevel_binding) const {
+  static const std::regex excluded_global_regex("\\$(?:KCODE|-K|=|IGNORECASE|FILENAME)");
+  std::smatch match;
+
   VariablesVector vec;
   VALUE binding = impl_->GetBinding(use_toplevel_binding);
   if (binding != 0) {
@@ -762,7 +844,7 @@ IDebugServer::VariablesVector Server::GetVariables(const char* type,
       VALUE var_val = RARRAY_PTR(arr_val)[i];
       Variable var;
       var.name = GetRubyObjectAsString(var_val);
-      if (!var.name.empty()) {
+      if (!var.name.empty() && !std::regex_match(var.name, match, excluded_global_regex)) {
         VALUE eval_val =
             EvaluateRubyExpressionAsValue(var.name, binding);
         var.object_id = eval_val;

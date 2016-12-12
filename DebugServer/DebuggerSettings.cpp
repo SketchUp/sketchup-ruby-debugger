@@ -36,6 +36,7 @@ static void Save(const BreakPoint& bp, ptree& pt) {
   pt.put("line", bp.line);
   pt.put("index", bp.index);
   pt.put("enabled", bp.enabled);
+  pt.put("condition", bp.condition);
 }
 
 static void Load(const ptree& pt, BreakPoint& bp) {
@@ -43,6 +44,7 @@ static void Load(const ptree& pt, BreakPoint& bp) {
   bp.line = pt.get<size_t>("line");
   bp.index = pt.get<size_t>("index");
   bp.enabled = pt.get<bool>("enabled");
+  bp.condition = pt.get<std::string>("condition");
 }
 
 void SaveBreakPoints(const BreakPointsMap& resolved_bps,
