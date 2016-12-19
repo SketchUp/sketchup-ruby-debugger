@@ -43,7 +43,7 @@ When launching SketchUp with debugging enabled, the following command-line argum
 
 - `port=<number>` - Configures the port on which the SketchUp debugger accepts connections from IDEs. This must match the remote debugger port setting configured in the IDE. If not specified, the port defaults to **1234**.
 
-- `wait` - Instructs the SketchUp debugger to wait for an initial connection from an IDE before allowing execution to continue. This is necessary to debug scripts that run automatically, for instance when an extention is loaded. When using this option, the SketchUp process will appear to be frozen until an IDE is attached.
+- `wait` - Instructs the SketchUp debugger to wait for an initial connection from an IDE before allowing execution to continue. This is necessary to debug scripts that run automatically, for instance when an extension is loaded. When using this option, the SketchUp process will appear to be frozen until an IDE is attached.
 
 ## Notes:
 While most common debugging functionality has been implemented, there are few TODOs:
