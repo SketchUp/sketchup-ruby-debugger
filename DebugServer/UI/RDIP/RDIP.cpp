@@ -72,6 +72,7 @@ private:
   boost::asio::ip::tcp::acceptor acceptor_;
   boost::asio::streambuf read_buffer_;
 
+  bool is_waiting_;
   bool stop_waiting_;
   std::mutex wait_mutex_;
   std::condition_variable wait_cond_;
@@ -86,6 +87,8 @@ RDIP::Impl::Impl(IDebugServer *server, int port)
   , signal_set_(io_service_, SIGINT, SIGTERM, SIGSEGV)
   , socket_(io_service_)
   , acceptor_(io_service_, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port))
+  , is_waiting_(false)
+  , stop_waiting_(false)
   , work_queue_timer_(io_service_) {
   signal_set_.async_wait(std::bind(&RDIP::Impl::handleError, this, std::placeholders::_1, std::placeholders::_2));
 
@@ -108,11 +111,13 @@ void RDIP::Impl::postResponse(const std::string &response) {
 void RDIP::Impl::wait() {
   std::unique_lock<std::mutex> lock(wait_mutex_);
 
+  is_waiting_ = true;
   stop_waiting_ = false;
   do {
     wait_cond_.wait(lock);
     processWorkQueue();
   } while (!stop_waiting_);
+  is_waiting_ = false;
 }
 
 void RDIP::Impl::handleError(const boost::system::error_code &err, int signal) {
@@ -177,6 +182,9 @@ void RDIP::Impl::handleReadUntil(const boost::system::error_code &err, size_t by
 static std::string escapeXml(const std::string& str) {
   std::ostringstream escaped;
   std::for_each(str.begin(), str.end(), [&](char ch){
+    // Strip all control characters.
+    if (ch < ' ') return;
+
     switch (ch) {
       case '"': escaped << "&quot;"; break;
       case '\'': escaped << "&apos;"; break;
@@ -315,28 +323,52 @@ void RDIP::Impl::evaluateCommand(const std::string &command) {
 
   if (std::regex_match(command, match, eval_regex)) {
     std::string expression = match[1];
-    queueWork([=](){
-      auto &var = server_->EvaluateExpression(expression);
-      std::ostringstream response;
-      response << "<eval expression=\"" << escapeXml(var.name) << "\" value=\"" << escapeXml(var.value) << "\" />";
-      postResponse(response.str());
-    });
+    if (!is_waiting_) {
+      response << "<eval expression=\"" << escapeXml(expression) << "\" value=\"Expression cannot be evaluated\" />";
+    } else {
+      queueWork([=](){
+        auto &var = server_->EvaluateExpression(expression);
+        std::ostringstream response;
+        response << "<eval expression=\"" << escapeXml(var.name) << "\" value=\"" << escapeXml(var.value) << "\" />";
+        postResponse(response.str());
+      });
+    }
   } else if (std::regex_match(command, match, inspect_regex)) {
     std::string expression = match[1];
-    queueWork([=](){
+    if (!is_waiting_) {
       std::vector<Variable> variables;
-      variables.push_back(server_->EvaluateExpression(expression));
       sendVariables("watch", variables);
-    });
+    } else {
+      queueWork([=](){
+        std::vector<Variable> variables;
+        variables.push_back(server_->EvaluateExpression(expression));
+        sendVariables("watch", variables);
+      });
+    }
   } else if (std::regex_match(command, match, var_global_regex)) {
-    queueWork([=](){ sendVariables("global", server_->GetGlobalVariables()); });
+    if (!is_waiting_) {
+      std::vector<Variable> variables;
+      sendVariables("global", variables);
+    } else {
+      queueWork([=](){ sendVariables("global", server_->GetGlobalVariables()); });
+    }
   } else if (std::regex_match(command, match, var_instance_regex)) {
     std::istringstream iss(match[1]);
     size_t object_id;
     iss >> std::hex >> object_id;
-    queueWork([=](){ sendVariables("instance", server_->GetInstanceVariables(object_id)); });
+    if (!is_waiting_) {
+      std::vector<Variable> variables;
+      sendVariables("instance", variables);
+    } else {
+      queueWork([=](){ sendVariables("instance", server_->GetInstanceVariables(object_id)); });
+    }
   } else if (std::regex_match(command, match, var_local_regex)) {
-    queueWork([=](){ sendVariables("local", server_->GetLocalVariables()); });
+    if (!is_waiting_) {
+      std::vector<Variable> variables;
+      sendVariables("local", variables);
+    } else {
+      queueWork([=](){ sendVariables("local", server_->GetLocalVariables()); });
+    }
   }
 
   sendResponse(response.str());

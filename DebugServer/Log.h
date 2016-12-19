@@ -60,10 +60,14 @@ static inline void Write(const std::string &context, const std::string &message)
   static const std::regex newline_regex("[\r\n]+");
   static const std::sregex_token_iterator end;
   for (std::sregex_token_iterator iter(message.begin(), message.end(), newline_regex, -1); iter != end; ++iter) {
+    const int line_length_limit = 4000;
+    std::string line = context + iter->str();
+    if (line.length() > line_length_limit) line = line.substr(0, line_length_limit);
+
 #ifdef WIN32
-    OutputDebugStringA((context + iter->str() + "\r\n").c_str());
+    OutputDebugStringA((line + "\r\n").c_str());
 #else
-    std::cout << context << iter->str() << std::endl;
+    std::cout << line << std::endl;
 #endif
   }
 }
