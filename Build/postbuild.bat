@@ -1,7 +1,7 @@
 @ECHO OFF
 
 REM Comment/uncomment the next line to control deployment of files to the SketchUp program directory.
-GOTO CopyFiles
+REM GOTO CopyFiles
 
 ECHO postbuild.bat - Skipping deployment of files to the SketchUp program directory.
 GOTO End
