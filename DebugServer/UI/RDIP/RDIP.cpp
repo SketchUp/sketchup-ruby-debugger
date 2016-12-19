@@ -380,10 +380,10 @@ void RDIP::Impl::sendResponse(const std::string &response) {
   str.append("\r\n");
 
   if (socket_.is_open()) {
-    LOG(FMT("Sending response to ruby-debug-ide client:\r\n" << str));
+    LOG(FMT("Sending response to ruby-debug-ide client:\r\n" << str.substr(0, 4000)));
     boost::asio::write(socket_, boost::asio::buffer(str));
   } else {
-    LOG(FMT("No ruby-debug-ide client connected.  Unable to send response:\r\n" << str));
+    LOG(FMT("No ruby-debug-ide client connected.  Unable to send response:\r\n" << str.substr(0, 4000)));
   }
 }
 
