@@ -13,7 +13,7 @@
 namespace SketchUp {
 namespace RubyDebugger {
 
-// Debugger server implementation 
+// Debugger server implementation
 class Server : public IDebugServer {
 public:
 
@@ -26,6 +26,12 @@ public:
   virtual bool AddBreakPoint(BreakPoint& bp, bool assume_resolved);
 
   virtual bool RemoveBreakPoint(size_t index);
+
+  virtual bool RemoveAllBreakPoints();
+
+  virtual bool EnableBreakPoint(size_t index, bool enable);
+
+  virtual bool ConditionBreakPoint(size_t index, const std::string& condition);
 
   virtual std::vector<BreakPoint> GetBreakPoints() const;
 
@@ -46,6 +52,8 @@ public:
   virtual void StepOver();
 
   virtual void StepOut();
+
+  virtual void Pause();
 
   virtual std::vector<std::pair<size_t, std::string>>
       GetCodeLines(size_t beg_line, size_t end_line) const;

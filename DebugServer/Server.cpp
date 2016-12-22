@@ -21,6 +21,7 @@
 #include <iostream>
 #include <map>
 #include <mutex>
+#include <regex>
 #include <thread>
 
 using namespace SketchUp::RubyDebugger;
@@ -213,7 +214,11 @@ public:
 
   void DisableTracePoint();
 
-  const BreakPoint* GetBreakPoint(const std::string& file, size_t line) const;
+  BreakPoint* GetBreakPoint(const std::string& file, size_t line);
+
+  BreakPoint* GetBreakPoint(size_t index);
+
+  bool IsBreakPointActive(const BreakPoint &bp);
 
   void ReadScriptLinesHash();
 
@@ -279,7 +284,7 @@ public:
   std::atomic<size_t> stepout_to_call_depth_;
 
   std::atomic<size_t> stepover_to_call_depth_;
-  
+
   std::vector<StackFrame> frames_;
 
   size_t active_frame_index_;
@@ -329,9 +334,8 @@ void Server::Impl::DisableTracePoint() {
   }
 }
 
-const BreakPoint* Server::Impl::GetBreakPoint(const std::string& file,
-                                              size_t line) const {
-  const BreakPoint* bp = nullptr;
+BreakPoint* Server::Impl::GetBreakPoint(const std::string& file, size_t line) {
+  BreakPoint* bp = nullptr;
   auto it = breakpoints_.find(line);
   if (it != breakpoints_.end()) {
     auto itf = it->second.find(file);
@@ -340,6 +344,35 @@ const BreakPoint* Server::Impl::GetBreakPoint(const std::string& file,
     }
   }
   return bp;
+}
+
+BreakPoint* Server::Impl::GetBreakPoint(size_t index) {
+  // Check resolved breakpoints
+  for (auto it = breakpoints_.begin(), ite = breakpoints_.end(); it != ite; ++it) {
+    auto& map = it->second;
+    for (auto itm = map.begin(), itme = map.end(); itm != itme; ++itm) {
+      if (itm->second.index == index) return &(itm->second);
+    }
+  }
+
+  // Check unresolved breakpoints
+  for (auto it = unresolved_breakpoints_.begin(),
+      ite = unresolved_breakpoints_.end(); it != ite; ++it) {
+    if (index == it->index) return &(*it);
+  }
+
+  return nullptr;
+}
+
+bool Server::Impl::IsBreakPointActive(const BreakPoint &bp) {
+  if (!bp.enabled) return false;
+  if (bp.condition.empty()) return true;
+
+  assert(!frames_.empty());
+  VALUE binding = frames_.front().binding;
+  assert(binding != Qnil);
+  VALUE condition_value = EvaluateRubyExpressionAsValue(bp.condition, binding);
+  return (condition_value == Qtrue);
 }
 
 void Server::Impl::SaveBreakPoints() const {
@@ -446,10 +479,14 @@ void Server::Impl::DoBreak(const std::string& file_path, size_t line) {
 // Performs necessary operations when a break point is hit.
 void Server::Impl::DoBreak(const BreakPoint& bp) {
   frames_ = GetStackFrames();
-  last_break_file_path_ = bp.file;
-  last_break_line_ = bp.line;
-  is_stopped_ = true;
-  ui_->Break(bp); // Blocked here until ui says continue
+
+  // NOTE: This check can only be performed after calling `GetStackFrames`.
+  if (IsBreakPointActive(bp)) {
+    last_break_file_path_ = bp.file;
+    last_break_line_ = bp.line;
+    is_stopped_ = true;
+    ui_->Break(bp); // Blocked here until ui says continue
+  }
   ClearBreakData();
 }
 
@@ -513,9 +550,17 @@ void Server::Impl::ResolveBreakPoints() {
 }
 
 void Server::Impl::AddBreakPoint(BreakPoint& bp, bool is_resolved) {
+  auto existing = GetBreakPoint(bp.file, bp.line);
+  if (existing) {
+    bp.index = existing->index;
+    existing->enabled = bp.enabled;
+    existing->condition = bp.condition;
+    return;
+  }
+
   if (bp.index == 0)
     bp.index = ++last_breakpoint_index;
-  
+
   if (is_resolved) {
     auto& bp_map = breakpoints_[bp.line];
     bp_map.insert(std::make_pair(bp.file, bp));
@@ -584,7 +629,7 @@ void Server::Stop() {
 
 bool Server::AddBreakPoint(BreakPoint& bp, bool assume_resolved) {
   std::lock_guard<std::mutex> lock(impl_->break_point_mutex_);
-  
+
   // Make sure we have the loaded files
   impl_->ReadScriptLinesHash();
 
@@ -597,7 +642,7 @@ bool Server::AddBreakPoint(BreakPoint& bp, bool assume_resolved) {
 
 bool Server::RemoveBreakPoint(size_t index) {
   bool removed = false;
-  
+
   // Check resolved breakpoints
   for (auto it = impl_->breakpoints_.begin(), ite = impl_->breakpoints_.end();
        it != ite; ++it) {
@@ -633,12 +678,51 @@ bool Server::RemoveBreakPoint(size_t index) {
   return removed;
 }
 
+bool Server::RemoveAllBreakPoints() {
+  bool removed = false;
+
+  if (!impl_->breakpoints_.empty()) {
+    impl_->breakpoints_.clear();
+    removed = true;
+  }
+
+  if (!impl_->unresolved_breakpoints_.empty()) {
+    impl_->unresolved_breakpoints_.clear();
+    removed = true;
+  }
+
+  if (removed) {
+    impl_->SaveBreakPoints();
+  }
+  return removed;
+}
+
+bool Server::EnableBreakPoint(size_t index, bool enable) {
+  auto bp = impl_->GetBreakPoint(index);
+  if (bp) {
+    bp->enabled = enable;
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool Server::ConditionBreakPoint(size_t index, const std::string& condition) {
+  auto bp = impl_->GetBreakPoint(index);
+  if (bp) {
+    bp->condition = condition;
+    return true;
+  } else {
+    return false;
+  }
+}
+
 std::vector<BreakPoint> Server::GetBreakPoints() const {
   // Try to resolve any unresolved breakpoints
   impl_->ResolveBreakPoints();
 
   std::vector<BreakPoint> bps;
-  
+
   // Add resolved breakpoints
   for (auto it = impl_->breakpoints_.cbegin(), ite = impl_->breakpoints_.cend();
        it != ite; ++it) {
@@ -715,6 +799,12 @@ void Server::StepOut() {
   }
 }
 
+void Server::Pause() {
+  if (!IsStopped()) {
+    impl_->break_at_next_line_ = true;
+  }
+}
+
 std::vector<std::pair<size_t, std::string>>
       Server::GetCodeLines(size_t beg_line, size_t end_line) const {
   std::vector<std::pair<size_t, std::string>> lines;
@@ -753,6 +843,9 @@ size_t Server::GetBreakLineNumber() const {
 
 IDebugServer::VariablesVector Server::GetVariables(const char* type,
     bool use_toplevel_binding) const {
+  static const std::regex excluded_global_regex("\\$(?:KCODE|-K|=|IGNORECASE|FILENAME)");
+  std::smatch match;
+
   VariablesVector vec;
   VALUE binding = impl_->GetBinding(use_toplevel_binding);
   if (binding != 0) {
@@ -762,7 +855,7 @@ IDebugServer::VariablesVector Server::GetVariables(const char* type,
       VALUE var_val = RARRAY_PTR(arr_val)[i];
       Variable var;
       var.name = GetRubyObjectAsString(var_val);
-      if (!var.name.empty()) {
+      if (!var.name.empty() && !std::regex_match(var.name, match, excluded_global_regex)) {
         VALUE eval_val =
             EvaluateRubyExpressionAsValue(var.name, binding);
         var.object_id = eval_val;

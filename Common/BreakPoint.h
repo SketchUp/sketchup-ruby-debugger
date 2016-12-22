@@ -17,6 +17,7 @@ struct BreakPoint {
   bool enabled;
   std::string file;
   size_t line;
+  std::string condition;
 };
 
 } // end namespace RubyDebugger

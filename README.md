@@ -1,24 +1,30 @@
 SketchUp Ruby API Debugger
 ==========================
 
-This is a Ruby debugger framework for SketchUp 2014 and later. The ruby-debug-ide protocol has been mostly implemented so any Ruby IDE that supports this protocol should work. We have tested with Aptana RadRails, NetBeans (with Ruby community plugin) and RubyMine.
+This is a Ruby debugger framework for SketchUp 2014 and later. The `ruby-debug-ide` protocol has been mostly implemented so any Ruby IDE that supports this protocol should work.
 
-Instructions for Windows:
-- Download the pre-built dynamic library (SURubyDebugger.dll) from the [latest release](https://github.com/SketchUp/sketchup-ruby-debugger/releases). Copy this DLL into the SketchUp installation directory:
+| IDE | Stable (1.0.3.0) | Latest (pre-release) |
+| --- | --- | --- |
+| Aptana RadRails | Good | *Untested* |
+| NetBeans (with Ruby community plugin) | Good | *Untested* |
+| RubyMine | Good | Testing in progress |
+| VS Code (with `vscode-ruby` extension) | Not supported | Testing in progress |
+
+## Instructions for Windows:
+- Download the pre-built dynamic library (SURubyDebugger.dll) from the [latest release](https://github.com/SketchUp/sketchup-ruby-debugger/releases) or build from the sources.
+- Copy the DLL into the SketchUp installation directory. As the exact path will depend on the version of SketchUp you have installed, look for a folder similar to the following:
 ```
-C:\Program Files\SketchUp\SketchUp 2015\
-```
-or for 32-bit SketchUp (including SketchUp 2014):
-```
+C:\Program Files\SketchUp\SketchUp 2017\
+
 C:\Program Files (x86)\SketchUp\SketchUp 2015\
 ```
-- Run SketchUp with the following command line arguments:
+- Start SketchUp from the command line or the "Run..." dialog:
 ```
 SketchUp.exe -rdebug "ide port=7000"
 ```
 
-Instructions for Mac OS X:
-- Install SketchUp 2014 Maintenance 1 Release (version 14.1.1283) or later
+## Instructions for Mac OS X:
+- Install SketchUp 2014 Maintenance 1 Release (version 14.1.1283) or later.
 - Download SURubyDebugger.dylib into the Frameworks directory of the app bundle:
 ```
 curl https://github.com/SketchUp/sketchup-ruby-debugger/releases/download/1.0.3.0/SURubyDebugger.dylib -o /Applications/SketchUp\ 2017/SketchUp.app/Contents/Frameworks/SURubyDebugger.dylib
@@ -28,17 +34,23 @@ curl https://github.com/SketchUp/sketchup-ruby-debugger/releases/download/1.0.3.
 open -a /Applications/SketchUp\ 2015/SketchUp.app --args -rdebug "ide port=7000"
 ```
 
-Notes:
-- The port should match the remote debugger port setting configured in the IDE. Default port is 1234.
-- SketchUp will start up and appear to be frozen. It is waiting for the debugger to show up.
-- Launch remote debugging in the IDE, SketchUp should continue running. You should see breakpoints hit when Ruby code execution reaches the specified lines.
+## Command-line arguments:
+When launching SketchUp with debugging enabled, the following command-line arguments are supported:
 
+```
+-rdebug "ide [port=<number>] [wait]"
+```
 
-Most common debugging functionality has been implemented but there are few TODOs:
+- `port=<number>` - Configures the port on which the SketchUp debugger accepts connections from IDEs. This must match the remote debugger port setting configured in the IDE. If not specified, the port defaults to **1234**.
+
+- `wait` - Instructs the SketchUp debugger to wait for an initial connection from an IDE before allowing execution to continue. This is necessary to debug scripts that run automatically, for instance when an extension is loaded. When using this option, the SketchUp process will appear to be frozen until an IDE is attached.
+
+## Notes:
+While most common debugging functionality has been implemented, there are few TODOs:
 - Debugging of multi-threaded execution
+- Function breakpoints
 - Exception breakpoints
-- Conditional breakpoints
-- What else are we missing ? Please report and contribute!
+- *Are we missing something else?* Please report and contribute!
 
 To contribute, please fork the repository, make your changes and submit a pull request.
 

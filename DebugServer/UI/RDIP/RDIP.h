@@ -2,20 +2,14 @@
 // Authors:
 // - Orhun Birsoy
 // - Bugra Barin
+// - Aaron Hill (@Seraku) - Refactored ruby-debug-ide protocol implementation.
 //
 #ifndef RDEBUGGER_DEBUGSERVER_UI_CONSOLE_WIN_RDIP_H_
 #define RDEBUGGER_DEBUGSERVER_UI_CONSOLE_WIN_RDIP_H_
 
 #include <DebugServer/UI/IDebuggerUI.h>
 
-#include <atomic>
-#include <functional>
-#include <condition_variable>
-#include <mutex>
-#include <thread>
-
-#include <boost/asio/io_service.hpp>
-#include <boost/asio/signal_set.hpp>
+#include <memory>
 
 namespace SketchUp {
 namespace RubyDebugger {
@@ -38,23 +32,9 @@ public:
   virtual void Break(const std::string& file, size_t line);
 
 private:
-    class Connection;
-
-    void RunService(int port);
-    void HandleFatalFailure(const boost::system::error_code& err, int signal);
-    void HandleConnection(const boost::system::error_code& err);
-
-private:
-    boost::asio::io_service io_service_;
-    boost::asio::signal_set signal_set_;
-    std::thread service_thread_;
-    std::condition_variable server_wait_cond_;
-    std::mutex server_wait_mutex_;
-    bool server_can_continue_;
-
-    std::shared_ptr<Connection> connection_;
-    std::function<void(void)> server_response_;
-    std::function<void(void)> process_server_response_;
+  class Impl;
+  std::shared_ptr<Impl> impl_;
+  bool wait_for_client_;
 };
 
 } // end namespace RubyDebugger
