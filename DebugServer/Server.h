@@ -53,6 +53,8 @@ public:
 
   virtual void StepOut();
 
+  virtual void Pause();
+
   virtual std::vector<std::pair<size_t, std::string>>
       GetCodeLines(size_t beg_line, size_t end_line) const;
 

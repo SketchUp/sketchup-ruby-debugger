@@ -79,6 +79,9 @@ public:
   // Steps execution out of the current method.
   virtual void StepOut() = 0;
 
+  // Interrupts execution at the first available opportunity.
+  virtual void Pause() = 0;
+
   // Returns the code lines around the current line. Execution must have stopped.
   virtual std::vector<std::pair<size_t, std::string>>
       GetCodeLines(size_t beg_line, size_t end_line) const = 0;

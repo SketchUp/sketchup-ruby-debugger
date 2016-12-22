@@ -205,8 +205,8 @@ void RDIP::Impl::evaluateCommand(const std::string &command) {
   // This represents only a subset of all commands defined by ruby-debug-ide.
   //
   // For reference, here are the commands that are not yet supported:
-  //    catch, restart, interrupt, detach, pp, expression_info,
-  //    include, exclude, file-filter, up, down, jump, load, pause,
+  //    catch, restart, detach, pp, expression_info,
+  //    include, exclude, file-filter, up, down, jump, load,
   //    set_type, thread switch, thread inspect, thread stop,
   //    thread current, thread resume, var constant
 
@@ -267,6 +267,7 @@ void RDIP::Impl::evaluateCommand(const std::string &command) {
   static const std::regex continue_regex("^c(?:ont)?$", std::regex_constants::icase);
   static const std::regex finish_regex("^fin(?:ish)?$", std::regex_constants::icase);
   static const std::regex next_regex("^n(?:ext)?$", std::regex_constants::icase);
+  static const std::regex pause_regex("^(?:pause|i(?:nterrupt)?)$", std::regex_constants::icase);
   static const std::regex quit_regex("^(?:q(?:uit)?|exit)$", std::regex_constants::icase);
   static const std::regex start_regex("^start$", std::regex_constants::icase);
   static const std::regex step_regex("^s(?:tep)?$", std::regex_constants::icase);
@@ -279,6 +280,8 @@ void RDIP::Impl::evaluateCommand(const std::string &command) {
   } else if (std::regex_match(command, match, next_regex)) {
     server_->StepOver();
     notifyWait(true);
+  } else if (std::regex_match(command, match, pause_regex)) {
+    server_->Pause();
   } else if (std::regex_match(command, match, quit_regex)) {
     notifyWait(true);
     closeConnection();

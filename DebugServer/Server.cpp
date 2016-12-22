@@ -368,14 +368,12 @@ BreakPoint* Server::Impl::GetBreakPoint(size_t index) {
 bool Server::Impl::IsBreakPointActive(const BreakPoint &bp) {
   if (!bp.enabled) return false;
   if (bp.condition.empty()) return true;
-  
-  VALUE binding = GetBinding(false);
-  if (binding != Qnil) {
-    VALUE condition_value = EvaluateRubyExpressionAsValue(bp.condition, binding);
-    return RTEST(condition_value);
-  }
-  
-  return true;
+
+  assert(!frames_.empty());
+  VALUE binding = frames_.front().binding;
+  assert(binding != Qnil);
+  VALUE condition_value = EvaluateRubyExpressionAsValue(bp.condition, binding);
+  return (condition_value == Qtrue);
 }
 
 void Server::Impl::SaveBreakPoints() const {
@@ -791,6 +789,12 @@ void Server::StepOver() {
 void Server::StepOut() {
   if (IsStopped() && impl_->call_depth_ > 1) {
     impl_->stepout_to_call_depth_ = impl_->call_depth_ - 1;
+  }
+}
+
+void Server::Pause() {
+  if (!IsStopped()) {
+    impl_->break_at_next_line_ = true;
   }
 }
 
