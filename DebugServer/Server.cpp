@@ -214,7 +214,7 @@ public:
 
   void DisableTracePoint();
 
-  const BreakPoint* GetBreakPoint(const std::string& file, size_t line) const;
+  BreakPoint* GetBreakPoint(const std::string& file, size_t line);
 
   BreakPoint* GetBreakPoint(size_t index);
 
@@ -284,7 +284,7 @@ public:
   std::atomic<size_t> stepout_to_call_depth_;
 
   std::atomic<size_t> stepover_to_call_depth_;
-  
+
   std::vector<StackFrame> frames_;
 
   size_t active_frame_index_;
@@ -334,9 +334,8 @@ void Server::Impl::DisableTracePoint() {
   }
 }
 
-const BreakPoint* Server::Impl::GetBreakPoint(const std::string& file,
-                                              size_t line) const {
-  const BreakPoint* bp = nullptr;
+BreakPoint* Server::Impl::GetBreakPoint(const std::string& file, size_t line) {
+  BreakPoint* bp = nullptr;
   auto it = breakpoints_.find(line);
   if (it != breakpoints_.end()) {
     auto itf = it->second.find(file);
@@ -480,7 +479,7 @@ void Server::Impl::DoBreak(const std::string& file_path, size_t line) {
 // Performs necessary operations when a break point is hit.
 void Server::Impl::DoBreak(const BreakPoint& bp) {
   frames_ = GetStackFrames();
-  
+
   // NOTE: This check can only be performed after calling `GetStackFrames`.
   if (IsBreakPointActive(bp)) {
     last_break_file_path_ = bp.file;
@@ -551,9 +550,17 @@ void Server::Impl::ResolveBreakPoints() {
 }
 
 void Server::Impl::AddBreakPoint(BreakPoint& bp, bool is_resolved) {
+  auto existing = GetBreakPoint(bp.file, bp.line);
+  if (existing) {
+    bp.index = existing->index;
+    existing->enabled = bp.enabled;
+    existing->condition = bp.condition;
+    return;
+  }
+
   if (bp.index == 0)
     bp.index = ++last_breakpoint_index;
-  
+
   if (is_resolved) {
     auto& bp_map = breakpoints_[bp.line];
     bp_map.insert(std::make_pair(bp.file, bp));
@@ -622,7 +629,7 @@ void Server::Stop() {
 
 bool Server::AddBreakPoint(BreakPoint& bp, bool assume_resolved) {
   std::lock_guard<std::mutex> lock(impl_->break_point_mutex_);
-  
+
   // Make sure we have the loaded files
   impl_->ReadScriptLinesHash();
 
@@ -635,7 +642,7 @@ bool Server::AddBreakPoint(BreakPoint& bp, bool assume_resolved) {
 
 bool Server::RemoveBreakPoint(size_t index) {
   bool removed = false;
-  
+
   // Check resolved breakpoints
   for (auto it = impl_->breakpoints_.begin(), ite = impl_->breakpoints_.end();
        it != ite; ++it) {
@@ -715,7 +722,7 @@ std::vector<BreakPoint> Server::GetBreakPoints() const {
   impl_->ResolveBreakPoints();
 
   std::vector<BreakPoint> bps;
-  
+
   // Add resolved breakpoints
   for (auto it = impl_->breakpoints_.cbegin(), ite = impl_->breakpoints_.cend();
        it != ite; ++it) {

@@ -44,13 +44,13 @@ public:
 private:
   void handleError(const boost::system::error_code &err, int signal);
   void closeConnection();
-  
+
   void doAccept();
   void handleAccept(const boost::system::error_code &err);
-  
+
   void doReadUntil();
   void handleReadUntil(const boost::system::error_code &err, size_t bytes);
-  
+
   void evaluateCommand(const std::string &command);
   void sendResponse(const std::string &response);
   void sendVariables(const std::string &kind, const std::vector<Variable> &variables);
@@ -122,6 +122,7 @@ void RDIP::Impl::wait() {
 
 void RDIP::Impl::handleError(const boost::system::error_code &err, int signal) {
   LOG(FMT("boost::system::error_code: " << err << ", signal: " << signal));
+  closeConnection();
 }
 
 void RDIP::Impl::closeConnection() {
@@ -132,6 +133,7 @@ void RDIP::Impl::closeConnection() {
 
     server_->RemoveAllBreakPoints();
   }
+  notifyWait(true);
 }
 
 void RDIP::Impl::doAccept() {
@@ -224,9 +226,8 @@ void RDIP::Impl::evaluateCommand(const std::string &command) {
     bp.line = boost::lexical_cast<size_t>(match[2]);
     bp.enabled = true;
     if (match[3].matched) bp.condition = match[3];
-    if (server_->AddBreakPoint(bp, true)) {
-      response << "<breakpointAdded no=\"" << bp.index << "\" location=\"" << escapeXml(bp.file) << ':' << bp.line << "\" />";
-    }
+    server_->AddBreakPoint(bp, true);
+    response << "<breakpointAdded no=\"" << bp.index << "\" location=\"" << escapeXml(bp.file) << ':' << bp.line << "\" />";
   } else if (std::regex_match(command, match, breakpoints_regex)) {
     response << "<breakpoints>";
     auto &bps = server_->GetBreakPoints();
@@ -244,9 +245,8 @@ void RDIP::Impl::evaluateCommand(const std::string &command) {
   } else if (std::regex_match(command, match, delete_breakpoint_regex)) {
     if (match[1].matched) {
       size_t index = boost::lexical_cast<size_t>(match[1]);
-      if (server_->RemoveBreakPoint(index)) {
-        response << "<breakpointDeleted no=\"" << index << "\" />";
-      }
+      server_->RemoveBreakPoint(index);
+      response << "<breakpointDeleted no=\"" << index << "\" />";
     } else {
       server_->RemoveAllBreakPoints();
     }
