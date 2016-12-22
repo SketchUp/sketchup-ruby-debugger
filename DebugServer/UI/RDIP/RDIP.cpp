@@ -31,7 +31,7 @@ namespace RubyDebugger {
 
 static const int DefaultPort = 1234;
 
-class RDIP::Impl : std::enable_shared_from_this<Impl> {
+class RDIP::Impl : public std::enable_shared_from_this<Impl> {
 public:
   Impl(IDebugServer *server, int port);
   ~Impl();
@@ -230,7 +230,7 @@ void RDIP::Impl::evaluateCommand(const std::string &command) {
     response << "<breakpointAdded no=\"" << bp.index << "\" location=\"" << escapeXml(bp.file) << ':' << bp.line << "\" />";
   } else if (std::regex_match(command, match, breakpoints_regex)) {
     response << "<breakpoints>";
-    auto &bps = server_->GetBreakPoints();
+    auto bps = server_->GetBreakPoints();
     std::for_each(bps.begin(), bps.end(), [&](auto &bp){
       response << "<breakpoint n=\"" << bp.index << "\" file=\"" << escapeXml(bp.file) << "\" line=\"" << bp.line << "\" />";
     });
@@ -299,14 +299,19 @@ void RDIP::Impl::evaluateCommand(const std::string &command) {
   static const std::regex where_regex("^(?:w(?:here)?|bt|backtrace)$", std::regex_constants::icase);
 
   if (std::regex_match(command, match, frame_regex)) {
-    auto &frames = server_->GetStackFrames();
-    size_t index = boost::lexical_cast<size_t>(match[1]) - 1;
-    if (index >= 0 && index < frames.size()) server_->SetActiveFrameIndex(index);
+    const auto &frames = server_->GetStackFrames();
+    size_t index = boost::lexical_cast<size_t>(match[1]);
+    if (index >= 1) {
+      --index;
+      if (index < frames.size()) {
+        server_->SetActiveFrameIndex(index);
+      }
+    }
   } else if (std::regex_match(command, match, thread_list_regex)) {
     response << "<threads><thread id=\"1\" status=\"run\" /></threads>";
   } else if (std::regex_match(command, match, where_regex)) {
     response << "<frames>";
-    auto &frames = server_->GetStackFrames();
+    const auto &frames = server_->GetStackFrames();
     size_t activeIndex = server_->GetActiveFrameIndex();
     for (size_t index = 0; index < frames.size(); ++index) {
       auto &frame = frames[index];
@@ -330,7 +335,7 @@ void RDIP::Impl::evaluateCommand(const std::string &command) {
       response << "<eval expression=\"" << escapeXml(expression) << "\" value=\"Expression cannot be evaluated\" />";
     } else {
       queueWork([=](){
-        auto &var = server_->EvaluateExpression(expression);
+        const auto &var = server_->EvaluateExpression(expression);
         std::ostringstream response;
         response << "<eval expression=\"" << escapeXml(var.name) << "\" value=\"" << escapeXml(var.value) << "\" />";
         postResponse(response.str());
