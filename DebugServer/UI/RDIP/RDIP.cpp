@@ -267,7 +267,7 @@ void RDIP::Impl::evaluateCommand(const std::string &command) {
   static const std::regex continue_regex("^c(?:ont)?$", std::regex_constants::icase);
   static const std::regex finish_regex("^fin(?:ish)?$", std::regex_constants::icase);
   static const std::regex next_regex("^n(?:ext)?$", std::regex_constants::icase);
-  static const std::regex pause_regex("^(?:pause|i(?:nterrupt)?)$", std::regex_constants::icase);
+  static const std::regex pause_regex("^(?:pause(?:\\s+(\\d+))?|i(?:nterrupt)?)$", std::regex_constants::icase);
   static const std::regex quit_regex("^(?:q(?:uit)?|exit|detach)$", std::regex_constants::icase);
   static const std::regex start_regex("^start$", std::regex_constants::icase);
   static const std::regex step_regex("^s(?:tep)?$", std::regex_constants::icase);
