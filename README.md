@@ -3,18 +3,18 @@ SketchUp Ruby API Debugger
 
 This is a Ruby debugger framework for SketchUp 2014 and later. The `ruby-debug-ide` protocol has been mostly implemented so any Ruby IDE that supports this protocol should work.
 
-| IDE | Stable (1.0.3.0) | Latest (pre-release) |
+| IDE | Stable (1.0.3.0) | Stable (1.1.0.0) |
 | --- | --- | --- |
 | Aptana RadRails | Good | *Untested* |
 | NetBeans (with Ruby community plugin) | Good | *Untested* |
-| RubyMine | Good | Testing in progress |
-| VS Code (with `vscode-ruby` extension) | Not supported | Testing in progress |
+| RubyMine | Good | Good |
+| VS Code (with `vscode-ruby` extension) | Not supported | Good |
 
 ## Instructions for Windows:
 - Download the pre-built dynamic library (SURubyDebugger.dll) from the [latest release](https://github.com/SketchUp/sketchup-ruby-debugger/releases) or build from the sources.
 - Copy the DLL into the SketchUp installation directory. As the exact path will depend on the version of SketchUp you have installed, look for a folder similar to the following:
 ```
-C:\Program Files\SketchUp\SketchUp 2017\
+C:\Program Files\SketchUp\SketchUp 2018\
 
 C:\Program Files (x86)\SketchUp\SketchUp 2015\
 ```
@@ -25,13 +25,13 @@ SketchUp.exe -rdebug "ide port=7000"
 
 ## Instructions for Mac OS X:
 - Install SketchUp 2014 Maintenance 1 Release (version 14.1.1283) or later.
-- Download SURubyDebugger.dylib into the Frameworks directory of the app bundle:
+- Download `SURubyDebugger.dylib` into the Frameworks directory of the app bundle:
 ```
-curl https://github.com/SketchUp/sketchup-ruby-debugger/releases/download/1.0.3.0/SURubyDebugger.dylib -o /Applications/SketchUp\ 2017/SketchUp.app/Contents/Frameworks/SURubyDebugger.dylib
+curl https://github.com/SketchUp/sketchup-ruby-debugger/releases/download/1.1.0.0/SURubyDebugger.dylib -o /Applications/SketchUp\ 2018/SketchUp.app/Contents/Frameworks/SURubyDebugger.dylib
 ```
 - Run SketchUp from the command line:
 ```
-open -a /Applications/SketchUp\ 2015/SketchUp.app --args -rdebug "ide port=7000"
+open -a /Applications/SketchUp\ 2018/SketchUp.app --args -rdebug "ide port=7000"
 ```
 
 ## Command-line arguments:
