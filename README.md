@@ -27,7 +27,7 @@ SketchUp.exe -rdebug "ide port=7000"
 - Install SketchUp 2014 Maintenance 1 Release (version 14.1.1283) or later.
 - Download `SURubyDebugger.dylib` into the Frameworks directory of the app bundle:
 ```
-curl https://github.com/SketchUp/sketchup-ruby-debugger/releases/download/1.1.0.0/SURubyDebugger.dylib -o /Applications/SketchUp\ 2018/SketchUp.app/Contents/Frameworks/SURubyDebugger.dylib
+curl -L https://github.com/SketchUp/sketchup-ruby-debugger/releases/download/1.1.0.0/SURubyDebugger.dylib -o /Applications/SketchUp\ 2018/SketchUp.app/Contents/Frameworks/SURubyDebugger.dylib
 ```
 - Run SketchUp from the command line:
 ```
