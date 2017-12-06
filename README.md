@@ -5,10 +5,10 @@ This is a Ruby debugger framework for SketchUp 2014 and later. The `ruby-debug-i
 
 | IDE | Stable (1.0.3.0) | Stable (1.1.0.0) |
 | --- | --- | --- |
-| Aptana RadRails | Good | *Untested* |
+| [Aptana RadRails](https://github.com/SketchUp/sketchup-ruby-debugger/wiki/How-to-set-up-an-IDE-for-debugging-Ruby-extensions-in-SketchUp) | Good | *Untested* |
 | NetBeans (with Ruby community plugin) | Good | *Untested* |
-| RubyMine | Good | Good |
-| VS Code (with `vscode-ruby` extension) | Not supported | Good |
+| [RubyMine](https://github.com/SketchUp/sketchup-ruby-api-tutorials/wiki/RubyMine-Debugger-Setup) | Good | Good |
+| [VS Code](https://github.com/SketchUp/sketchup-ruby-api-tutorials/wiki/VSCode-Debugger-Setup) (with `vscode-ruby` extension) | Not supported | Good |
 
 ## Instructions for Windows:
 - Download the pre-built dynamic library (SURubyDebugger.dll) from the [latest release](https://github.com/SketchUp/sketchup-ruby-debugger/releases) or build from the sources.
