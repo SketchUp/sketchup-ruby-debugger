@@ -2,8 +2,8 @@
 
   rubysig.h -
 
-  $Author: akr $
-  $Date: 2014-02-15 00:16:31 +0900 (Sat, 15 Feb 2014) $
+  $Author: kosaki $
+  $Date: 2015-10-18 11:10:34 +0900 (Sun, 18 Oct 2015) $
   created at: Wed Aug 16 01:15:38 JST 1995
 
   Copyright (C) 1993-2008 Yukihiro Matsumoto
@@ -12,7 +12,7 @@
 
 #if   defined __GNUC__
 #warning rubysig.h is obsolete
-#elif defined _MSC_VER || defined __BORLANDC__
+#elif defined _MSC_VER
 #pragma message("warning: rubysig.h is obsolete")
 #endif
 
