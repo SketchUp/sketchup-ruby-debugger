@@ -13,7 +13,8 @@ TODO:
 
 ## Releasing
 
-1. Build binaries for each platform.
-2. Tag commit it was built from.
-3. Upload binaries to GitHub Releases.
-4. Update README.md to refer to new download URL and versions.
+1. Update binary versions. (VS Resource Editor)
+2. Build binaries for each platform.
+3. Tag commit it was built from.
+4. Upload binaries to GitHub Releases.
+5. Update README.md to refer to new download URL and versions.
