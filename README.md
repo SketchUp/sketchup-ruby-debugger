@@ -3,18 +3,18 @@ SketchUp Ruby API Debugger
 
 This is a Ruby debugger framework for SketchUp 2014 and later. The `ruby-debug-ide` protocol has been mostly implemented so any Ruby IDE that supports this protocol should work.
 
-| IDE | Stable (1.0.3.0) | Stable (1.1.0.0) |
+| IDE | Stable (1.0.3.0) | Stable (1.1.0.0) | Stable (1.2.0.0) |
 | --- | --- | --- |
-| [Aptana RadRails](https://github.com/SketchUp/sketchup-ruby-debugger/wiki/How-to-set-up-an-IDE-for-debugging-Ruby-extensions-in-SketchUp) | Good | *Untested* |
-| NetBeans (with Ruby community plugin) | Good | *Untested* |
-| [RubyMine](https://github.com/SketchUp/sketchup-ruby-api-tutorials/wiki/RubyMine-Debugger-Setup) | Good | Good |
-| [VS Code](https://github.com/SketchUp/sketchup-ruby-api-tutorials/wiki/VSCode-Debugger-Setup) (with `vscode-ruby` extension) | Not supported | Good |
+| [Aptana RadRails](https://github.com/SketchUp/sketchup-ruby-debugger/wiki/How-to-set-up-an-IDE-for-debugging-Ruby-extensions-in-SketchUp) | Good | *Untested* | *Untested* |
+| NetBeans (with Ruby community plugin) | Good | *Untested* | *Untested* |
+| [RubyMine](https://github.com/SketchUp/sketchup-ruby-api-tutorials/wiki/RubyMine-Debugger-Setup) | Good | Good | Good |
+| [VS Code](https://github.com/SketchUp/sketchup-ruby-api-tutorials/wiki/VSCode-Debugger-Setup) (with `vscode-ruby` extension) | Not supported | Good | Good |
 
 ## Instructions for Windows:
 - Download the pre-built dynamic library (SURubyDebugger.dll) from the [latest release](https://github.com/SketchUp/sketchup-ruby-debugger/releases) or build from the sources.
 - Copy the DLL into the SketchUp installation directory. As the exact path will depend on the version of SketchUp you have installed, look for a folder similar to the following:
 ```
-C:\Program Files\SketchUp\SketchUp 2018\
+C:\Program Files\SketchUp\SketchUp 2019\
 
 C:\Program Files (x86)\SketchUp\SketchUp 2015\
 ```
@@ -27,11 +27,11 @@ SketchUp.exe -rdebug "ide port=7000"
 - Install SketchUp 2014 Maintenance 1 Release (version 14.1.1283) or later.
 - Download `SURubyDebugger.dylib` into the Frameworks directory of the app bundle:
 ```
-curl -L https://github.com/SketchUp/sketchup-ruby-debugger/releases/download/1.1.0.0/SURubyDebugger.dylib -o /Applications/SketchUp\ 2018/SketchUp.app/Contents/Frameworks/SURubyDebugger.dylib
+curl -L https://github.com/SketchUp/sketchup-ruby-debugger/releases/download/1.2.0.0/SURubyDebugger.dylib -o /Applications/SketchUp\ 2019/SketchUp.app/Contents/Frameworks/SURubyDebugger.dylib
 ```
 - Run SketchUp from the command line:
 ```
-open -a /Applications/SketchUp\ 2018/SketchUp.app --args -rdebug "ide port=7000"
+open -a /Applications/SketchUp\ 2019/SketchUp.app --args -rdebug "ide port=7000"
 ```
 
 ## Command-line arguments:
