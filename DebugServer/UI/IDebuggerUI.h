@@ -18,6 +18,8 @@ struct BreakPoint;
 class IDebuggerUI
 {
 public:
+  virtual ~IDebuggerUI() {}
+  
   // Initializes the UI, given a server interface.
   virtual void Initialize(IDebugServer* server,
                           const std::string& str_debugger) = 0;
