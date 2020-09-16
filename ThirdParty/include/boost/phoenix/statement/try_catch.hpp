@@ -10,6 +10,7 @@
 #ifndef BOOST_PHOENIX_STATEMENT_TRY_CATCH_HPP
 #define BOOST_PHOENIX_STATEMENT_TRY_CATCH_HPP
 
+#include <boost/phoenix/config.hpp>
 #include <boost/phoenix/core/limits.hpp>
 #include <boost/phoenix/core/call.hpp>
 #include <boost/phoenix/core/expression.hpp>
@@ -135,7 +136,8 @@ namespace boost { namespace phoenix
 
         template <typename Catch, typename Exception, typename Context>
         typename enable_if<proto::matches<Catch, rule::non_captured_catch> >::type
-        eval_catch_body(Catch const &c, Exception & /*unused*/, Context const &ctx) const
+        eval_catch_body(Catch const &c, Exception & /*unused*/, Context const &ctx
+            BOOST_PHOENIX_SFINAE_AND_OVERLOADS) const
         {
             phoenix::eval(proto::child_c<1>(c), ctx);
         }
@@ -416,8 +418,8 @@ namespace boost { namespace phoenix
                 );
         }
 
-        TryCatch const & try_catch;
-        Capture const & capture;
+        TryCatch try_catch;
+        Capture capture;
     };
 
     template <typename TryCatch, typename Exception>
@@ -444,7 +446,7 @@ namespace boost { namespace phoenix
                 );
         }
 
-        TryCatch const & try_catch;
+        TryCatch try_catch;
     };
 
     template <typename TryCatch>
@@ -470,7 +472,7 @@ namespace boost { namespace phoenix
             );
         }
 
-        TryCatch const & try_catch;
+        TryCatch try_catch;
     };
 
     template <
@@ -482,7 +484,6 @@ namespace boost { namespace phoenix
     struct try_catch_actor
         : actor<Expr>
     {
-        typedef try_catch_actor<Expr> that_type;
         typedef actor<Expr> base_type;
 
         try_catch_actor(base_type const& expr)
@@ -492,21 +493,26 @@ namespace boost { namespace phoenix
         }
 
         template <typename Exception>
-        catch_gen<that_type, Exception> const
+        catch_gen<base_type, Exception> const
         catch_() const
         {
-            return catch_gen<that_type, Exception>(*this);
+            return catch_gen<base_type, Exception>(*this);
         }
 
         template <typename Exception, typename Capture>
-        catch_gen<that_type, Exception, Capture> const
+        catch_gen<base_type, Exception, Capture> const
         catch_(Capture const &expr) const
         {
-            return catch_gen<that_type, Exception, Capture>(*this, expr);
+            return catch_gen<base_type, Exception, Capture>(*this, expr);
         }
 
-        catch_all_gen<that_type> const catch_all;
+        catch_all_gen<base_type> const catch_all;
     };
+
+    template <typename Expr>
+    struct is_actor<try_catch_actor<Expr> >
+        : mpl::true_
+    {};
 
     struct try_gen
     {

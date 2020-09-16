@@ -21,7 +21,6 @@
 		33CC243318D57BE30079FC3E /* BreakPoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 33CC243118D57BE30079FC3E /* BreakPoint.h */; };
 		33CC243418D57BE30079FC3E /* StackFrame.h in Headers */ = {isa = PBXBuildFile; fileRef = 33CC243218D57BE30079FC3E /* StackFrame.h */; };
 		33CC243B18D5808E0079FC3E /* Ruby.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33CC243918D5808E0079FC3E /* Ruby.framework */; };
-		33CC243D18D5893B0079FC3E /* libboost_system.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33CC243C18D5893B0079FC3E /* libboost_system.a */; };
 		CE5F5B2125123C3300237692 /* IDebuggerUI.h in Headers */ = {isa = PBXBuildFile; fileRef = CE5F5B2025123C3300237692 /* IDebuggerUI.h */; };
 /* End PBXBuildFile section */
 
@@ -41,7 +40,6 @@
 		33CC243118D57BE30079FC3E /* BreakPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BreakPoint.h; path = ../Common/BreakPoint.h; sourceTree = "<group>"; };
 		33CC243218D57BE30079FC3E /* StackFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StackFrame.h; path = ../Common/StackFrame.h; sourceTree = "<group>"; };
 		33CC243918D5808E0079FC3E /* Ruby.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Ruby.framework; path = ../ThirdParty/lib/Mac/Ruby.framework; sourceTree = "<group>"; };
-		33CC243C18D5893B0079FC3E /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_system.a; path = ../ThirdParty/lib/Mac/libboost_system.a; sourceTree = "<group>"; };
 		CE5F5B2025123C3300237692 /* IDebuggerUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IDebuggerUI.h; path = ../DebugServer/UI/IDebuggerUI.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -51,7 +49,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				33CC243B18D5808E0079FC3E /* Ruby.framework in Frameworks */,
-				33CC243D18D5893B0079FC3E /* libboost_system.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -115,7 +112,6 @@
 		33CC243518D57C050079FC3E /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				33CC243C18D5893B0079FC3E /* libboost_system.a */,
 				33CC243918D5808E0079FC3E /* Ruby.framework */,
 			);
 			name = Libraries;

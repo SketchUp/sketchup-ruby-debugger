@@ -28,7 +28,7 @@ class context;
 
 namespace algo {
 
-struct algorithm;
+class algorithm;
 
 }
 
@@ -50,7 +50,7 @@ public:
 
     // fiber_properties, and by implication every subclass, must accept a back
     // pointer to its context.
-    fiber_properties( context * ctx) noexcept :
+    explicit fiber_properties( context * ctx) noexcept :
         ctx_{ ctx } {
     }
 

@@ -1,8 +1,9 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 
-// Copyright (c) 2014-2015, Oracle and/or its affiliates.
+// Copyright (c) 2014-2019, Oracle and/or its affiliates.
 
 // Contributed and/or modified by Menelaos Karavelas, on behalf of Oracle
+// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Licensed under the Boost Software License version 1.0.
 // http://www.boost.org/users/license.html
@@ -38,21 +39,29 @@ namespace detail { namespace is_simple
 template <typename MultiPoint>
 struct is_simple_multipoint
 {
-    static inline bool apply(MultiPoint const& multipoint)
+    template <typename Strategy>
+    static inline bool apply(MultiPoint const& multipoint, Strategy const&)
     {
+        typedef typename Strategy::cs_tag cs_tag;
+        typedef geometry::less
+            <
+                typename point_type<MultiPoint>::type,
+                -1,
+                cs_tag
+            > less_type;
+
         if (boost::empty(multipoint))
         {
             return true;
         }
 
         MultiPoint mp(multipoint);
-        std::sort(boost::begin(mp), boost::end(mp),
-                  geometry::less<typename point_type<MultiPoint>::type>());
+        std::sort(boost::begin(mp), boost::end(mp), less_type());
 
         simplicity_failure_policy policy;
         return !detail::is_valid::has_duplicates
             <
-                MultiPoint, closed
+                MultiPoint, closed, cs_tag
             >::apply(mp, policy);
     }
 };

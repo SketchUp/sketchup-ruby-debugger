@@ -163,6 +163,8 @@ public:
             if( m_max_dt != static_cast<time_type>(0) )
             {
                 dt = detail::min_abs(m_max_dt, dt_new);
+            } else {
+                dt = dt_new;
             }
             m_last_rejected = false;
             return success;
@@ -198,7 +200,7 @@ public:
 
 
 
-private:
+protected:
 
     template< class StateIn >
     bool resize_m_xerr( const StateIn &x )

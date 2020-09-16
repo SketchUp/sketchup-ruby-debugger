@@ -1,11 +1,13 @@
 //Copyright (c) 2008-2016 Emil Dotchevski and Reverge Studios, Inc.
+//Copyright (c) 2019 agate-pris
 
 //Distributed under the Boost Software License, Version 1.0. (See accompanying
 //file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef UUID_384AFF3AD23A11DFA80B754FE0D72085
-#define UUID_384AFF3AD23A11DFA80B754FE0D72085
+#ifndef BOOST_QVM_384AFF3AD23A11DFA80B754FE0D72085
+#define BOOST_QVM_384AFF3AD23A11DFA80B754FE0D72085
 
+#include <boost/qvm/detail/vec_assign.hpp>
 #include <boost/qvm/vec_operations2.hpp>
 #include <boost/qvm/vec_operations3.hpp>
 #include <boost/qvm/vec_operations4.hpp>
@@ -97,58 +99,6 @@ boost
             {
             template <int D>
             struct
-            assign_vv_defined
-                {
-                static bool const value=false;
-                };
-
-            template <int I,int N>
-            struct
-            copy_vector_elements
-                {
-                template <class A,class B>
-                static
-                void
-                f( A & a, B const & b )
-                    {
-                    vec_traits<A>::template write_element<I>(a)=vec_traits<B>::template read_element<I>(b);
-                    copy_vector_elements<I+1,N>::f(a,b);
-                    }
-                };
-
-            template <int N>
-            struct
-            copy_vector_elements<N,N>
-                {
-                template <class A,class B>
-                static
-                void
-                f( A &, B const & )
-                    {
-                    }
-                };
-            }
-
-        template <class A,class B>
-        inline
-        typename boost::enable_if_c<
-            is_vec<A>::value && is_vec<B>::value &&
-            vec_traits<A>::dim==vec_traits<B>::dim &&
-            !qvm_detail::assign_vv_defined<vec_traits<A>::dim>::value,
-            A &>::type
-        assign( A & a, B const & b )
-            {
-            qvm_detail::copy_vector_elements<0,vec_traits<A>::dim>::f(a,b);
-            return a;
-            }
-
-        ////////////////////////////////////////////////
-
-        namespace
-        qvm_detail
-            {
-            template <int D>
-            struct
             convert_to_v_defined
                 {
                 static bool const value=false;
@@ -202,14 +152,10 @@ boost
             bool>::type
         cmp( A const & a, B const & b, Cmp f )
             {
-            typedef typename deduce_scalar<
-                typename vec_traits<A>::scalar_type,
-                typename vec_traits<B>::scalar_type>::type T;
-            int const dim=vec_traits<A>::dim;
-            T v1[dim]; assign(v1,a);
-            T v2[dim]; assign(v2,b);
-            for( int i=0; i!=dim; ++i )
-                if( !f(v1[i],v2[i]) )
+            for( int i=0; i!=vec_traits<A>::dim; ++i )
+                if( !f(
+                    vec_traits<A>::read_element_idx(i,a),
+                    vec_traits<B>::read_element_idx(i,b)) )
                     return false;
             return true;
             }
@@ -255,7 +201,7 @@ boost
             static
             BOOST_QVM_INLINE_CRITICAL
             scalar_type
-            read_element( this_vector const & x )
+            read_element( this_vector const & )
                 {
                 BOOST_QVM_STATIC_ASSERT(I>=0);
                 BOOST_QVM_STATIC_ASSERT(I<Dim);
@@ -265,7 +211,7 @@ boost
             static
             BOOST_QVM_INLINE_CRITICAL
             scalar_type
-            read_element_idx( int i, this_vector const & x )
+            read_element_idx( int i, this_vector const & )
                 {
                 BOOST_QVM_ASSERT(i>=0);
                 BOOST_QVM_ASSERT(i<Dim);
@@ -689,6 +635,34 @@ boost
             R r;
             for( int i=0; i!=vec_traits<A>::dim; ++i )
                 vec_traits<R>::write_element_idx(i,r)=vec_traits<A>::read_element_idx(i,a)*b;
+            return r;
+            }
+
+        ////////////////////////////////////////////////
+
+        namespace
+        qvm_detail
+            {
+            template <int D>
+            struct
+            mul_sv_defined
+                {
+                static bool const value=false;
+                };
+            }
+
+        template <class A,class B>
+        BOOST_QVM_INLINE_OPERATIONS
+        typename lazy_enable_if_c<
+            is_scalar<A>::value && is_vec<B>::value &&
+            !qvm_detail::mul_sv_defined<vec_traits<B>::dim>::value,
+            deduce_vec<B> >::type
+        operator*( A a, B const & b )
+            {
+            typedef typename deduce_vec<B>::type R;
+            R r;
+            for( int i=0; i!=vec_traits<B>::dim; ++i )
+                vec_traits<R>::write_element_idx(i,r)=a*vec_traits<B>::read_element_idx(i,b);
             return r;
             }
 

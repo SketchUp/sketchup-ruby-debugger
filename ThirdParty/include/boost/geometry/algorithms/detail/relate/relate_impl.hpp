@@ -2,8 +2,8 @@
 
 // Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
 
-// This file was modified by Oracle on 2013, 2014, 2015.
-// Modifications copyright (c) 2013-2015 Oracle and/or its affiliates.
+// This file was modified by Oracle on 2013, 2014, 2015, 2019.
+// Modifications copyright (c) 2013-2019 Oracle and/or its affiliates.
 
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
@@ -30,25 +30,19 @@ namespace detail { namespace relate {
 
 struct implemented_tag {};
 
-template <template <typename, typename> class StaticMaskTrait,
-          typename Geometry1,
-          typename Geometry2>
-struct relate_impl
-    : boost::mpl::if_
+template
+<
+    typename Geometry1,
+    typename Geometry2
+>
+struct relate_impl_base
+    : boost::mpl::if_c
         <
-            boost::mpl::or_
+            boost::is_base_of
                 <
-                    boost::is_base_of
-                        <
-                            nyi::not_implemented_tag,
-                            StaticMaskTrait<Geometry1, Geometry2>
-                        >,
-                    boost::is_base_of
-                        <
-                            nyi::not_implemented_tag,
-                            dispatch::relate<Geometry1, Geometry2>
-                        >
-                >,
+                    nyi::not_implemented_tag,
+                    dispatch::relate<Geometry1, Geometry2>
+                >::value,
             not_implemented
                 <
                     typename geometry::tag<Geometry1>::type,
@@ -56,21 +50,58 @@ struct relate_impl
                 >,
             implemented_tag
         >::type
+{};
+
+template
+<
+    typename Geometry1,
+    typename Geometry2,
+    typename StaticMask
+>
+struct relate_impl_dispatch
+    : relate_impl_base<Geometry1, Geometry2>
 {
-    static inline bool apply(Geometry1 const& g1, Geometry2 const& g2)
+    template <typename Strategy>
+    static inline bool apply(Geometry1 const& g1, Geometry2 const& g2, Strategy const& strategy)
     {
         typename detail::relate::result_handler_type
             <
                 Geometry1,
                 Geometry2,
-                typename StaticMaskTrait<Geometry1, Geometry2>::type
+                StaticMask
             >::type handler;
 
-        dispatch::relate<Geometry1, Geometry2>::apply(g1, g2, handler);
+        dispatch::relate<Geometry1, Geometry2>::apply(g1, g2, handler, strategy);
 
         return handler.result();
     }
 };
+
+template <typename Geometry1, typename Geometry2>
+struct relate_impl_dispatch<Geometry1, Geometry2, detail::relate::false_mask>
+    : relate_impl_base<Geometry1, Geometry2>
+{
+    template <typename Strategy>
+    static inline bool apply(Geometry1 const& , Geometry2 const& , Strategy const& )
+    {
+        return false;
+    }
+};
+
+template
+<
+    template <typename, typename> class StaticMaskTrait,
+    typename Geometry1,
+    typename Geometry2
+>
+struct relate_impl
+    : relate_impl_dispatch
+        <
+            Geometry1,
+            Geometry2,
+            typename StaticMaskTrait<Geometry1, Geometry2>::type
+        >
+{};
 
 }} // namespace detail::relate
 #endif // DOXYGEN_NO_DETAIL

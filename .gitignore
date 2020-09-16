@@ -1,6 +1,7 @@
 Debug/
 Release/
 !ThirdParty/**/*
+.vs/
 *.suo
 *.sdf
 *.vcxproj.user
