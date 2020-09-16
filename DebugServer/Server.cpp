@@ -14,7 +14,10 @@
 #include <ruby/debug.h>
 #include <ruby/encoding.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcomma"
 #include <boost/lexical_cast.hpp>
+#pragma clang diagnostic pop
 
 #include <atomic>
 #include <string>

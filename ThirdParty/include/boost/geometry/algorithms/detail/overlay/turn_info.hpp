@@ -13,8 +13,10 @@
 #include <boost/array.hpp>
 
 #include <boost/geometry/core/coordinate_type.hpp>
+#include <boost/geometry/algorithms/detail/signed_size_type.hpp>
 #include <boost/geometry/algorithms/detail/overlay/segment_identifier.hpp>
 #include <boost/geometry/algorithms/detail/overlay/overlay_type.hpp>
+#include <boost/geometry/policies/robustness/segment_ratio.hpp>
 
 namespace boost { namespace geometry
 {
@@ -75,7 +77,7 @@ struct turn_operation
 template
 <
     typename Point,
-    typename SegmentRatio,
+    typename SegmentRatio = geometry::segment_ratio<typename coordinate_type<Point>::type>,
     typename Operation = turn_operation<Point, SegmentRatio>,
     typename Container = boost::array<Operation, 2>
 >
@@ -88,19 +90,19 @@ struct turn_info
 
     Point point;
     method_type method;
-    int cluster_id;
+    bool touch_only; // True in case of method touch(interior) and lines do not cross
+    signed_size_type cluster_id; // For multiple turns on same location, > 0. Else -1. 0 is unused.
     bool discarded;
-    bool colocated;
-    bool switch_source; // For u/u turns which can either switch or not
+    bool has_colocated_both; // Colocated with a uu turn (for union) or ii (other)
 
     Container operations;
 
     inline turn_info()
         : method(method_none)
+        , touch_only(false)
         , cluster_id(-1)
         , discarded(false)
-        , colocated(false)
-        , switch_source(false)
+        , has_colocated_both(false)
     {}
 
     inline bool both(operation_type type) const
@@ -131,7 +133,10 @@ struct turn_info
     {
         return has(operation_blocked);
     }
-
+    inline bool is_clustered() const
+    {
+        return cluster_id > 0;
+    }
 
 private :
     inline bool has12(operation_type type1, operation_type type2) const

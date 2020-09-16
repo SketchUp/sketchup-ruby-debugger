@@ -7,11 +7,14 @@
 
 #include <string>
 
+#pragma warning( push )
+#pragma warning( disable : 4117 ) // warning C4117: macro name '_INTEGRAL_MAX_BITS' is reserved, '#define' ignored
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wsign-conversion"
 #pragma clang diagnostic ignored "-Wdeprecated-register"
 #include <ruby/ruby.h>
 #pragma clang diagnostic pop
+#pragma warning( pop )
 
 namespace SketchUp {
 namespace RubyDebugger {

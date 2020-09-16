@@ -1,8 +1,9 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 
-// Copyright (c) 2014-2015, Oracle and/or its affiliates.
+// Copyright (c) 2014-2019, Oracle and/or its affiliates.
 
 // Contributed and/or modified by Menelaos Karavelas, on behalf of Oracle
+// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Licensed under the Boost Software License version 1.0.
 // http://www.boost.org/users/license.html
@@ -28,7 +29,6 @@
 #include <boost/geometry/policies/robustness/no_rescale_policy.hpp>
 #include <boost/geometry/policies/robustness/segment_ratio.hpp>
 
-#include <boost/geometry/algorithms/equals.hpp>
 #include <boost/geometry/algorithms/intersects.hpp>
 #include <boost/geometry/algorithms/not_implemented.hpp>
 
@@ -36,6 +36,7 @@
 #include <boost/geometry/algorithms/detail/signed_size_type.hpp>
 
 #include <boost/geometry/algorithms/detail/disjoint/linear_linear.hpp>
+#include <boost/geometry/algorithms/detail/equals/point_point.hpp>
 #include <boost/geometry/algorithms/detail/overlay/get_turn_info.hpp>
 #include <boost/geometry/algorithms/detail/overlay/turn_info.hpp>
 #include <boost/geometry/algorithms/detail/overlay/self_turn_points.hpp>
@@ -47,6 +48,8 @@
 #include <boost/geometry/algorithms/detail/is_valid/debug_print_turns.hpp>
 
 #include <boost/geometry/algorithms/dispatch/is_simple.hpp>
+
+#include <boost/geometry/strategies/intersection.hpp>
 
 
 namespace boost { namespace geometry
@@ -71,19 +74,25 @@ inline bool check_segment_indices(Turn const& turn,
 }
 
 
-template <typename Geometry, typename Tag = typename tag<Geometry>::type>
+template
+<
+    typename Geometry,
+    typename EqPPStrategy,
+    typename Tag = typename tag<Geometry>::type
+>
 class is_acceptable_turn
     : not_implemented<Geometry>
 {};
 
-template <typename Linestring>
-class is_acceptable_turn<Linestring, linestring_tag>
+template <typename Linestring, typename EqPPStrategy>
+class is_acceptable_turn<Linestring, EqPPStrategy, linestring_tag>
 {
 public:
     is_acceptable_turn(Linestring const& linestring)
         : m_linestring(linestring)
-        , m_is_closed(geometry::equals(range::front(linestring),
-                                       range::back(linestring)))
+        , m_is_closed(geometry::detail::equals::equals_point_point(range::front(linestring),
+                                                                   range::back(linestring),
+                                                                   EqPPStrategy()))
     {}
 
     template <typename Turn>
@@ -101,12 +110,16 @@ private:
     bool const m_is_closed;
 };
 
-template <typename MultiLinestring>
-class is_acceptable_turn<MultiLinestring, multi_linestring_tag>
+template <typename MultiLinestring, typename EqPPStrategy>
+class is_acceptable_turn<MultiLinestring, EqPPStrategy, multi_linestring_tag>
 {
 private:
-    typedef typename boost::range_value<MultiLinestring>::type linestring_type;
-    typedef is_acceptable_turn<linestring_type> base_type;
+    template <typename Point1, typename Point2>
+    static inline bool equals_point_point(Point1 const& point1, Point2 const& point2)
+    {
+        return geometry::detail::equals::equals_point_point(point1, point2,
+                                                            EqPPStrategy());
+    }
 
     template <typename Point, typename Linestring>
     static inline bool is_boundary_point_of(Point const& point,
@@ -114,11 +127,10 @@ private:
     {
         BOOST_GEOMETRY_ASSERT(boost::size(linestring) > 1);
         return
-            ! geometry::equals(range::front(linestring),
-                               range::back(linestring))
+            !equals_point_point(range::front(linestring), range::back(linestring))
             &&
-            (geometry::equals(point, range::front(linestring))
-             || geometry::equals(point, range::back(linestring)));
+            (equals_point_point(point, range::front(linestring))
+             || equals_point_point(point, range::back(linestring)));
     }
 
     template <typename Turn, typename Linestring>
@@ -131,7 +143,7 @@ private:
             &&
             check_segment_indices(turn, boost::size(linestring) - 2)
             &&
-            geometry::equals(range::front(linestring), range::back(linestring))
+            equals_point_point(range::front(linestring), range::back(linestring))
             &&
             turn.operations[0].fraction.is_zero();
             ;
@@ -142,13 +154,13 @@ private:
                                                  Linestring2 const& ls2)
     {
         return
-            geometry::equals(range::front(ls1), range::front(ls2))
+            equals_point_point(range::front(ls1), range::front(ls2))
             ?
-            geometry::equals(range::back(ls1), range::back(ls2))
+            equals_point_point(range::back(ls1), range::back(ls2))
             :
-            (geometry::equals(range::front(ls1), range::back(ls2))
+            (equals_point_point(range::front(ls1), range::back(ls2))
              &&
-             geometry::equals(range::back(ls1), range::front(ls2)))
+                equals_point_point(range::back(ls1), range::front(ls2)))
             ;
     }
 
@@ -160,6 +172,8 @@ public:
     template <typename Turn>
     inline bool apply(Turn const& turn) const
     {
+        typedef typename boost::range_value<MultiLinestring>::type linestring_type;
+        
         linestring_type const& ls1 =
             range::at(m_multilinestring, turn.operations[0].seg_id.multi_index);
 
@@ -186,20 +200,13 @@ private:
 };
 
 
-template <typename Linear>
-inline bool has_self_intersections(Linear const& linear)
+template <typename Linear, typename Strategy>
+inline bool has_self_intersections(Linear const& linear, Strategy const& strategy)
 {
     typedef typename point_type<Linear>::type point_type;
 
     // compute self turns
-    typedef detail::overlay::turn_info
-        <
-            point_type,
-            geometry::segment_ratio
-                <
-                    typename geometry::coordinate_type<point_type>::type
-                >
-        > turn_info;
+    typedef detail::overlay::turn_info<point_type> turn_info;
 
     std::deque<turn_info> turns;
 
@@ -208,19 +215,27 @@ inline bool has_self_intersections(Linear const& linear)
             detail::disjoint::assign_disjoint_policy
         > turn_policy;
 
-    is_acceptable_turn<Linear> predicate(linear);
+    typedef is_acceptable_turn
+        <
+            Linear,
+            typename Strategy::equals_point_point_strategy_type
+        > is_acceptable_turn_type;
+
+    is_acceptable_turn_type predicate(linear);
     detail::overlay::predicate_based_interrupt_policy
         <
-            is_acceptable_turn<Linear>
+            is_acceptable_turn_type
         > interrupt_policy(predicate);
 
+    // TODO: skip_adjacent should be set to false
     detail::self_get_turn_points::get_turns
         <
-            turn_policy
+            false, turn_policy
         >::apply(linear,
+                 strategy,
                  detail::no_rescale_policy(),
                  turns,
-                 interrupt_policy);
+                 interrupt_policy, 0, true);
 
     detail::is_valid::debug_print_turns(turns.begin(), turns.end());
     debug_print_boundary_points(linear);
@@ -232,19 +247,35 @@ inline bool has_self_intersections(Linear const& linear)
 template <typename Linestring, bool CheckSelfIntersections = true>
 struct is_simple_linestring
 {
-    static inline bool apply(Linestring const& linestring)
+    template <typename Strategy>
+    static inline bool apply(Linestring const& linestring,
+                             Strategy const& strategy)
     {
         simplicity_failure_policy policy;
         return ! boost::empty(linestring)
             && ! detail::is_valid::has_duplicates
                     <
-                        Linestring, closed
+                        Linestring, closed, typename Strategy::cs_tag
                     >::apply(linestring, policy)
             && ! detail::is_valid::has_spikes
                     <
                         Linestring, closed
-                    >::apply(linestring, policy)
-            && ! (CheckSelfIntersections && has_self_intersections(linestring));
+                    >::apply(linestring, policy, strategy.get_side_strategy());
+    }
+};
+
+template <typename Linestring>
+struct is_simple_linestring<Linestring, true>
+{
+    template <typename Strategy>
+    static inline bool apply(Linestring const& linestring,
+                             Strategy const& strategy)
+    {
+        return is_simple_linestring
+                <
+                    Linestring, false
+                >::apply(linestring, strategy)
+            && ! has_self_intersections(linestring, strategy);
     }
 };
 
@@ -252,27 +283,50 @@ struct is_simple_linestring
 template <typename MultiLinestring>
 struct is_simple_multilinestring
 {
-    static inline bool apply(MultiLinestring const& multilinestring)
+private:
+    template <typename Strategy>
+    struct per_linestring
     {
+        per_linestring(Strategy const& strategy)
+            : m_strategy(strategy)
+        {}
+
+        template <typename Linestring>
+        inline bool apply(Linestring const& linestring) const
+        {
+            return detail::is_simple::is_simple_linestring
+                <
+                    Linestring,
+                    false // do not compute self-intersections
+                >::apply(linestring, m_strategy);
+        }
+
+        Strategy const& m_strategy;
+    };
+
+public:
+    template <typename Strategy>
+    static inline bool apply(MultiLinestring const& multilinestring,
+                             Strategy const& strategy)
+    {
+        typedef per_linestring<Strategy> per_ls;
+
         // check each of the linestrings for simplicity
         // but do not compute self-intersections yet; these will be
         // computed for the entire multilinestring
         if ( ! detail::check_iterator_range
                  <
-                     is_simple_linestring
-                         <
-                             typename boost::range_value<MultiLinestring>::type,
-                             false // do not compute self-intersections
-                         >,
+                     per_ls, // do not compute self-intersections
                      true // allow empty multilinestring
                  >::apply(boost::begin(multilinestring),
-                          boost::end(multilinestring))
+                          boost::end(multilinestring),
+                          per_ls(strategy))
              )
         {
             return false;
         }
 
-        return ! has_self_intersections(multilinestring);
+        return ! has_self_intersections(multilinestring, strategy);
     }
 };
 

@@ -13,11 +13,17 @@
                                    of the virtual address space as tag (at least 16bit)
 */
 
-#define BOOST_LOCKFREE_CACHELINE_BYTES 64
+#if defined(__s390__) || defined(__s390x__)
+    #define BOOST_LOCKFREE_CACHELINE_BYTES 256
+#elif defined(powerpc) || defined(__powerpc__) || defined(__ppc__)
+    #define BOOST_LOCKFREE_CACHELINE_BYTES 128
+#else
+    #define BOOST_LOCKFREE_CACHELINE_BYTES 64
+#endif
 
 #include <boost/predef.h>
 
-#ifdef BOOST_ARCH_X86_64
+#if BOOST_ARCH_X86_64 || defined (__aarch64__)
 #define BOOST_LOCKFREE_PTR_COMPRESSION 1
 #endif
 

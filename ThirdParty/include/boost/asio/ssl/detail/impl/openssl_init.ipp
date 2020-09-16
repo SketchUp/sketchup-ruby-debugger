@@ -3,7 +3,7 @@
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 // Copyright (c) 2005 Voipster / Indrek dot Juhani at voipster dot com
-// Copyright (c) 2005-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2005-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -36,11 +36,11 @@ class openssl_init_base::do_init
 public:
   do_init()
   {
+#if (OPENSSL_VERSION_NUMBER < 0x10100000L)
     ::SSL_library_init();
     ::SSL_load_error_strings();        
     ::OpenSSL_add_all_algorithms();
 
-#if (OPENSSL_VERSION_NUMBER < 0x10100000L)
     mutexes_.resize(::CRYPTO_num_locks());
     for (size_t i = 0; i < mutexes_.size(); ++i)
       mutexes_[i].reset(new boost::asio::detail::mutex);
@@ -80,13 +80,15 @@ public:
     ::ERR_remove_thread_state(NULL);
 #endif // (OPENSSL_VERSION_NUMBER < 0x10000000L)
 #if (OPENSSL_VERSION_NUMBER >= 0x10002000L) \
-    && (OPENSSL_VERSION_NUMBER < 0x10100000L)
+    && (OPENSSL_VERSION_NUMBER < 0x10100000L) \
+    && !defined(SSL_OP_NO_COMPRESSION)
     ::SSL_COMP_free_compression_methods();
 #endif // (OPENSSL_VERSION_NUMBER >= 0x10002000L)
        // && (OPENSSL_VERSION_NUMBER < 0x10100000L)
-#if !defined(OPENSSL_IS_BORINGSSL)
+       // && !defined(SSL_OP_NO_COMPRESSION)
+#if !defined(OPENSSL_IS_BORINGSSL) && !defined(BOOST_ASIO_USE_WOLFSSL)
     ::CONF_modules_unload(1);
-#endif // !defined(OPENSSL_IS_BORINGSSL)
+#endif // !defined(OPENSSL_IS_BORINGSSL) && !defined(BOOST_ASIO_USE_WOLFSSL)
 #if !defined(OPENSSL_NO_ENGINE) \
   && (OPENSSL_VERSION_NUMBER < 0x10100000L)
     ::ENGINE_cleanup();

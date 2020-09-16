@@ -3,11 +3,10 @@
 //Distributed under the Boost Software License, Version 1.0. (See accompanying
 //file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef UUID_E6519754D19211DFB8405F74DFD72085
-#define UUID_E6519754D19211DFB8405F74DFD72085
+#ifndef BOOST_QVM_E6519754D19211DFB8405F74DFD72085
+#define BOOST_QVM_E6519754D19211DFB8405F74DFD72085
 
-#include <boost/qvm/inline.hpp>
-#include <boost/qvm/enable_if.hpp>
+#include <boost/qvm/detail/quat_assign.hpp>
 #include <boost/qvm/deduce_quat.hpp>
 #include <boost/qvm/mat_traits.hpp>
 #include <boost/qvm/scalar_traits.hpp>
@@ -72,20 +71,6 @@ boost
 
         ////////////////////////////////////////////////
 
-        template <class A,class B>
-        BOOST_QVM_INLINE_OPERATIONS
-        typename enable_if_c<
-            is_quat<A>::value && is_quat<B>::value,
-            A &>::type
-        assign( A & a, B const & b )
-            {
-            quat_traits<A>::template write_element<0>(a) = quat_traits<B>::template read_element<0>(b);
-            quat_traits<A>::template write_element<1>(a) = quat_traits<B>::template read_element<1>(b);
-            quat_traits<A>::template write_element<2>(a) = quat_traits<B>::template read_element<2>(b);
-            quat_traits<A>::template write_element<3>(a) = quat_traits<B>::template read_element<3>(b);
-            return a;
-            }
-
         template <class A,class B,class Cmp>
         BOOST_QVM_INLINE_OPERATIONS
         typename enable_if_c<
@@ -93,9 +78,8 @@ boost
             bool>::type
         cmp( A const & a, B const & b, Cmp f )
             {
-            typedef typename deduce_scalar<
-                typename quat_traits<A>::scalar_type,
-                typename quat_traits<B>::scalar_type>::type T;
+            typedef typename quat_traits<A>::scalar_type T;
+            typedef typename quat_traits<B>::scalar_type U;
             T q1[4] =
                 {
                 quat_traits<A>::template read_element<0>(a),
@@ -103,7 +87,7 @@ boost
                 quat_traits<A>::template read_element<2>(a),
                 quat_traits<A>::template read_element<3>(a)
                 };
-            T q2[4] =
+            U q2[4] =
                 {
                 quat_traits<B>::template read_element<0>(b),
                 quat_traits<B>::template read_element<1>(b),
@@ -734,7 +718,7 @@ boost
             TR sc=one;
             if( dp < one )
                 {
-                TR const theta = acosf(dp);
+                TR const theta = acos<TR>(dp);
                 TR const invsintheta = one/sin<TR>(theta);
                 TR const scale = sin<TR>(theta*(one-t)) * invsintheta;
                 TR const invscale = sin<TR>(theta*t) * invsintheta * sc;
@@ -1450,9 +1434,9 @@ boost
                 }
             else
                 {
-                typedef typename vec_traits<B>::scalar_type T;
-                vec_traits<B>::template write_element<0>(b) = scalar_traits<T>::value(1);
-                vec_traits<B>::template write_element<1>(b) = vec_traits<B>::template write_element<2>(b) = scalar_traits<T>::value(0);
+                typedef typename vec_traits<B>::scalar_type U;
+                vec_traits<B>::template write_element<0>(b) = scalar_traits<U>::value(1);
+                vec_traits<B>::template write_element<1>(b) = vec_traits<B>::template write_element<2>(b) = scalar_traits<U>::value(0);
                 }
             return scalar_traits<T>::value(2) * qvm::acos(a0);
             }

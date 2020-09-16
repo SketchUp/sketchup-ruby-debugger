@@ -8,12 +8,15 @@
 #ifndef BOOST_PHOENIX_CORE_FUNCTION_EQUAL_HPP
 #define BOOST_PHOENIX_CORE_FUNCTION_EQUAL_HPP
 
-#include <boost/preprocessor/arithmetic/inc.hpp>
 #include <boost/phoenix/core/limits.hpp>
 #include <boost/is_placeholder.hpp>
-#include <boost/mpl/bool.hpp>
+#include <boost/mpl/int.hpp>
 #include <boost/phoenix/core/terminal.hpp>
 #include <boost/proto/matches.hpp>
+
+#ifndef BOOST_PHOENIX_NO_VARIADIC_FUNCTION_EQUAL
+#   include <boost/phoenix/core/detail/index_sequence.hpp>
+#endif
 
 namespace boost
 {
@@ -37,7 +40,7 @@ namespace boost { namespace phoenix
             {
                 return a0 == a1;
             }
-            
+
             // hard wiring reference_wrapper and weak_ptr here ...
             // **TODO** find out why boost bind does this ...
             template <typename A0, typename A1>
@@ -91,6 +94,7 @@ namespace boost { namespace phoenix
                 return false;
             }
 
+#ifdef BOOST_PHOENIX_NO_VARIADIC_FUNCTION_EQUAL
             template <typename Expr1>
             result_type operator()(Expr1 const& e1, Expr1 const& e2) const
             {
@@ -98,71 +102,60 @@ namespace boost { namespace phoenix
                     this->evaluate(
                         e1
                       , e2
-                      , typename proto::arity_of<Expr1>::type()
+                      , mpl::int_<proto::arity_of<Expr1>::value - 1>()
                     );
             }
 
-            private:
-#if !defined(BOOST_PHOENIX_DONT_USE_PREPROCESSED_FILES)
-#include <boost/phoenix/core/preprocessed/function_equal.hpp>
+        private:
+            template <typename Expr1>
+            static BOOST_FORCEINLINE result_type
+            evaluate(Expr1 const& e1, Expr1 const& e2, mpl::int_<0>)
+            {
+                return
+                    function_equal_()(
+                        proto::child_c<0>(e1)
+                      , proto::child_c<0>(e2)
+                    );
+            }
+
+            template <typename Expr1, int N>
+            static BOOST_FORCEINLINE result_type
+            evaluate(Expr1 const& e1, Expr1 const& e2, mpl::int_<N>)
+            {
+                return
+                    evaluate(
+                        e1
+                      , e2
+                      , mpl::int_<N - 1>()
+                    ) && function_equal_()(
+                        proto::child_c<N>(e1)
+                      , proto::child_c<N>(e2)
+                    );
+            }
 #else
-#if defined(__WAVE__) && defined(BOOST_PHOENIX_CREATE_PREPROCESSED_FILES)
-#pragma wave option(preserve: 2, line: 0, output: "preprocessed/function_equal_" BOOST_PHOENIX_LIMIT_STR ".hpp")
-#endif
-/*==============================================================================
-    Copyright (c) 2001-2010 Joel de Guzman
-    Copyright (c) 2004 Daniel Wallin
-    Copyright (c) 2010 Thomas Heller
+            template <typename Expr1>
+            result_type operator()(Expr1 const& e1, Expr1 const& e2) const
+            {
+                return
+                    this->evaluate(
+                        e1
+                      , e2
+                      , typename make_index_sequence<proto::arity_of<Expr1>::value>::type()
+                    );
+            }
 
-    Distributed under the Boost Software License, Version 1.0. (See accompanying
-    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-==============================================================================*/
-#if defined(__WAVE__) && defined(BOOST_PHOENIX_CREATE_PREPROCESSED_FILES)
-#pragma wave option(preserve: 1)
-#endif
-
-                #define BOOST_PHOENIX_FUNCTION_EQUAL_R(Z, N, DATA)              \
-                    && function_equal_()(                                       \
-                            proto::child_c< N >(e1)                             \
-                          , proto::child_c< N >(e2)                             \
-                        )                                                       \
-                /**/
-
-                #define BOOST_PHOENIX_FUNCTION_EQUAL(Z, N, DATA)                \
-                    template <typename Expr1>                                   \
-                    result_type                                                 \
-                    evaluate(                                                   \
-                        Expr1 const& e1                                         \
-                      , Expr1 const& e2                                         \
-                      , mpl::long_< N >                                         \
-                    ) const                                                     \
-                    {                                                           \
-                        return                                                  \
-                            function_equal_()(                                  \
-                                proto::child_c<0>(e1)                           \
-                              , proto::child_c<0>(e2)                           \
-                            )                                                   \
-                            BOOST_PP_REPEAT_FROM_TO(                            \
-                                1                                               \
-                              , N                                               \
-                              , BOOST_PHOENIX_FUNCTION_EQUAL_R                  \
-                              , _                                               \
-                            );                                                  \
-                    }                                                           \
-                /**/
-
-                BOOST_PP_REPEAT_FROM_TO(
-                    1
-                  , BOOST_PP_INC(BOOST_PROTO_MAX_ARITY)
-                  , BOOST_PHOENIX_FUNCTION_EQUAL
-                  , _
-                )
-                #undef BOOST_PHOENIX_FUNCTION_EQUAL_R
-                #undef BOOST_PHOENIX_FUNCTION_EQUAL
-
-#if defined(__WAVE__) && defined(BOOST_PHOENIX_CREATE_PREPROCESSED_FILES)
-#pragma wave option(output: null)
-#endif
+        private:
+            template <typename Expr1, std::size_t... I>
+            static BOOST_FORCEINLINE result_type
+            evaluate(Expr1 const& e1, Expr1 const& e2, index_sequence<I...>)
+            {
+                bool result = true;
+                int dummy[] = { (result && (
+                        result = function_equal_()(proto::child_c<I>(e1), proto::child_c<I>(e2))
+                    ))... };
+                (void)dummy;
+                return result;
+            }
 #endif
         };
     }

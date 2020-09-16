@@ -13,6 +13,9 @@
 #include <queue>
 #include <thread>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wconversion"
+#pragma clang diagnostic ignored "-Wcomma"
 #include <boost/algorithm/string.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/io_service.hpp>
@@ -20,6 +23,7 @@
 #include <boost/asio/streambuf.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/lexical_cast.hpp>
+#pragma clang diagnostic pop
 
 #include <DebugServer/IDebugServer.h>
 #include <DebugServer/Log.h>
