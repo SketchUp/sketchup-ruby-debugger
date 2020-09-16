@@ -6,7 +6,12 @@
 #define RDEBUGGER_COMMON_STACKFRAME_H_
 
 #include <string>
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wdeprecated-register"
 #include <ruby/ruby.h>
+#pragma clang diagnostic pop
 
 namespace SketchUp {
 namespace RubyDebugger {
