@@ -516,7 +516,7 @@ static int EachKeyValFunc(VALUE key, VALUE val, VALUE data) {
 
 void Server::Impl::ReadScriptLinesHash() {
   if (script_lines_hash_ != Qnil) {
-    rb_hash_foreach(script_lines_hash_, (int(*)(...))EachKeyValFunc, (VALUE)this);
+    rb_hash_foreach(script_lines_hash_, (int(*)(VALUE, VALUE, VALUE))EachKeyValFunc, (VALUE)this);
   }
 }
 
