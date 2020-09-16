@@ -18,7 +18,7 @@ namespace RubyDebugger {
 class RDIP : public IDebuggerUI {
 public:
   RDIP();
-  ~RDIP();
+  virtual ~RDIP();
 
   virtual void Initialize(IDebugServer* server,
                           const std::string& str_debugger);
