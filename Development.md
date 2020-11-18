@@ -7,6 +7,8 @@
     cd Build
     xcodebuild -scheme SURubyDebugger -configuration Release
 
+    xcodebuild -scheme SURubyDebugger -showBuildSettings | grep TARGET_BUILD_DIR
+
 ### Windows
 
 TODO:

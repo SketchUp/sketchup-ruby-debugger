@@ -1,5 +1,8 @@
 #ifndef INCLUDE_RUBY_CONFIG_H
 #define INCLUDE_RUBY_CONFIG_H 1
+#if _MSC_VER < 1920
+#warning MSC version unmatch: _MSC_VER: >= 1920 is expected.
+#endif
 #define RUBY_MSVCRT_VERSION 140
 #define STDC_HEADERS 1
 #define HAVE_SYS_TYPES_H 1
@@ -37,9 +40,11 @@
 #define HAVE_PROTOTYPES 1
 #define TOKEN_PASTE(x,y) x##y
 #define HAVE_STDARG_PROTOTYPES 1
+#define HAVE_VA_COPY 1
 #define NORETURN(x) __declspec(noreturn) x
 #define DEPRECATED(x) __declspec(deprecated) x
 #define DEPRECATED_TYPE(mesg, x) __declspec(deprecated mesg) x
+#define RUBY_CXX_DEPRECATED(mesg) __declspec(deprecated(mesg))
 #define NOINLINE(x) __declspec(noinline) x
 #define ALWAYS_INLINE(x) __forceinline x
 #define WARN_UNUSED_RESULT(x) x
@@ -53,6 +58,8 @@
 #define PACKED_STRUCT(x) __pragma(pack(push, 1)) x __pragma(pack(pop))
 #define PACKED_STRUCT_UNALIGNED(x) PACKED_STRUCT(x)
 #define RUBY_EXTERN extern __declspec(dllimport)
+#define RUBY_ALIGNAS(n) __declspec(align(n))
+#define RUBY_ALIGNOF __alignof
 #define HAVE_DECL_SYS_NERR 1
 #define HAVE_LIMITS_H 1
 #define HAVE_FCNTL_H 1
@@ -87,6 +94,7 @@
 #define HAVE_UINTPTR_T 1
 #define HAVE_SSIZE_T 1
 #define ssize_t __int64
+#define PRI_PTR_PREFIX "I64"
 #define PRI_LL_PREFIX "I64"
 #define PRI_PIDT_PREFIX PRI_INT_PREFIX
 #define GETGROUPS_T int
@@ -110,6 +118,7 @@
 #define HAVE_MKDIR 1
 #define HAVE_CLOCK_GETTIME 1
 #define HAVE_CLOCK_GETRES 1
+#define HAVE_GETTIMEOFDAY 1
 #define HAVE_SPAWNV 1
 #define HAVE_STRCASECMP 1
 #define HAVE_STRNCASECMP 1
@@ -120,6 +129,7 @@
 #define HAVE_FLOCK 1
 #define HAVE_ISNAN 1
 #define HAVE_FINITE 1
+#define HAVE_NAN 1
 #define HAVE_HYPOT 1
 #define HAVE_FMOD 1
 #define HAVE_FREXP 1
@@ -155,10 +165,13 @@
 #define RUBY_SETJMP(env) _setjmp(env)
 #define RUBY_LONGJMP(env,val) longjmp(env,val)
 #define RUBY_JMP_BUF jmp_buf
-//#define inline __inline
+// #define inline __inline
+#ifndef __cplusplus
+#define restrict __restrict
+#endif
 #define NEED_IO_SEEK_BETWEEN_RW 1
 #define STACK_GROW_DIRECTION -1
-#define CANONICALIZATION_FOR_MATHN 1
+#define COROUTINE_H "coroutine/win64/Context.h"
 #define DEFAULT_KCODE KCODE_NONE
 #define LOAD_RELATIVE 1
 #define DLEXT ".so"
@@ -166,4 +179,5 @@
 #define RUBY_COREDLL "vcruntime140"
 #define RUBY_PLATFORM "x64-mswin64_140"
 #define RUBY_SITEARCH "x64-vcruntime140"
+#define USE_MJIT 1
 #endif /* INCLUDE_RUBY_CONFIG_H */
