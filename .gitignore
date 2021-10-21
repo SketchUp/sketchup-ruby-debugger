@@ -11,4 +11,5 @@ ipch/
 .DS_Store
 Build/SURubyDebugger.xcodeproj/xcuserdata
 Build/SURubyDebugger.xcworkspace/xcuserdata
+Build/output
 !SURubyDebugger.dll

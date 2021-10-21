@@ -5,9 +5,9 @@
 ### Mac
 
     cd Build
-    xcodebuild -scheme SURubyDebugger -configuration Release
+    xcodebuild -scheme SURubyDebugger -configuration Release -derivedDataPath output
 
-    xcodebuild -scheme SURubyDebugger -showBuildSettings | grep TARGET_BUILD_DIR
+The binary will be located under: `Build/output/Build/Products/Release/SURubyDebugger.dylib`
 
 ### Windows
 
