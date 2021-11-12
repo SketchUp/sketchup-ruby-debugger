@@ -301,16 +301,12 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../ThirdParty/lib/Mac\"",
+					"$(SRCROOT)/../ThirdParty/lib/Mac",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/..",
 					"$(SRCROOT)/../ThirdParty/include",
 					"$(SRCROOT)/../ThirdParty/include/ruby/mac",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../ThirdParty/lib/Mac\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -322,16 +318,12 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../ThirdParty/lib/Mac\"",
+					"$(SRCROOT)/../ThirdParty/lib/Mac",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/..",
 					"$(SRCROOT)/../ThirdParty/include",
 					"$(SRCROOT)/../ThirdParty/include/ruby/mac",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../ThirdParty/lib/Mac\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
