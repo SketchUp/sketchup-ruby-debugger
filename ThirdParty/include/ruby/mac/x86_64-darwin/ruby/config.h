@@ -406,5 +406,5 @@
 #define USE_MJIT 1
 #define HAVE_PTHREAD_H 1
 #define LOAD_RELATIVE 1
-#define RUBY_PLATFORM "x86_64-darwin18"
+#define RUBY_PLATFORM "x86_64-darwin20"
 #endif /* INCLUDE_RUBY_CONFIG_H */

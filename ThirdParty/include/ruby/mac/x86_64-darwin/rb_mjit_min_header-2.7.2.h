@@ -1707,618 +1707,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 typedef signed char __int8_t;
 
 
@@ -2670,7 +2058,7 @@ size_t fwrite(const void * __restrict __ptr, size_t __size, size_t __nitems, FIL
 int getc(FILE *);
 int getchar(void);
 char *gets(char *);
-void perror(const char *);
+void perror(const char *) __attribute__((__cold__));
 int printf(const char * __restrict, ...) __attribute__((__format__ (__printf__, 1, 2)));
 int putc(int, FILE *);
 int putchar(int);
@@ -2687,7 +2075,7 @@ FILE *tmpfile(void);
 
 __attribute__((__availability__(swift, unavailable, message="Use mkstemp(3) instead.")))
 
-__attribute__((deprecated("This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of tmpnam(3), it is highly recommended that you use mkstemp(3) instead.")))
+__attribute__((__deprecated__("This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of tmpnam(3), it is highly recommended that you use mkstemp(3) instead.")))
 
 char *tmpnam(char *);
 int ungetc(int, FILE *);
@@ -2698,8 +2086,11 @@ int vsprintf(char * __restrict, const char * __restrict, va_list) __attribute__(
 
 
 
-char *ctermid(char *);
 
+
+
+
+char *ctermid(char *);
 
 
 FILE *fdopen(int, const char *) __asm("_" "fdopen" "$DARWIN_EXTSN");
@@ -2754,7 +2145,7 @@ int putw(int, FILE *);
 
 __attribute__((__availability__(swift, unavailable, message="Use mkstemp(3) instead.")))
 
-__attribute__((deprecated("This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of tempnam(3), it is highly recommended that you use mkstemp(3) instead.")))
+__attribute__((__deprecated__("This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of tempnam(3), it is highly recommended that you use mkstemp(3) instead.")))
 
 char *tempnam(const char *__dir, const char *__prefix) __asm("_" "tempnam" );
 
@@ -2903,9 +2294,6 @@ extern int __vsnprintf_chk (char * __restrict, size_t, int, size_t,
 
 
 
-
-
-
 static inline
 __uint16_t
 _OSSwapInt16(
@@ -2938,6 +2326,9 @@ _OSSwapInt64(
 {
  return __builtin_bswap64(_data);
 }
+
+
+
 
 
 
@@ -3052,13 +2443,54 @@ typedef struct fd_set {
  __int32_t fds_bits[((((1024) % ((sizeof(__int32_t) * 8))) == 0) ? ((1024) / ((sizeof(__int32_t) * 8))) : (((1024) / ((sizeof(__int32_t) * 8))) + 1))];
 } fd_set;
 
+int __darwin_check_fd_set_overflow(int, const void *, int) __attribute__((availability(macosx,introduced=11.0))) __attribute__((availability(ios,introduced=14.0))) __attribute__((availability(tvos,introduced=14.0))) __attribute__((availability(watchos,introduced=7.0)));
 
 
-static __inline int
-__darwin_fd_isset(int _n, const struct fd_set *_p)
+inline __attribute__ ((__always_inline__)) int
+__darwin_check_fd_set(int _a, const void *_b)
 {
- return _p->fds_bits[(unsigned long)_n / (sizeof(__int32_t) * 8)] & ((__int32_t)(((unsigned long)1) << ((unsigned long)_n % (sizeof(__int32_t) * 8))));
+
+
+ if ((uintptr_t)&__darwin_check_fd_set_overflow != (uintptr_t) 0) {
+
+  return __darwin_check_fd_set_overflow(_a, _b, 1);
+
+
+
+ } else {
+  return 1;
+ }
+
+
 }
+
+
+inline __attribute__ ((__always_inline__)) int
+__darwin_fd_isset(int _fd, const struct fd_set *_p)
+{
+ if (__darwin_check_fd_set(_fd, (const void *) _p)) {
+  return _p->fds_bits[(unsigned long)_fd / (sizeof(__int32_t) * 8)] & ((__int32_t)(((unsigned long)1) << ((unsigned long)_fd % (sizeof(__int32_t) * 8))));
+ }
+
+ return 0;
+}
+
+inline __attribute__ ((__always_inline__)) void
+__darwin_fd_set(int _fd, struct fd_set *const _p)
+{
+ if (__darwin_check_fd_set(_fd, (const void *) _p)) {
+  (_p->fds_bits[(unsigned long)_fd / (sizeof(__int32_t) * 8)] |= ((__int32_t)(((unsigned long)1) << ((unsigned long)_fd % (sizeof(__int32_t) * 8)))));
+ }
+}
+
+inline __attribute__ ((__always_inline__)) void
+__darwin_fd_clr(int _fd, struct fd_set *const _p)
+{
+ if (__darwin_check_fd_set(_fd, (const void *) _p)) {
+  (_p->fds_bits[(unsigned long)_fd / (sizeof(__int32_t) * 8)] &= ~((__int32_t)(((unsigned long)1) << ((unsigned long)_fd % (sizeof(__int32_t) * 8)))));
+ }
+}
+
 
 
 
@@ -3150,6 +2582,19 @@ struct ostat {
 
 struct stat { dev_t st_dev; mode_t st_mode; nlink_t st_nlink; __darwin_ino64_t st_ino; uid_t st_uid; gid_t st_gid; dev_t st_rdev; struct timespec st_atimespec; struct timespec st_mtimespec; struct timespec st_ctimespec; struct timespec st_birthtimespec; off_t st_size; blkcnt_t st_blocks; blksize_t st_blksize; __uint32_t st_flags; __uint32_t st_gen; __int32_t st_lspare; __int64_t st_qspare[2]; };
 struct stat64 { dev_t st_dev; mode_t st_mode; nlink_t st_nlink; __darwin_ino64_t st_ino; uid_t st_uid; gid_t st_gid; dev_t st_rdev; struct timespec st_atimespec; struct timespec st_mtimespec; struct timespec st_ctimespec; struct timespec st_birthtimespec; off_t st_size; blkcnt_t st_blocks; blksize_t st_blksize; __uint32_t st_flags; __uint32_t st_gen; __int32_t st_lspare; __int64_t st_qspare[2]; };
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3545,6 +2990,49 @@ struct __darwin_x86_debug_state32
  unsigned int __dr6;
  unsigned int __dr7;
 };
+
+struct __x86_instruction_state
+{
+        int __insn_stream_valid_bytes;
+        int __insn_offset;
+ int __out_of_synch;
+
+
+
+
+ __uint8_t __insn_bytes[(2448 - 64 - 4)];
+ __uint8_t __insn_cacheline[64];
+};
+
+struct __last_branch_record
+{
+ __uint64_t __from_ip;
+ __uint64_t __to_ip;
+ __uint32_t __mispredict : 1,
+   __tsx_abort : 1,
+   __in_tsx : 1,
+   __cycle_count: 16,
+   __reserved : 13;
+};
+
+struct __last_branch_state
+{
+        int __lbr_count;
+ __uint32_t __lbr_supported_tsx : 1,
+     __lbr_supported_cycle_count : 1,
+     __reserved : 30;
+ struct __last_branch_record __lbrs[32];
+};
+struct __x86_pagein_state
+{
+ int __pagein_error;
+};
+
+
+
+
+
+
 struct __darwin_x86_thread_state64
 {
  __uint64_t __rax;
@@ -3571,7 +3059,7 @@ struct __darwin_x86_thread_state64
 };
 struct __darwin_x86_thread_full_state64
 {
- struct __darwin_x86_thread_state64 ss64;
+ struct __darwin_x86_thread_state64 __ss64;
  __uint64_t __ds;
  __uint64_t __es;
  __uint64_t __ss;
@@ -3914,6 +3402,7 @@ typedef struct __darwin_sigaltstack stack_t;
 
 
 
+
 struct __darwin_ucontext
 {
  int uc_onstack;
@@ -4175,7 +3664,6 @@ typedef long unsigned int uintmax_t;
 
 
 
-
 struct timeval
 {
  __darwin_time_t tv_sec;
@@ -4227,6 +3715,10 @@ struct rusage {
  long ru_nivcsw;
 
 };
+
+
+
+
 
 
 
@@ -4358,11 +3850,50 @@ struct rusage_info_v4 {
  uint64_t ri_billed_energy;
  uint64_t ri_serviced_energy;
  uint64_t ri_interval_max_phys_footprint;
-
- uint64_t ri_unused[1];
+ uint64_t ri_runnable_time;
 };
 
-typedef struct rusage_info_v4 rusage_info_current;
+struct rusage_info_v5 {
+ uint8_t ri_uuid[16];
+ uint64_t ri_user_time;
+ uint64_t ri_system_time;
+ uint64_t ri_pkg_idle_wkups;
+ uint64_t ri_interrupt_wkups;
+ uint64_t ri_pageins;
+ uint64_t ri_wired_size;
+ uint64_t ri_resident_size;
+ uint64_t ri_phys_footprint;
+ uint64_t ri_proc_start_abstime;
+ uint64_t ri_proc_exit_abstime;
+ uint64_t ri_child_user_time;
+ uint64_t ri_child_system_time;
+ uint64_t ri_child_pkg_idle_wkups;
+ uint64_t ri_child_interrupt_wkups;
+ uint64_t ri_child_pageins;
+ uint64_t ri_child_elapsed_abstime;
+ uint64_t ri_diskio_bytesread;
+ uint64_t ri_diskio_byteswritten;
+ uint64_t ri_cpu_time_qos_default;
+ uint64_t ri_cpu_time_qos_maintenance;
+ uint64_t ri_cpu_time_qos_background;
+ uint64_t ri_cpu_time_qos_utility;
+ uint64_t ri_cpu_time_qos_legacy;
+ uint64_t ri_cpu_time_qos_user_initiated;
+ uint64_t ri_cpu_time_qos_user_interactive;
+ uint64_t ri_billed_system_time;
+ uint64_t ri_serviced_system_time;
+ uint64_t ri_logical_writes;
+ uint64_t ri_lifetime_max_phys_footprint;
+ uint64_t ri_instructions;
+ uint64_t ri_cycles;
+ uint64_t ri_billed_energy;
+ uint64_t ri_serviced_energy;
+ uint64_t ri_interval_max_phys_footprint;
+ uint64_t ri_runnable_time;
+ uint64_t ri_flags;
+};
+
+typedef struct rusage_info_v5 rusage_info_current;
 
 
 
@@ -4405,6 +3936,12 @@ struct proc_rlimit_control_wakeupmon {
  uint32_t wm_flags;
  int32_t wm_rate;
 };
+
+
+
+
+
+
 
 
 
@@ -4553,11 +4090,16 @@ void *realloc(void *__ptr, size_t __size) __attribute__((__warn_unused_result__)
 
 void *valloc(size_t) __attribute__((alloc_size(1)));
 
+
+
+
+void *aligned_alloc(size_t __alignment, size_t __size) __attribute__((__warn_unused_result__)) __attribute__((alloc_size(2))) __attribute__((availability(macosx,introduced=10.15))) __attribute__((availability(ios,introduced=13.0))) __attribute__((availability(tvos,introduced=13.0))) __attribute__((availability(watchos,introduced=6.0)));
+
 int posix_memalign(void **__memptr, size_t __alignment, size_t __size) __attribute__((availability(macosx,introduced=10.6)));
 
 
-void abort(void) __attribute__((noreturn));
-int abs(int) __attribute__((const));
+void abort(void) __attribute__((__cold__)) __attribute__((__noreturn__));
+int abs(int) __attribute__((__const__));
 int atexit(void (* _Nonnull)(void));
 double atof(const char *);
 int atoi(const char *);
@@ -4569,12 +4111,12 @@ long long
 void *bsearch(const void *__key, const void *__base, size_t __nel,
      size_t __width, int (* _Nonnull __compar)(const void *, const void *));
 
-div_t div(int, int) __attribute__((const));
-void exit(int) __attribute__((noreturn));
+div_t div(int, int) __attribute__((__const__));
+void exit(int) __attribute__((__noreturn__));
 
 char *getenv(const char *);
-long labs(long) __attribute__((const));
-ldiv_t ldiv(long, long) __attribute__((const));
+long labs(long) __attribute__((__const__));
+ldiv_t ldiv(long, long) __attribute__((__const__));
 
 long long
   llabs(long long);
@@ -4621,7 +4163,7 @@ size_t wcstombs(char * __restrict, const wchar_t * __restrict, size_t);
 int wctomb(char *, wchar_t);
 
 
-void _Exit(int) __attribute__((noreturn));
+void _Exit(int) __attribute__((__noreturn__));
 long a64l(const char *);
 double drand48(void);
 char *ecvt(double, int, int *__restrict, int *__restrict);
@@ -4711,41 +4253,59 @@ char *getbsize(int *, long *);
 int getloadavg(double [], int);
 const char
  *getprogname(void);
+void setprogname(const char *);
+
+
+
+
+
+
+
 
 int heapsort(void *__base, size_t __nel, size_t __width,
      int (* _Nonnull __compar)(const void *, const void *));
 
 int heapsort_b(void *__base, size_t __nel, size_t __width,
-     int (^ _Nonnull __compar)(const void *, const void *)) __attribute__((availability(macosx,introduced=10.6)));
+     int (^ _Nonnull __compar)(const void *, const void *) __attribute__((__noescape__)))
+     __attribute__((availability(macosx,introduced=10.6)));
 
 int mergesort(void *__base, size_t __nel, size_t __width,
      int (* _Nonnull __compar)(const void *, const void *));
 
 int mergesort_b(void *__base, size_t __nel, size_t __width,
-     int (^ _Nonnull __compar)(const void *, const void *)) __attribute__((availability(macosx,introduced=10.6)));
+     int (^ _Nonnull __compar)(const void *, const void *) __attribute__((__noescape__)))
+     __attribute__((availability(macosx,introduced=10.6)));
 
 void psort(void *__base, size_t __nel, size_t __width,
-     int (* _Nonnull __compar)(const void *, const void *)) __attribute__((availability(macosx,introduced=10.6)));
+     int (* _Nonnull __compar)(const void *, const void *))
+     __attribute__((availability(macosx,introduced=10.6)));
 
 void psort_b(void *__base, size_t __nel, size_t __width,
-     int (^ _Nonnull __compar)(const void *, const void *)) __attribute__((availability(macosx,introduced=10.6)));
+     int (^ _Nonnull __compar)(const void *, const void *) __attribute__((__noescape__)))
+     __attribute__((availability(macosx,introduced=10.6)));
 
 void psort_r(void *__base, size_t __nel, size_t __width, void *,
-     int (* _Nonnull __compar)(void *, const void *, const void *)) __attribute__((availability(macosx,introduced=10.6)));
+     int (* _Nonnull __compar)(void *, const void *, const void *))
+     __attribute__((availability(macosx,introduced=10.6)));
 
 void qsort_b(void *__base, size_t __nel, size_t __width,
-     int (^ _Nonnull __compar)(const void *, const void *)) __attribute__((availability(macosx,introduced=10.6)));
+     int (^ _Nonnull __compar)(const void *, const void *) __attribute__((__noescape__)))
+     __attribute__((availability(macosx,introduced=10.6)));
 
 void qsort_r(void *__base, size_t __nel, size_t __width, void *,
      int (* _Nonnull __compar)(void *, const void *, const void *));
 int radixsort(const unsigned char **__base, int __nel, const unsigned char *__table,
      unsigned __endbyte);
-void setprogname(const char *);
+int rpmatch(const char *)
+ __attribute__((availability(macos,introduced=10.15))) __attribute__((availability(ios,introduced=13.0))) __attribute__((availability(tvos,introduced=13.0))) __attribute__((availability(watchos,introduced=6.0)));
 int sradixsort(const unsigned char **__base, int __nel, const unsigned char *__table,
      unsigned __endbyte);
 void sranddev(void);
 void srandomdev(void);
 void *reallocf(void *__ptr, size_t __size) __attribute__((alloc_size(2)));
+long long
+ strtonum(const char *__numstr, long long __minval, long long __maxval, const char **__errstrp)
+ __attribute__((availability(macos,introduced=11.0))) __attribute__((availability(ios,introduced=14.0))) __attribute__((availability(tvos,introduced=14.0))) __attribute__((availability(watchos,introduced=7.0)));
 
 long long
   strtoq(const char *__str, char **__endptr, int __base);
@@ -4838,6 +4398,10 @@ __attribute__((availability(macosx,introduced=10.12.1))) __attribute__((availabi
 __attribute__((availability(tvos,introduced=10.0.1))) __attribute__((availability(watchos,introduced=3.1)))
 int timingsafe_bcmp(const void *__b1, const void *__b2, size_t __len);
 
+__attribute__((availability(macosx,introduced=11.0))) __attribute__((availability(ios,introduced=14.0)))
+__attribute__((availability(tvos,introduced=14.0))) __attribute__((availability(watchos,introduced=7.0)))
+int strsignal_r(int __sig, char *__strsignalbuf, size_t __buflen);
+
 
 
 
@@ -4865,10 +4429,6 @@ int ffsll(long long) __attribute__((availability(macosx,introduced=10.9)));
 int fls(int) __attribute__((availability(macosx,introduced=10.5)));
 int flsl(long) __attribute__((availability(macosx,introduced=10.5)));
 int flsll(long long) __attribute__((availability(macosx,introduced=10.9)));
-
-
-
-
 
 
 
@@ -5172,7 +4732,8 @@ int unlinkat(int, const char *, int) __attribute__((availability(macosx,introduc
 
 
 
-void _exit(int) __attribute__((noreturn));
+
+void _exit(int) __attribute__((__noreturn__));
 int access(const char *, int);
 unsigned int
   alarm(unsigned int);
@@ -5252,18 +4813,13 @@ extern int optind, opterr, optopt;
 
 
 
-__attribute__((deprecated)) __attribute__((availability(watchos,unavailable))) __attribute__((availability(tvos,unavailable)))
+__attribute__((__deprecated__)) __attribute__((availability(watchos,unavailable))) __attribute__((availability(tvos,unavailable)))
 
 void *brk(const void *);
 int chroot(const char *) ;
 
 
 char *crypt(const char *, const char *);
-
-
-
-
-
 
 void encrypt(char *, int) __asm("_" "encrypt" );
 
@@ -5277,7 +4833,7 @@ pid_t getsid(pid_t);
 
 
 int getdtablesize(void) ;
-int getpagesize(void) __attribute__((const)) ;
+int getpagesize(void) __attribute__((__const__)) ;
 char *getpass(const char *) ;
 
 
@@ -5301,7 +4857,7 @@ ssize_t pwrite(int __fd, const void * __buf, size_t __nbyte, off_t __offset) __a
 
 
 
-__attribute__((deprecated)) __attribute__((availability(watchos,unavailable))) __attribute__((availability(tvos,unavailable)))
+__attribute__((__deprecated__)) __attribute__((availability(watchos,unavailable))) __attribute__((availability(tvos,unavailable)))
 
 void *sbrk(int);
 
@@ -5351,8 +4907,13 @@ __asm("_" "pselect" "$DARWIN_EXTSN" )
 
 
 
+
+
+
+
 int select(int, fd_set * __restrict, fd_set * __restrict,
     fd_set * __restrict, struct timeval * __restrict)
+
 
 __asm("_" "select" "$DARWIN_EXTSN" )
 
@@ -5370,7 +4931,7 @@ __asm("_" "select" "$DARWIN_EXTSN" )
 typedef __darwin_uuid_t uuid_t;
 
 
-void _Exit(int) __attribute__((noreturn));
+void _Exit(int) __attribute__((__noreturn__));
 int accessx_np(const struct accessx_descriptor *, size_t, int *, uid_t);
 int acct(const char *);
 int add_profil(char *, size_t, unsigned long, unsigned int) __attribute__((availability(watchos,unavailable))) __attribute__((availability(tvos,unavailable)));
@@ -5435,21 +4996,21 @@ int mkostempsat_np(int dfd, char *path, int slen, int oflags)
 int nfssvc(int, void *);
 int profil(char *, size_t, unsigned long, unsigned int);
 
-__attribute__((deprecated("Use of per-thread security contexts is error-prone and discouraged.")))
+__attribute__((__deprecated__("Use of per-thread security contexts is error-prone and discouraged.")))
 int pthread_setugid_np(uid_t, gid_t);
 int pthread_getugid_np( uid_t *, gid_t *);
 
 int reboot(int);
 int revoke(const char *);
 
-__attribute__((deprecated)) int rcmd(char **, int, const char *, const char *, const char *, int *);
-__attribute__((deprecated)) int rcmd_af(char **, int, const char *, const char *, const char *, int *,
+__attribute__((__deprecated__)) int rcmd(char **, int, const char *, const char *, const char *, int *);
+__attribute__((__deprecated__)) int rcmd_af(char **, int, const char *, const char *, const char *, int *,
   int);
-__attribute__((deprecated)) int rresvport(int *);
-__attribute__((deprecated)) int rresvport_af(int *, int);
-__attribute__((deprecated)) int iruserok(unsigned long, int, const char *, const char *);
-__attribute__((deprecated)) int iruserok_sa(const void *, int, int, const char *, const char *);
-__attribute__((deprecated)) int ruserok(const char *, int, const char *, const char *);
+__attribute__((__deprecated__)) int rresvport(int *);
+__attribute__((__deprecated__)) int rresvport_af(int *, int);
+__attribute__((__deprecated__)) int iruserok(unsigned long, int, const char *, const char *);
+__attribute__((__deprecated__)) int iruserok_sa(const void *, int, int, const char *, const char *);
+__attribute__((__deprecated__)) int ruserok(const char *, int, const char *, const char *);
 
 int setdomainname(const char *, int);
 int setgroups(int, const gid_t *);
@@ -5869,6 +5430,7 @@ extern long double fmal(long double, long double, long double);
 
 
 
+
 extern float __inff(void)
 __attribute__((availability(macos,introduced=10.0,deprecated=10.9,message="use `(float)INFINITY` instead"))) __attribute__((availability(ios,unavailable))) __attribute__((availability(watchos,unavailable))) __attribute__((availability(tvos,unavailable)));
 extern double __inf(void)
@@ -5877,13 +5439,6 @@ extern long double __infl(void)
 __attribute__((availability(macos,introduced=10.0,deprecated=10.9,message="use `(long double)INFINITY` instead"))) __attribute__((availability(ios,unavailable))) __attribute__((availability(watchos,unavailable))) __attribute__((availability(tvos,unavailable)));
 extern float __nan(void)
 __attribute__((availability(macos,introduced=10.0,deprecated=10.14,message="use `NAN` instead"))) __attribute__((availability(ios,unavailable))) __attribute__((availability(watchos,unavailable))) __attribute__((availability(tvos,unavailable)));
-
-
-
-
-
-
-
 extern float lgammaf_r(float, int *) __attribute__((availability(macos,introduced=10.6))) __attribute__((availability(ios,introduced=3.1)));
 extern double lgamma_r(double, int *) __attribute__((availability(macos,introduced=10.6))) __attribute__((availability(ios,introduced=3.1)));
 extern long double lgammal_r(long double, int *) __attribute__((availability(macos,introduced=10.6))) __attribute__((availability(ios,introduced=3.1)));
@@ -5958,6 +5513,7 @@ extern int signgam;
 
 
 
+
 extern long int rinttol(double)
 __attribute__((availability(macos,introduced=10.0,deprecated=10.9,replacement="lrint"))) __attribute__((availability(ios,unavailable))) __attribute__((availability(watchos,unavailable))) __attribute__((availability(tvos,unavailable)));
 
@@ -5975,6 +5531,7 @@ __attribute__((availability(macos,introduced=10.0,deprecated=10.9,replacement="t
 
 extern double significand(double)
 __attribute__((availability(macos,introduced=10.0,deprecated=10.9,message="Use `2*frexp( )` or `scalbn(x, -ilogb(x))` instead."))) __attribute__((availability(ios,unavailable))) __attribute__((availability(watchos,unavailable))) __attribute__((availability(tvos,unavailable)));
+
 
 
 struct exception {
@@ -6148,6 +5705,12 @@ typedef char ruby_check_sizeof_long[8 == sizeof(long) ? 1 : -1];
 typedef char ruby_check_sizeof_long_long[8 == sizeof(long long) ? 1 : -1];
 
 typedef char ruby_check_sizeof_voidp[8 == sizeof(void*) ? 1 : -1];
+
+
+
+
+
+
 
 
 
@@ -9821,6 +9384,7 @@ typedef enum {
     RB_WARN_CATEGORY_NONE,
     RB_WARN_CATEGORY_DEPRECATED,
     RB_WARN_CATEGORY_EXPERIMENTAL,
+    RB_WARN_CATEGORY_ALL_BITS = 0x6,
 } rb_warning_category_t;
 rb_warning_category_t rb_warning_category_from_name(VALUE category);
 _Bool rb_warning_category_enabled_p(rb_warning_category_t category);
@@ -11041,6 +10605,7 @@ typedef struct rb_ast_struct {
 rb_ast_t *rb_ast_new(void);
 void rb_ast_mark(rb_ast_t*);
 void rb_ast_update_references(rb_ast_t*);
+void rb_ast_add_local_table(rb_ast_t*, ID *buf);
 void rb_ast_dispose(rb_ast_t*);
 void rb_ast_free(rb_ast_t*);
 size_t rb_ast_memsize(const rb_ast_t*);
@@ -11585,7 +11150,7 @@ typedef unsigned int rb_atomic_t;
 
 
 
-void __assert_rtn(const char *, const char *, int, const char *) __attribute__((noreturn)) __attribute__((__disable_tail_calls__));
+void __assert_rtn(const char *, const char *, int, const char *) __attribute__((__noreturn__)) __attribute__((__cold__)) __attribute__((__disable_tail_calls__));
 
 
 
@@ -11841,7 +11406,16 @@ static inline void *list_entry_or_null(const struct list_head *h,
 
 
 
+
+
+
+
+
+
+
 struct sched_param { int sched_priority; char __opaque[4]; };
+
+
 
 
 extern int sched_yield(void);
@@ -11958,6 +11532,8 @@ int clock_settime(clockid_t __clock_id, const struct timespec *__tp);
 
 
 
+__attribute__((availability(macosx,introduced=10.15))) __attribute__((availability(ios,introduced=13.0))) __attribute__((availability(tvos,introduced=13.0))) __attribute__((availability(watchos,introduced=6.0)))
+int timespec_get(struct timespec *ts, int base);
 
 
 
@@ -12182,7 +11758,7 @@ __attribute__((availability(macos,introduced=10.4))) __attribute__((availability
 int pthread_equal(pthread_t _Nullable, pthread_t _Nullable);
 
 __attribute__((availability(macos,introduced=10.4))) __attribute__((availability(ios,introduced=2.0)))
-void pthread_exit(void * _Nullable) __attribute__((noreturn));
+void pthread_exit(void * _Nullable) __attribute__((__noreturn__));
 
 __attribute__((availability(macos,introduced=10.4))) __attribute__((availability(ios,introduced=2.0)))
 int pthread_getconcurrency(void);
@@ -12394,6 +11970,17 @@ int pthread_sigmask(int, const sigset_t * _Nullable, sigset_t * _Nullable)
 
 __attribute__((availability(macos,introduced=10.4))) __attribute__((availability(ios,introduced=2.0)))
 void pthread_yield_np(void);
+
+__attribute__((availability(macos,introduced=11.0)))
+__attribute__((availability(ios,unavailable))) __attribute__((availability(tvos,unavailable))) __attribute__((availability(watchos,unavailable))) __attribute__((availability(driverkit,unavailable)))
+void pthread_jit_write_protect_np(int enabled);
+
+__attribute__((availability(macos,introduced=11.0)))
+__attribute__((availability(ios,unavailable))) __attribute__((availability(tvos,unavailable))) __attribute__((availability(watchos,unavailable))) __attribute__((availability(driverkit,unavailable)))
+int pthread_jit_write_protect_supported_np(void);
+__attribute__((availability(macos,introduced=11.0))) __attribute__((availability(ios,introduced=14.2))) __attribute__((availability(tvos,introduced=14.2))) __attribute__((availability(watchos,introduced=7.1)))
+int
+pthread_cpu_number_np(size_t *cpu_number_out);
 typedef pthread_t rb_nativethread_id_t;
 typedef pthread_mutex_t rb_nativethread_lock_t;
 
@@ -12461,13 +12048,13 @@ typedef struct rb_global_vm_lock_struct {
 typedef int jmp_buf[((9 * 2) + 3 + 16)];
 typedef int sigjmp_buf[((9 * 2) + 3 + 16) + 1];
 extern int setjmp(jmp_buf);
-extern void longjmp(jmp_buf, int) __attribute__((noreturn));
+extern void longjmp(jmp_buf, int) __attribute__((__noreturn__));
 
 
 int _setjmp(jmp_buf);
-void _longjmp(jmp_buf, int) __attribute__((noreturn));
+void _longjmp(jmp_buf, int) __attribute__((__noreturn__));
 int sigsetjmp(sigjmp_buf, int);
-void siglongjmp(sigjmp_buf, int) __attribute__((noreturn));
+void siglongjmp(sigjmp_buf, int) __attribute__((__noreturn__));
 
 
 
@@ -12514,16 +12101,11 @@ int sigvec(int, struct sigvec *, struct sigvec *);
 
 
 
-
-
 inline __attribute__ ((__always_inline__)) int
 __sigbits(int __signo)
 {
     return __signo > 32 ? 0 : (1 << (__signo - 1));
 }
-
-
-
 
 
 
@@ -20235,7 +19817,7 @@ vm_defined(rb_execution_context_t *ec, rb_control_frame_t *reg_cfp, rb_num_t op_
        case METHOD_VISI_PRIVATE:
   break;
        case METHOD_VISI_PROTECTED:
-  if (!rb_obj_is_kind_of((((((reg_cfp)))->self)), rb_class_real(klass))) {
+  if (!rb_obj_is_kind_of((((((reg_cfp)))->self)), rb_class_real(me->defined_class))) {
       break;
   }
        case METHOD_VISI_PUBLIC:
@@ -22476,7 +22058,7 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define USE_MJIT 1
 #define HAVE_PTHREAD_H 1
 #define LOAD_RELATIVE 1
-#define RUBY_PLATFORM "x86_64-darwin18"
+#define RUBY_PLATFORM "x86_64-darwin20"
 #define RUBY_DEFINES_H 1
 #define HAVE_ATTRIBUTE_ERRORFUNC 0
 #define ERRORFUNC(mesg,x) x
@@ -22501,14 +22083,21 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __const const
 #define __signed signed
 #define __volatile volatile
-#define __dead2 __attribute__((noreturn))
-#define __pure2 __attribute__((const))
-#define __unused __attribute__((unused))
-#define __used __attribute__((used))
-#define __deprecated __attribute__((deprecated))
-#define __deprecated_msg(_msg) __attribute__((deprecated(_msg)))
+#define __dead2 __attribute__((__noreturn__))
+#define __pure2 __attribute__((__const__))
+#define __unused __attribute__((__unused__))
+#define __used __attribute__((__used__))
+#define __cold __attribute__((__cold__))
+#define __exported __attribute__((__visibility__("default")))
+#define __exported_push _Pragma("GCC visibility push(default)")
+#define __exported_pop _Pragma("GCC visibility pop")
+#define __deprecated __attribute__((__deprecated__))
+#define __deprecated_msg(_msg) __attribute__((__deprecated__(_msg)))
 #define __deprecated_enum_msg(_msg) __deprecated_msg(_msg)
-#define __unavailable __attribute__((unavailable))
+#define __kpi_deprecated(_msg) 
+#define __unavailable __attribute__((__unavailable__))
+#define __kpi_unavailable 
+#define __kpi_deprecated_arm64_macos_unavailable 
 #define __dead 
 #define __pure 
 #define __restrict restrict
@@ -22516,6 +22105,7 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __not_tail_called __attribute__((__not_tail_called__))
 #define __result_use_check __attribute__((__warn_unused_result__))
 #define __swift_unavailable(_msg) __attribute__((__availability__(swift, unavailable, message=_msg)))
+#define __abortlike __dead2 __cold __not_tail_called
 #define __header_inline inline
 #define __header_always_inline __header_inline __attribute__ ((__always_inline__))
 #define __unreachable_ok_push _Pragma("clang diagnostic push") _Pragma("clang diagnostic ignored \"-Wunreachable-code\"")
@@ -22534,8 +22124,8 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __DEQUALIFY(type,var) __CAST_AWAY_QUALIFIER(var, const volatile, type)
 #define __alloc_size(...) __attribute__((alloc_size(__VA_ARGS__)))
 #define __DARWIN_ONLY_64_BIT_INO_T 0
-#define __DARWIN_ONLY_VERS_1050 0
 #define __DARWIN_ONLY_UNIX_CONFORMANCE 1
+#define __DARWIN_ONLY_VERS_1050 0
 #define __DARWIN_UNIX03 1
 #define __DARWIN_64_BIT_INO_T 1
 #define __DARWIN_VERS_1050 1
@@ -22595,6 +22185,20 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __DARWIN_ALIAS_STARTING_IPHONE___IPHONE_12_1(x) 
 #define __DARWIN_ALIAS_STARTING_IPHONE___IPHONE_12_2(x) 
 #define __DARWIN_ALIAS_STARTING_IPHONE___IPHONE_12_3(x) 
+#define __DARWIN_ALIAS_STARTING_IPHONE___IPHONE_12_4(x) 
+#define __DARWIN_ALIAS_STARTING_IPHONE___IPHONE_13_0(x) 
+#define __DARWIN_ALIAS_STARTING_IPHONE___IPHONE_13_1(x) 
+#define __DARWIN_ALIAS_STARTING_IPHONE___IPHONE_13_2(x) 
+#define __DARWIN_ALIAS_STARTING_IPHONE___IPHONE_13_3(x) 
+#define __DARWIN_ALIAS_STARTING_IPHONE___IPHONE_13_4(x) 
+#define __DARWIN_ALIAS_STARTING_IPHONE___IPHONE_13_5(x) 
+#define __DARWIN_ALIAS_STARTING_IPHONE___IPHONE_13_6(x) 
+#define __DARWIN_ALIAS_STARTING_IPHONE___IPHONE_13_7(x) 
+#define __DARWIN_ALIAS_STARTING_IPHONE___IPHONE_14_0(x) 
+#define __DARWIN_ALIAS_STARTING_IPHONE___IPHONE_14_1(x) 
+#define __DARWIN_ALIAS_STARTING_IPHONE___IPHONE_14_2(x) 
+#define __DARWIN_ALIAS_STARTING_IPHONE___IPHONE_14_3(x) 
+#define __DARWIN_ALIAS_STARTING_IPHONE___IPHONE_14_5(x) 
 #define __DARWIN_ALIAS_STARTING_MAC___MAC_10_0(x) x
 #define __DARWIN_ALIAS_STARTING_MAC___MAC_10_1(x) x
 #define __DARWIN_ALIAS_STARTING_MAC___MAC_10_2(x) x
@@ -22623,6 +22227,14 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __DARWIN_ALIAS_STARTING_MAC___MAC_10_14(x) 
 #define __DARWIN_ALIAS_STARTING_MAC___MAC_10_14_1(x) 
 #define __DARWIN_ALIAS_STARTING_MAC___MAC_10_14_4(x) 
+#define __DARWIN_ALIAS_STARTING_MAC___MAC_10_14_5(x) 
+#define __DARWIN_ALIAS_STARTING_MAC___MAC_10_14_6(x) 
+#define __DARWIN_ALIAS_STARTING_MAC___MAC_10_15(x) 
+#define __DARWIN_ALIAS_STARTING_MAC___MAC_10_15_1(x) 
+#define __DARWIN_ALIAS_STARTING_MAC___MAC_10_16(x) 
+#define __DARWIN_ALIAS_STARTING_MAC___MAC_11_0(x) 
+#define __DARWIN_ALIAS_STARTING_MAC___MAC_11_1(x) 
+#define __DARWIN_ALIAS_STARTING_MAC___MAC_11_3(x) 
 #define __DARWIN_ALIAS_STARTING(_mac,_iphone,x) __DARWIN_ALIAS_STARTING_MAC_##_mac(x)
 #define ___POSIX_C_DEPRECATED_STARTING_198808L 
 #define ___POSIX_C_DEPRECATED_STARTING_199009L 
@@ -22642,8 +22254,16 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __CAST_AWAY_QUALIFIER(variable,qualifier,type) (type) (long)(variable)
 #define __XNU_PRIVATE_EXTERN __attribute__((visibility("hidden")))
 #define __compiler_barrier() __asm__ __volatile__("" ::: "memory")
+#define __enum_open __attribute__((__enum_extensibility__(open)))
+#define __enum_closed __attribute__((__enum_extensibility__(closed)))
+#define __enum_options __attribute__((__flag_enum__))
+#define __enum_decl(_name,_type,...) typedef enum : _type __VA_ARGS__ __enum_open _name
+#define __enum_closed_decl(_name,_type,...) typedef enum : _type __VA_ARGS__ __enum_closed _name
+#define __options_decl(_name,_type,...) typedef enum : _type __VA_ARGS__ __enum_open __enum_options _name
+#define __options_closed_decl(_name,_type,...) typedef enum : _type __VA_ARGS__ __enum_closed __enum_options _name
 #define __AVAILABILITY__ 
 #define __API_TO_BE_DEPRECATED 100000
+#define __AVAILABILITY_VERSIONS__ 
 #define __MAC_10_0 1000
 #define __MAC_10_1 1010
 #define __MAC_10_2 1020
@@ -22673,6 +22293,13 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __MAC_10_14_1 101401
 #define __MAC_10_14_4 101404
 #define __MAC_10_14_6 101406
+#define __MAC_10_15 101500
+#define __MAC_10_15_1 101501
+#define __MAC_10_15_4 101504
+#define __MAC_10_16 101600
+#define __MAC_11_0 110000
+#define __MAC_11_1 110100
+#define __MAC_11_3 110300
 #define __IPHONE_2_0 20000
 #define __IPHONE_2_1 20100
 #define __IPHONE_2_2 20200
@@ -22712,6 +22339,19 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __IPHONE_12_2 120200
 #define __IPHONE_12_3 120300
 #define __IPHONE_12_4 120400
+#define __IPHONE_13_0 130000
+#define __IPHONE_13_1 130100
+#define __IPHONE_13_2 130200
+#define __IPHONE_13_3 130300
+#define __IPHONE_13_4 130400
+#define __IPHONE_13_5 130500
+#define __IPHONE_13_6 130600
+#define __IPHONE_13_7 130700
+#define __IPHONE_14_0 140000
+#define __IPHONE_14_1 140100
+#define __IPHONE_14_2 140200
+#define __IPHONE_14_3 140300
+#define __IPHONE_14_5 140500
 #define __TVOS_9_0 90000
 #define __TVOS_9_1 90100
 #define __TVOS_9_2 90200
@@ -22729,6 +22369,15 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __TVOS_12_2 120200
 #define __TVOS_12_3 120300
 #define __TVOS_12_4 120400
+#define __TVOS_13_0 130000
+#define __TVOS_13_2 130200
+#define __TVOS_13_3 130300
+#define __TVOS_13_4 130400
+#define __TVOS_14_0 140000
+#define __TVOS_14_1 140100
+#define __TVOS_14_2 140200
+#define __TVOS_14_3 140300
+#define __TVOS_14_5 140500
 #define __WATCHOS_1_0 10000
 #define __WATCHOS_2_0 20000
 #define __WATCHOS_2_1 20100
@@ -22745,77 +22394,81 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __WATCHOS_5_1 50100
 #define __WATCHOS_5_2 50200
 #define __WATCHOS_5_3 50300
+#define __WATCHOS_6_0 60000
+#define __WATCHOS_6_1 60100
+#define __WATCHOS_6_2 60200
+#define __WATCHOS_7_0 70000
+#define __WATCHOS_7_1 70100
+#define __WATCHOS_7_2 70200
+#define __WATCHOS_7_3 70300
+#define __WATCHOS_7_4 70400
+#define MAC_OS_X_VERSION_10_0 1000
+#define MAC_OS_X_VERSION_10_1 1010
+#define MAC_OS_X_VERSION_10_2 1020
+#define MAC_OS_X_VERSION_10_3 1030
+#define MAC_OS_X_VERSION_10_4 1040
+#define MAC_OS_X_VERSION_10_5 1050
+#define MAC_OS_X_VERSION_10_6 1060
+#define MAC_OS_X_VERSION_10_7 1070
+#define MAC_OS_X_VERSION_10_8 1080
+#define MAC_OS_X_VERSION_10_9 1090
+#define MAC_OS_X_VERSION_10_10 101000
+#define MAC_OS_X_VERSION_10_10_2 101002
+#define MAC_OS_X_VERSION_10_10_3 101003
+#define MAC_OS_X_VERSION_10_11 101100
+#define MAC_OS_X_VERSION_10_11_2 101102
+#define MAC_OS_X_VERSION_10_11_3 101103
+#define MAC_OS_X_VERSION_10_11_4 101104
+#define MAC_OS_X_VERSION_10_12 101200
+#define MAC_OS_X_VERSION_10_12_1 101201
+#define MAC_OS_X_VERSION_10_12_2 101202
+#define MAC_OS_X_VERSION_10_12_4 101204
+#define MAC_OS_X_VERSION_10_13 101300
+#define MAC_OS_X_VERSION_10_13_1 101301
+#define MAC_OS_X_VERSION_10_13_2 101302
+#define MAC_OS_X_VERSION_10_13_4 101304
+#define MAC_OS_X_VERSION_10_14 101400
+#define MAC_OS_X_VERSION_10_14_1 101401
+#define MAC_OS_X_VERSION_10_14_4 101404
+#define MAC_OS_X_VERSION_10_14_6 101406
+#define MAC_OS_X_VERSION_10_15 101500
+#define MAC_OS_X_VERSION_10_15_1 101501
+#define MAC_OS_X_VERSION_10_16 101600
+#define MAC_OS_VERSION_11_0 110000
+#define __DRIVERKIT_19_0 190000
+#define __DRIVERKIT_20_0 200000
 #define __AVAILABILITY_INTERNAL__ 
+#define __MAC_OS_X_VERSION_MIN_REQUIRED __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__
+#define __MAC_OS_X_VERSION_MAX_ALLOWED __MAC_11_3
 #define __AVAILABILITY_INTERNAL_DEPRECATED __attribute__((deprecated))
 #define __AVAILABILITY_INTERNAL_DEPRECATED_MSG(_msg) __attribute__((deprecated(_msg)))
 #define __AVAILABILITY_INTERNAL_UNAVAILABLE __attribute__((unavailable))
 #define __AVAILABILITY_INTERNAL_WEAK_IMPORT __attribute__((weak_import))
 #define __AVAILABILITY_INTERNAL_REGULAR 
-#define __MAC_OS_X_VERSION_MIN_REQUIRED __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__
-#define __MAC_OS_X_VERSION_MAX_ALLOWED __MAC_10_14_6
-#define __AVAILABILITY_INTERNAL__MAC_10_0 __attribute__((availability(macosx,introduced=10.0)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_0 __attribute__((availability(macosx,introduced=10.0,deprecated=10.0)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_0_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.0,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_1 __attribute__((availability(macosx,introduced=10.0,deprecated=10.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_2 __attribute__((availability(macosx,introduced=10.0,deprecated=10.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_3 __attribute__((availability(macosx,introduced=10.0,deprecated=10.3)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.3,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_4 __attribute__((availability(macosx,introduced=10.0,deprecated=10.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_5 __attribute__((availability(macosx,introduced=10.0,deprecated=10.5)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_5_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.5,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_6 __attribute__((availability(macosx,introduced=10.0,deprecated=10.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_7 __attribute__((availability(macosx,introduced=10.0,deprecated=10.7)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_7_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.7,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_8 __attribute__((availability(macosx,introduced=10.0,deprecated=10.8)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_8_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.8,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_9 __attribute__((availability(macosx,introduced=10.0,deprecated=10.9)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_9_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.9,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_10 __attribute__((availability(macosx,introduced=10.0,deprecated=10.10)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_10_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.10,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_10_2 __attribute__((availability(macosx,introduced=10.0,deprecated=10.10.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.10.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_10_3 __attribute__((availability(macosx,introduced=10.0,deprecated=10.10.3)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.10.3,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_11 __attribute__((availability(macosx,introduced=10.0,deprecated=10.11)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.11,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.0,deprecated=10.11.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.11.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.0,deprecated=10.11.3)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.11.3,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.0,deprecated=10.11.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.11.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.0,deprecated=10.12)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.12,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.0,deprecated=10.12.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.12.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.0,deprecated=10.12.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.12.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.0,deprecated=10.12.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.12.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.0,deprecated=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.13,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.0,deprecated=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_13_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.13.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.0,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.0,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.0,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.0,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.0,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.0,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.0)))
-#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.0)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1 __attribute__((availability(macosx,introduced=10.1)))
+#define __ENABLE_LEGACY_MAC_AVAILABILITY 1
 #define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_1 __attribute__((availability(macosx,introduced=10.1,deprecated=10.1)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_10 __attribute__((availability(macosx,introduced=10.1,deprecated=10.10)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_10_2 __attribute__((availability(macosx,introduced=10.1,deprecated=10.10.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.10.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_10_3 __attribute__((availability(macosx,introduced=10.1,deprecated=10.10.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.10.3,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_10_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.10,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_11 __attribute__((availability(macosx,introduced=10.1,deprecated=10.11)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.1,deprecated=10.11.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.11.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.1,deprecated=10.11.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.11.3,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.1,deprecated=10.11.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.11.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.11,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.1,deprecated=10.12)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.1,deprecated=10.12.1)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.12.1,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.1,deprecated=10.12.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.12.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.1,deprecated=10.12.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.12.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.12,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.1,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_2 __attribute__((availability(macosx,introduced=10.1,deprecated=10.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.2,message=_msg)))
@@ -22833,47 +22486,33 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_8_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.8,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_9 __attribute__((availability(macosx,introduced=10.1,deprecated=10.9)))
 #define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_9_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.9,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_10 __attribute__((availability(macosx,introduced=10.1,deprecated=10.10)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_10_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.10,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_10_2 __attribute__((availability(macosx,introduced=10.1,deprecated=10.10.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.10.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_10_3 __attribute__((availability(macosx,introduced=10.1,deprecated=10.10.3)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.10.3,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_11 __attribute__((availability(macosx,introduced=10.1,deprecated=10.11)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.11,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.1,deprecated=10.11.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.11.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.1,deprecated=10.11.3)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.11.3,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.1,deprecated=10.11.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.11.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.1,deprecated=10.12)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.12,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.1,deprecated=10.12.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.12.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.1,deprecated=10.12.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.12.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.1,deprecated=10.12.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.12.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.1,deprecated=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.13,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.1,deprecated=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_13_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.13.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.1,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.1,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.1,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.1,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.1,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.1,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.1,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.1)))
 #define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.1)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.1)))
 #define __AVAILABILITY_INTERNAL__MAC_10_2 __attribute__((availability(macosx,introduced=10.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_1 __attribute__((availability(macosx,introduced=10.2,deprecated=10.1)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_10 __attribute__((availability(macosx,introduced=10.2,deprecated=10.10)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_10_2 __attribute__((availability(macosx,introduced=10.2,deprecated=10.10.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.10.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_10_3 __attribute__((availability(macosx,introduced=10.2,deprecated=10.10.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.10.3,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_10_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.10,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_11 __attribute__((availability(macosx,introduced=10.2,deprecated=10.11)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.2,deprecated=10.11.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.11.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.2,deprecated=10.11.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.11.3,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.2,deprecated=10.11.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.11.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.11,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.2,deprecated=10.12)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.2,deprecated=10.12.1)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.12.1,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.2,deprecated=10.12.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.12.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.2,deprecated=10.12.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.12.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.12,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.2,deprecated=10.13)))
 #define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_2 __attribute__((availability(macosx,introduced=10.2,deprecated=10.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.2,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_3 __attribute__((availability(macosx,introduced=10.2,deprecated=10.3)))
@@ -22890,47 +22529,33 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_8_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.8,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_9 __attribute__((availability(macosx,introduced=10.2,deprecated=10.9)))
 #define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_9_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.9,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_10 __attribute__((availability(macosx,introduced=10.2,deprecated=10.10)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_10_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.10,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_10_2 __attribute__((availability(macosx,introduced=10.2,deprecated=10.10.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.10.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_10_3 __attribute__((availability(macosx,introduced=10.2,deprecated=10.10.3)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.10.3,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_11 __attribute__((availability(macosx,introduced=10.2,deprecated=10.11)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.11,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.2,deprecated=10.11.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.11.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.2,deprecated=10.11.3)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.11.3,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.2,deprecated=10.11.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.11.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.2,deprecated=10.12)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.12,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.2,deprecated=10.12.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.12.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.2,deprecated=10.12.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.12.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.2,deprecated=10.12.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.12.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.2,deprecated=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.13,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.2,deprecated=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_13_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.13.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.2,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.2,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.2,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.2,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.2,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.2,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.2,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_2_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_3 __attribute__((availability(macosx,introduced=10.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_1 __attribute__((availability(macosx,introduced=10.3,deprecated=10.1)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_10 __attribute__((availability(macosx,introduced=10.3,deprecated=10.10)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_10_2 __attribute__((availability(macosx,introduced=10.3,deprecated=10.10.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.10.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_10_3 __attribute__((availability(macosx,introduced=10.3,deprecated=10.10.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.10.3,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_10_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.10,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_11 __attribute__((availability(macosx,introduced=10.3,deprecated=10.11)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.3,deprecated=10.11.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.11.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.3,deprecated=10.11.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.11.3,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.3,deprecated=10.11.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.11.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.11,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.3,deprecated=10.12)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.3,deprecated=10.12.1)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.12.1,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.3,deprecated=10.12.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.12.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.3,deprecated=10.12.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.12.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.12,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.3,deprecated=10.13)))
 #define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_3 __attribute__((availability(macosx,introduced=10.3,deprecated=10.3)))
 #define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.3,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_4 __attribute__((availability(macosx,introduced=10.3,deprecated=10.4)))
@@ -22945,47 +22570,33 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_8_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.8,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_9 __attribute__((availability(macosx,introduced=10.3,deprecated=10.9)))
 #define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_9_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.9,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_10 __attribute__((availability(macosx,introduced=10.3,deprecated=10.10)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_10_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.10,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_10_2 __attribute__((availability(macosx,introduced=10.3,deprecated=10.10.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.10.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_10_3 __attribute__((availability(macosx,introduced=10.3,deprecated=10.10.3)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.10.3,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_11 __attribute__((availability(macosx,introduced=10.3,deprecated=10.11)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.11,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.3,deprecated=10.11.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.11.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.3,deprecated=10.11.3)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.11.3,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.3,deprecated=10.11.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.11.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.3,deprecated=10.12)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.12,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.3,deprecated=10.12.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.12.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.3,deprecated=10.12.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.12.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.3,deprecated=10.12.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.12.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.3,deprecated=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.13,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.3,deprecated=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_13_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.13.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.3,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.3,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.3,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.3,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.3,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.3,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.3,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.3)))
 #define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_3_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.3)))
 #define __AVAILABILITY_INTERNAL__MAC_10_4 __attribute__((availability(macosx,introduced=10.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_1 __attribute__((availability(macosx,introduced=10.4,deprecated=10.1)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_10 __attribute__((availability(macosx,introduced=10.4,deprecated=10.10)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_10_2 __attribute__((availability(macosx,introduced=10.4,deprecated=10.10.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.10.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_10_3 __attribute__((availability(macosx,introduced=10.4,deprecated=10.10.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.10.3,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_10_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.10,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_11 __attribute__((availability(macosx,introduced=10.4,deprecated=10.11)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.4,deprecated=10.11.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.11.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.4,deprecated=10.11.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.11.3,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.4,deprecated=10.11.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.11.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.11,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.4,deprecated=10.12)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.4,deprecated=10.12.1)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.12.1,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.4,deprecated=10.12.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.12.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.4,deprecated=10.12.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.12.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.12,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.4,deprecated=10.13)))
 #define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_4 __attribute__((availability(macosx,introduced=10.4,deprecated=10.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.4,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_5 __attribute__((availability(macosx,introduced=10.4,deprecated=10.5)))
@@ -22998,47 +22609,33 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_8_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.8,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_9 __attribute__((availability(macosx,introduced=10.4,deprecated=10.9)))
 #define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_9_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.9,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_10 __attribute__((availability(macosx,introduced=10.4,deprecated=10.10)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_10_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.10,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_10_2 __attribute__((availability(macosx,introduced=10.4,deprecated=10.10.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.10.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_10_3 __attribute__((availability(macosx,introduced=10.4,deprecated=10.10.3)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.10.3,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_11 __attribute__((availability(macosx,introduced=10.4,deprecated=10.11)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.11,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.4,deprecated=10.11.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.11.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.4,deprecated=10.11.3)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.11.3,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.4,deprecated=10.11.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.11.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.4,deprecated=10.12)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.12,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.4,deprecated=10.12.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.12.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.4,deprecated=10.12.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.12.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.4,deprecated=10.12.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.12.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.4,deprecated=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.13,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.4,deprecated=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_13_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.13.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.4,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.4,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.4,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.4,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.4,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.4,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.4,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_4_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_5 __attribute__((availability(macosx,introduced=10.5)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEPRECATED__MAC_10_7 __attribute__((availability(macosx,introduced=10.5.DEPRECATED..MAC.10.7)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_1 __attribute__((availability(macosx,introduced=10.5,deprecated=10.1)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_10 __attribute__((availability(macosx,introduced=10.5,deprecated=10.10)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_10_2 __attribute__((availability(macosx,introduced=10.5,deprecated=10.10.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.10.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_10_3 __attribute__((availability(macosx,introduced=10.5,deprecated=10.10.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.10.3,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_10_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.10,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_11 __attribute__((availability(macosx,introduced=10.5,deprecated=10.11)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.5,deprecated=10.11.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.11.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.5,deprecated=10.11.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.11.3,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.5,deprecated=10.11.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.11.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.11,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.5,deprecated=10.12)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.5,deprecated=10.12.1)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.12.1,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.5,deprecated=10.12.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.12.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.5,deprecated=10.12.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.12.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.12,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_5 __attribute__((availability(macosx,introduced=10.5,deprecated=10.5)))
 #define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_5_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.5,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_6 __attribute__((availability(macosx,introduced=10.5,deprecated=10.6)))
@@ -23049,47 +22646,33 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_8_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.8,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_9 __attribute__((availability(macosx,introduced=10.5,deprecated=10.9)))
 #define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_9_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.9,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_10 __attribute__((availability(macosx,introduced=10.5,deprecated=10.10)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_10_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.10,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_10_2 __attribute__((availability(macosx,introduced=10.5,deprecated=10.10.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.10.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_10_3 __attribute__((availability(macosx,introduced=10.5,deprecated=10.10.3)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.10.3,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_11 __attribute__((availability(macosx,introduced=10.5,deprecated=10.11)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.11,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.5,deprecated=10.11.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.11.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.5,deprecated=10.11.3)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.11.3,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.5,deprecated=10.11.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.11.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.5,deprecated=10.12)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.12,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.5,deprecated=10.12.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.12.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.5,deprecated=10.12.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.12.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.5,deprecated=10.12.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.12.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.5,deprecated=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.13,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.5,deprecated=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_13_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.13.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.5,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.5,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.5,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.5,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.5,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.5,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.5,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.5)))
 #define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.5)))
+#define __AVAILABILITY_INTERNAL__MAC_10_5_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.5)))
 #define __AVAILABILITY_INTERNAL__MAC_10_6 __attribute__((availability(macosx,introduced=10.6)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_1 __attribute__((availability(macosx,introduced=10.6,deprecated=10.1)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_10 __attribute__((availability(macosx,introduced=10.6,deprecated=10.10)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_10_2 __attribute__((availability(macosx,introduced=10.6,deprecated=10.10.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.10.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_10_3 __attribute__((availability(macosx,introduced=10.6,deprecated=10.10.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.10.3,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_10_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.10,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_11 __attribute__((availability(macosx,introduced=10.6,deprecated=10.11)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.6,deprecated=10.11.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.11.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.6,deprecated=10.11.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.11.3,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.6,deprecated=10.11.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.11.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.11,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.6,deprecated=10.12)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.6,deprecated=10.12.1)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.12.1,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.6,deprecated=10.12.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.12.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.6,deprecated=10.12.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.12.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.12,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.6,deprecated=10.13)))
 #define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_6 __attribute__((availability(macosx,introduced=10.6,deprecated=10.6)))
 #define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.6,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_7 __attribute__((availability(macosx,introduced=10.6,deprecated=10.7)))
@@ -23098,333 +22681,224 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_8_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.8,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_9 __attribute__((availability(macosx,introduced=10.6,deprecated=10.9)))
 #define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_9_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.9,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_10 __attribute__((availability(macosx,introduced=10.6,deprecated=10.10)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_10_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.10,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_10_2 __attribute__((availability(macosx,introduced=10.6,deprecated=10.10.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.10.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_10_3 __attribute__((availability(macosx,introduced=10.6,deprecated=10.10.3)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.10.3,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_11 __attribute__((availability(macosx,introduced=10.6,deprecated=10.11)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.11,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.6,deprecated=10.11.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.11.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.6,deprecated=10.11.3)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.11.3,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.6,deprecated=10.11.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.11.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.6,deprecated=10.12)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.12,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.6,deprecated=10.12.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.12.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.6,deprecated=10.12.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.12.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.6,deprecated=10.12.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.12.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.6,deprecated=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.13,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.6,deprecated=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_13_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.13.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.6,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.6,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.6,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.6,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.6,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.6,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.6,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.6)))
 #define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.6)))
+#define __AVAILABILITY_INTERNAL__MAC_10_6_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.6)))
 #define __AVAILABILITY_INTERNAL__MAC_10_7 __attribute__((availability(macosx,introduced=10.7)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_7 __attribute__((availability(macosx,introduced=10.7,deprecated=10.7)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_7_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.7,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_8 __attribute__((availability(macosx,introduced=10.7,deprecated=10.8)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_8_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.8,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_9 __attribute__((availability(macosx,introduced=10.7,deprecated=10.9)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_9_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.9,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_1 __attribute__((availability(macosx,introduced=10.7,deprecated=10.1)))
 #define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_10 __attribute__((availability(macosx,introduced=10.7,deprecated=10.10)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_10_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.10,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_10_2 __attribute__((availability(macosx,introduced=10.7,deprecated=10.10.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.10.2,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_10_3 __attribute__((availability(macosx,introduced=10.7,deprecated=10.10.3)))
 #define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.10.3,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_10_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.10,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_11 __attribute__((availability(macosx,introduced=10.7,deprecated=10.11)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.11,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.7,deprecated=10.11.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.11.2,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.7,deprecated=10.11.3)))
 #define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.11.3,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.7,deprecated=10.11.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.11.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.11,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.7,deprecated=10.12)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.12,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.7,deprecated=10.12.1)))
 #define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.12.1,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.7,deprecated=10.12.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.12.2,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.7,deprecated=10.12.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.12.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.7,deprecated=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.13,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.7,deprecated=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_13_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.13.1,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.12,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.7,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.7,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.7,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.7,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.7,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.7,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.7)))
+#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_7 __attribute__((availability(macosx,introduced=10.7,deprecated=10.7)))
+#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_7_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.7,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_8 __attribute__((availability(macosx,introduced=10.7,deprecated=10.8)))
+#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_8_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.8,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_9 __attribute__((availability(macosx,introduced=10.7,deprecated=10.9)))
+#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_10_9_MSG(_msg) __attribute__((availability(macosx,introduced=10.7,deprecated=10.9,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.7)))
+#define __AVAILABILITY_INTERNAL__MAC_10_7_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.7)))
 #define __AVAILABILITY_INTERNAL__MAC_10_8 __attribute__((availability(macosx,introduced=10.8)))
-#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_8 __attribute__((availability(macosx,introduced=10.8,deprecated=10.8)))
-#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_8_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.8,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_9 __attribute__((availability(macosx,introduced=10.8,deprecated=10.9)))
-#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_9_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.9,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_1 __attribute__((availability(macosx,introduced=10.8,deprecated=10.1)))
 #define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_10 __attribute__((availability(macosx,introduced=10.8,deprecated=10.10)))
-#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_10_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.10,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_10_2 __attribute__((availability(macosx,introduced=10.8,deprecated=10.10.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.10.2,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_10_3 __attribute__((availability(macosx,introduced=10.8,deprecated=10.10.3)))
 #define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.10.3,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_10_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.10,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_11 __attribute__((availability(macosx,introduced=10.8,deprecated=10.11)))
-#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.11,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.8,deprecated=10.11.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.11.2,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.8,deprecated=10.11.3)))
 #define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.11.3,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.8,deprecated=10.11.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.11.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.11,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.8,deprecated=10.12)))
-#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.12,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.8,deprecated=10.12.1)))
 #define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.12.1,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.8,deprecated=10.12.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.12.2,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.8,deprecated=10.12.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.12.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.12,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.8,deprecated=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.13,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.8,deprecated=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_13_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.13.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.8,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.8,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.8,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.8,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.8,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.8,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.8)))
+#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_8 __attribute__((availability(macosx,introduced=10.8,deprecated=10.8)))
+#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_8_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.8,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_9 __attribute__((availability(macosx,introduced=10.8,deprecated=10.9)))
+#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_10_9_MSG(_msg) __attribute__((availability(macosx,introduced=10.8,deprecated=10.9,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.8)))
+#define __AVAILABILITY_INTERNAL__MAC_10_8_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.8)))
 #define __AVAILABILITY_INTERNAL__MAC_10_9 __attribute__((availability(macosx,introduced=10.9)))
-#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_9 __attribute__((availability(macosx,introduced=10.9,deprecated=10.9)))
-#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_9_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.9,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_1 __attribute__((availability(macosx,introduced=10.9,deprecated=10.1)))
 #define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_10 __attribute__((availability(macosx,introduced=10.9,deprecated=10.10)))
-#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_10_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.10,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_10_2 __attribute__((availability(macosx,introduced=10.9,deprecated=10.10.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.10.2,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_10_3 __attribute__((availability(macosx,introduced=10.9,deprecated=10.10.3)))
 #define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.10.3,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_10_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.10,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_11 __attribute__((availability(macosx,introduced=10.9,deprecated=10.11)))
-#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.11,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.9,deprecated=10.11.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.11.2,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.9,deprecated=10.11.3)))
 #define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.11.3,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.9,deprecated=10.11.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.11.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.11,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.9,deprecated=10.12)))
-#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.12,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.9,deprecated=10.12.1)))
 #define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.12.1,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.9,deprecated=10.12.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.12.2,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.9,deprecated=10.12.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.12.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.12,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.9,deprecated=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.13,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.9,deprecated=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_13_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.13.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.9,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.9,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.13.4,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.9,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.9,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.9,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.9,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.9)))
+#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_9 __attribute__((availability(macosx,introduced=10.9,deprecated=10.9)))
+#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_10_9_MSG(_msg) __attribute__((availability(macosx,introduced=10.9,deprecated=10.9,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.9)))
+#define __AVAILABILITY_INTERNAL__MAC_10_9_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.9)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0 __attribute__((availability(macosx,introduced=10.0)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_0 __attribute__((availability(macosx,introduced=10.0,deprecated=10.0)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_0_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.0,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_1 __attribute__((availability(macosx,introduced=10.0,deprecated=10.1)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_10 __attribute__((availability(macosx,introduced=10.0,deprecated=10.10)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_10_2 __attribute__((availability(macosx,introduced=10.0,deprecated=10.10.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.10.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_10_3 __attribute__((availability(macosx,introduced=10.0,deprecated=10.10.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.10.3,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_10_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.10,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_11 __attribute__((availability(macosx,introduced=10.0,deprecated=10.11)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.0,deprecated=10.11.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.11.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.0,deprecated=10.11.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.11.3,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.0,deprecated=10.11.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.11.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.11,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.0,deprecated=10.12)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.0,deprecated=10.12.1)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.12.1,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.0,deprecated=10.12.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.12.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.0,deprecated=10.12.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.12.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.12,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.0,deprecated=10.13)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.1,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_2 __attribute__((availability(macosx,introduced=10.0,deprecated=10.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_3 __attribute__((availability(macosx,introduced=10.0,deprecated=10.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.3,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_4 __attribute__((availability(macosx,introduced=10.0,deprecated=10.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_5 __attribute__((availability(macosx,introduced=10.0,deprecated=10.5)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_5_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.5,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_6 __attribute__((availability(macosx,introduced=10.0,deprecated=10.6)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.6,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_7 __attribute__((availability(macosx,introduced=10.0,deprecated=10.7)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_7_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.7,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_8 __attribute__((availability(macosx,introduced=10.0,deprecated=10.8)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_8_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.8,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_9 __attribute__((availability(macosx,introduced=10.0,deprecated=10.9)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_9_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.9,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.0,deprecated=10.13,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.0)))
+#define __AVAILABILITY_INTERNAL__MAC_10_0_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.0)))
+#define __AVAILABILITY_INTERNAL__MAC_10_1 __attribute__((availability(macosx,introduced=10.1)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10 __attribute__((availability(macosx,introduced=10.10)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_10 __attribute__((availability(macosx,introduced=10.10,deprecated=10.10)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_10_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.10,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_10_2 __attribute__((availability(macosx,introduced=10.10,deprecated=10.10.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.10.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_10_3 __attribute__((availability(macosx,introduced=10.10,deprecated=10.10.3)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.10.3,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_11 __attribute__((availability(macosx,introduced=10.10,deprecated=10.11)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.11,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.10,deprecated=10.11.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.11.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.10,deprecated=10.11.3)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.11.3,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.10,deprecated=10.11.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.11.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.10,deprecated=10.12)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.12,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.10,deprecated=10.12.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.12.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.10,deprecated=10.12.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.12.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.10,deprecated=10.12.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.12.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.10,deprecated=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.13,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.10,deprecated=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_13_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.13.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.10,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.10,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.10,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.10,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.10,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.10,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.10)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.10)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_2 __attribute__((availability(macosx,introduced=10.10.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_10_2 __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.10.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.10.2,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_10_3 __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.10.3)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.10.3,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_11 __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.11)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.11,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.11.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.11.2,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.11.3)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.11.3,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.11.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.11.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.11,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.12)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.12,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.12.1)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.12.1,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.12.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.12.2,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.12.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.12.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.13,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_13_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.13.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.2,deprecated=10.12,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.10.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_2_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_3 __attribute__((availability(macosx,introduced=10.10.3)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_10_3 __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.10.3)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.10.3,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_11 __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.11)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.11,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.11.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.11.2,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.11.3)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.11.3,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.11.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.11.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.11,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.12)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.12,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.12.1)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.12.1,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.12.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.12.2,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.12.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.12.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.13,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_13_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.13.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.3,deprecated=10.12,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.10.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_3_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.10.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_1 __attribute__((availability(macosx,introduced=10.10,deprecated=10.1)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_10 __attribute__((availability(macosx,introduced=10.10,deprecated=10.10)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_10_2 __attribute__((availability(macosx,introduced=10.10,deprecated=10.10.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_10_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.10.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_10_3 __attribute__((availability(macosx,introduced=10.10,deprecated=10.10.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_10_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.10.3,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_10_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.10,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_11 __attribute__((availability(macosx,introduced=10.10,deprecated=10.11)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.10,deprecated=10.11.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.11.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.10,deprecated=10.11.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.11.3,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.10,deprecated=10.11.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.11.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.11,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.10,deprecated=10.12)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.10,deprecated=10.12.1)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.12.1,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.10,deprecated=10.12.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.12.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.10,deprecated=10.12.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.12.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.12,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.10,deprecated=10.13)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.10,deprecated=10.13,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.10,deprecated=10.13.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.10)))
+#define __AVAILABILITY_INTERNAL__MAC_10_10_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.10)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11 __attribute__((availability(macosx,introduced=10.11)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_11 __attribute__((availability(macosx,introduced=10.11,deprecated=10.11)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.11,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.11,deprecated=10.11.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.11.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.11,deprecated=10.11.3)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.11.3,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.11,deprecated=10.11.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.11.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.11,deprecated=10.12)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.12,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.11,deprecated=10.12.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.12.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.11,deprecated=10.12.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.12.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.11,deprecated=10.12.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.12.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.11,deprecated=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.13,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.11,deprecated=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_13_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.13.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.11,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.11,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.11,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.11,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.11,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.11,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.11)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.11)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.11.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.11.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.11.2,message=_msg)))
@@ -23433,118 +22907,63 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.11.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.11.4,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.12)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.12,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.12.1)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.12.1,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.12.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.12.2,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.12.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.12.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.13,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_13_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.13.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.2,deprecated=10.12,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.11.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_2_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.11.3)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.11.3)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.11.3,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.11.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.11.4,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.12)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.12,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.12.1)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.12.1,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.12.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.12.2,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.12.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.12.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.13,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_13_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.13.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.3,deprecated=10.12,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.11.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_3_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.3)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.11.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.11.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.11.4,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.12)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.12,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.12.1)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.12.1,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.12.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.12.2,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.12.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.12.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.13,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_13_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.13.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.4,deprecated=10.12,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.11.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_4_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.11.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_1 __attribute__((availability(macosx,introduced=10.11,deprecated=10.1)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_11 __attribute__((availability(macosx,introduced=10.11,deprecated=10.11)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_11_2 __attribute__((availability(macosx,introduced=10.11,deprecated=10.11.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_11_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.11.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_11_3 __attribute__((availability(macosx,introduced=10.11,deprecated=10.11.3)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_11_3_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.11.3,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_11_4 __attribute__((availability(macosx,introduced=10.11,deprecated=10.11.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_11_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.11.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_11_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.11,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.11,deprecated=10.12)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.11,deprecated=10.12.1)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.12.1,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.11,deprecated=10.12.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.12.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.11,deprecated=10.12.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.12.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.11,deprecated=10.12,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.11)))
+#define __AVAILABILITY_INTERNAL__MAC_10_11_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.11)))
 #define __AVAILABILITY_INTERNAL__MAC_10_12 __attribute__((availability(macosx,introduced=10.12)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.12,deprecated=10.12)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.12,deprecated=10.12,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.12,deprecated=10.12.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.12,deprecated=10.12.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.12,deprecated=10.12.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.12,deprecated=10.12.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.12,deprecated=10.12.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.12,deprecated=10.12.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.12,deprecated=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.12,deprecated=10.13,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.12,deprecated=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_13_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.12,deprecated=10.13.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.12,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.12,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.12,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.12,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.12,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.12,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.12,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.12,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.12,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.12,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.12,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.12,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.12)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.12)))
 #define __AVAILABILITY_INTERNAL__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.12.1)))
 #define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.12.1,deprecated=10.12.1)))
 #define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.1,deprecated=10.12.1,message=_msg)))
@@ -23552,172 +22971,58 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.1,deprecated=10.12.2,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.12.1,deprecated=10.12.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.1,deprecated=10.12.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.12.1,deprecated=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.1,deprecated=10.13,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.12.1,deprecated=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_10_13_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.1,deprecated=10.13.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.12.1,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.1,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.12.1,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.1,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.12.1,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.1,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.12.1,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.1,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.12.1,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.1,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.12.1,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.1,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.1)))
 #define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.12.1)))
+#define __AVAILABILITY_INTERNAL__MAC_10_12_1_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.1)))
 #define __AVAILABILITY_INTERNAL__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.12.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_12_2_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.12.2,deprecated=10.12.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_12_2_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.2,deprecated=10.12.2,message=_msg)))
 #define __AVAILABILITY_INTERNAL__MAC_10_12_2_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.12.2,deprecated=10.12.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_12_2_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.2,deprecated=10.12.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_2_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.12.2,deprecated=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_2_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.2,deprecated=10.13,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_2_DEP__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.12.2,deprecated=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_2_DEP__MAC_10_13_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.2,deprecated=10.13.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_2_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.12.2,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_2_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.2,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_2_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.12.2,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_2_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.2,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_2_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.12.2,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_2_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.2,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_2_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.12.2,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_2_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.2,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_2_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.12.2,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_2_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.2,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_2_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.12.2,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_2_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.2,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_2_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_12_2_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.12.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_12_2_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.12.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_12_4_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.12.4,deprecated=10.12.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_12_4_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.4,deprecated=10.12.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_4_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.12.4,deprecated=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_4_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.4,deprecated=10.13,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_4_DEP__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.12.4,deprecated=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_4_DEP__MAC_10_13_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.4,deprecated=10.13.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_4_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.12.4,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_4_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.4,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_4_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.12.4,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_4_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.4,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_4_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.12.4,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_4_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.4,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_4_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.12.4,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_4_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.4,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_4_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.12.4,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_4_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.4,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_4_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.12.4,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_4_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.4,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_12_4_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_12_4_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.12.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_12_4_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.12.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_12 __attribute__((availability(macosx,introduced=10.12,deprecated=10.12)))
+#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_12_1 __attribute__((availability(macosx,introduced=10.12,deprecated=10.12.1)))
+#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_12_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.12,deprecated=10.12.1,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_12_2 __attribute__((availability(macosx,introduced=10.12,deprecated=10.12.2)))
+#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_12_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.12,deprecated=10.12.2,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_12_4 __attribute__((availability(macosx,introduced=10.12,deprecated=10.12.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_12_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.12,deprecated=10.12.4,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_12_MSG(_msg) __attribute__((availability(macosx,introduced=10.12,deprecated=10.12,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.12,deprecated=10.13)))
+#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.12,deprecated=10.13,message=_msg)))
+#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.12,deprecated=10.13.4)))
+#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.12,deprecated=10.14)))
+#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.12)))
+#define __AVAILABILITY_INTERNAL__MAC_10_12_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.12)))
 #define __AVAILABILITY_INTERNAL__MAC_10_13 __attribute__((availability(macosx,introduced=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_DEP__MAC_10_13 __attribute__((availability(macosx,introduced=10.13,deprecated=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_DEP__MAC_10_13_MSG(_msg) __attribute__((availability(macosx,introduced=10.13,deprecated=10.13,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_DEP__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.13,deprecated=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_DEP__MAC_10_13_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.13,deprecated=10.13.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.13,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.13,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.13,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.13,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.13,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.13,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.13,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.13,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.13,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.13,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.13,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.13,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.13)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_1_DEP__MAC_10_13_1 __attribute__((availability(macosx,introduced=10.13.1,deprecated=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_1_DEP__MAC_10_13_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.13.1,deprecated=10.13.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_1_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.13.1,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_1_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.13.1,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_1_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.13.1,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_1_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.13.1,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_1_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.13.1,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_1_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.13.1,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_1_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.13.1,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_1_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.13.1,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_1_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.13.1,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_1_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.13.1,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_1_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.13.1,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_1_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.13.1,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_1_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_1_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.13.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_2_DEP__MAC_10_13_2 __attribute__((availability(macosx,introduced=10.13.2,deprecated=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_2_DEP__MAC_10_13_2_MSG(_msg) __attribute__((availability(macosx,introduced=10.13.2,deprecated=10.13.2,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_2_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.13.2,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_2_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.13.2,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_2_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.13.2,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_2_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.13.2,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_2_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.13.2,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_2_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.13.2,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_2_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.13.2,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_2_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.13.2,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_2_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.13.2,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_2_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.13.2,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_2_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.13.2)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_2_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.13.2)))
 #define __AVAILABILITY_INTERNAL__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_4_DEP__MAC_10_13_4 __attribute__((availability(macosx,introduced=10.13.4,deprecated=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_4_DEP__MAC_10_13_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.13.4,deprecated=10.13.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_4_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.13.4,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_4_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.13.4,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_4_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.13.4,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_4_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.13.4,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_4_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.13.4,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_4_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.13.4,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_4_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.13.4,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_4_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.13.4,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_4_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.13.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_13_4_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.13.4)))
 #define __AVAILABILITY_INTERNAL__MAC_10_14 __attribute__((availability(macosx,introduced=10.14)))
 #define __AVAILABILITY_INTERNAL__MAC_10_14_DEP__MAC_10_14 __attribute__((availability(macosx,introduced=10.14,deprecated=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_DEP__MAC_10_14_MSG(_msg) __attribute__((availability(macosx,introduced=10.14,deprecated=10.14,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.14,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.14,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.14,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.14,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.14,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.14,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.14)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_1_DEP__MAC_10_14_1 __attribute__((availability(macosx,introduced=10.14.1,deprecated=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_1_DEP__MAC_10_14_1_MSG(_msg) __attribute__((availability(macosx,introduced=10.14.1,deprecated=10.14.1,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_1_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.14.1,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_1_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.14.1,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_1_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.14.1,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_1_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.14.1,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_1_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_1_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.14.1)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_4_DEP__MAC_10_14_4 __attribute__((availability(macosx,introduced=10.14.4,deprecated=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_4_DEP__MAC_10_14_4_MSG(_msg) __attribute__((availability(macosx,introduced=10.14.4,deprecated=10.14.4,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_4_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.14.4,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_4_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.14.4,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_4_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_4_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.14.4)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_6_DEP__MAC_10_14_6 __attribute__((availability(macosx,introduced=10.14.6,deprecated=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_6_DEP__MAC_10_14_6_MSG(_msg) __attribute__((availability(macosx,introduced=10.14.6,deprecated=10.14.6,message=_msg)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_6_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,introduced=10.14.6)))
-#define __AVAILABILITY_INTERNAL__MAC_10_14_6_DEP__MAC_NA __attribute__((availability(macosx,introduced=10.14.6)))
+#define __AVAILABILITY_INTERNAL__MAC_10_15 __attribute__((availability(macosx,introduced=10.15)))
 #define __AVAILABILITY_INTERNAL__MAC_NA __attribute__((availability(macosx,unavailable)))
 #define __AVAILABILITY_INTERNAL__MAC_NA_DEP__MAC_NA __attribute__((availability(macosx,unavailable)))
 #define __AVAILABILITY_INTERNAL__MAC_NA_DEP__MAC_NA_MSG(_msg) __attribute__((availability(macosx,unavailable)))
+#define __AVAILABILITY_INTERNAL__IPHONE_NA __attribute__((availability(ios,unavailable)))
+#define __AVAILABILITY_INTERNAL__IPHONE_NA__IPHONE_NA __attribute__((availability(ios,unavailable)))
+#define __AVAILABILITY_INTERNAL__IPHONE_NA_DEP__IPHONE_NA __attribute__((availability(ios,unavailable)))
+#define __AVAILABILITY_INTERNAL__IPHONE_NA_DEP__IPHONE_NA_MSG(_msg) __attribute__((availability(ios,unavailable)))
+#define __AVAILABILITY_INTERNAL__IPHONE_COMPAT_VERSION __attribute__((availability(ios,unavailable)))
+#define __AVAILABILITY_INTERNAL__IPHONE_COMPAT_VERSION_DEP__IPHONE_COMPAT_VERSION __attribute__((availability(ios,unavailable)))
+#define __AVAILABILITY_INTERNAL__IPHONE_COMPAT_VERSION_DEP__IPHONE_COMPAT_VERSION_MSG(_msg) __attribute__((availability(ios,unavailable)))
 #define __API_AVAILABLE_PLATFORM_macos(x) macos,introduced=x
 #define __API_AVAILABLE_PLATFORM_macosx(x) macosx,introduced=x
 #define __API_AVAILABLE_PLATFORM_ios(x) ios,introduced=x
 #define __API_AVAILABLE_PLATFORM_watchos(x) watchos,introduced=x
 #define __API_AVAILABLE_PLATFORM_tvos(x) tvos,introduced=x
+#define __API_AVAILABLE_PLATFORM_macCatalyst(x) macCatalyst,introduced=x
+#define __API_AVAILABLE_PLATFORM_macCatalyst(x) macCatalyst,introduced=x
+#define __API_AVAILABLE_PLATFORM_uikitformac(x) uikitformac,introduced=x
+#define __API_AVAILABLE_PLATFORM_driverkit(x) driverkit,introduced=x
 #define __API_A(x) __attribute__((availability(__API_AVAILABLE_PLATFORM_##x)))
 #define __API_AVAILABLE1(x) __API_A(x)
 #define __API_AVAILABLE2(x,y) __API_A(x) __API_A(y)
@@ -23725,12 +23030,29 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __API_AVAILABLE4(x,y,z,t) __API_A(x) __API_A(y) __API_A(z) __API_A(t)
 #define __API_AVAILABLE5(x,y,z,t,b) __API_A(x) __API_A(y) __API_A(z) __API_A(t) __API_A(b)
 #define __API_AVAILABLE6(x,y,z,t,b,m) __API_A(x) __API_A(y) __API_A(z) __API_A(t) __API_A(b) __API_A(m)
-#define __API_AVAILABLE_GET_MACRO(_1,_2,_3,_4,_5,_6,NAME,...) NAME
+#define __API_AVAILABLE7(x,y,z,t,b,m,d) __API_A(x) __API_A(y) __API_A(z) __API_A(t) __API_A(b) __API_A(m) __API_A(d)
+#define __API_AVAILABLE_GET_MACRO(_1,_2,_3,_4,_5,_6,_7,NAME,...) NAME
+#define __API_APPLY_TO any(record, enum, enum_constant, function, objc_method, objc_category, objc_protocol, objc_interface, objc_property, type_alias, variable, field)
+#define __API_RANGE_STRINGIFY(x) __API_RANGE_STRINGIFY2(x)
+#define __API_RANGE_STRINGIFY2(x) #x
+#define __API_A_BEGIN(x) _Pragma(__API_RANGE_STRINGIFY (clang attribute (__attribute__((availability(__API_AVAILABLE_PLATFORM_##x))), apply_to = __API_APPLY_TO)))
+#define __API_AVAILABLE_BEGIN1(a) __API_A_BEGIN(a)
+#define __API_AVAILABLE_BEGIN2(a,b) __API_A_BEGIN(a) __API_A_BEGIN(b)
+#define __API_AVAILABLE_BEGIN3(a,b,c) __API_A_BEGIN(a) __API_A_BEGIN(b) __API_A_BEGIN(c)
+#define __API_AVAILABLE_BEGIN4(a,b,c,d) __API_A_BEGIN(a) __API_A_BEGIN(b) __API_A_BEGIN(c) __API_A_BEGIN(d)
+#define __API_AVAILABLE_BEGIN5(a,b,c,d,e) __API_A_BEGIN(a) __API_A_BEGIN(b) __API_A_BEGIN(c) __API_A_BEGIN(d) __API_A_BEGIN(e)
+#define __API_AVAILABLE_BEGIN6(a,b,c,d,e,f) __API_A_BEGIN(a) __API_A_BEGIN(b) __API_A_BEGIN(c) __API_A_BEGIN(d) __API_A_BEGIN(e) __API_A_BEGIN(f)
+#define __API_AVAILABLE_BEGIN7(a,b,c,d,e,f,g) __API_A_BEGIN(a) __API_A_BEGIN(b) __API_A_BEGIN(c) __API_A_BEGIN(d) __API_A_BEGIN(e) __API_A_BEGIN(f) __API_A_BEGIN(g)
+#define __API_AVAILABLE_BEGIN_GET_MACRO(_1,_2,_3,_4,_5,_6,_7,NAME,...) NAME
 #define __API_DEPRECATED_PLATFORM_macos(x,y) macos,introduced=x,deprecated=y
 #define __API_DEPRECATED_PLATFORM_macosx(x,y) macosx,introduced=x,deprecated=y
 #define __API_DEPRECATED_PLATFORM_ios(x,y) ios,introduced=x,deprecated=y
 #define __API_DEPRECATED_PLATFORM_watchos(x,y) watchos,introduced=x,deprecated=y
 #define __API_DEPRECATED_PLATFORM_tvos(x,y) tvos,introduced=x,deprecated=y
+#define __API_DEPRECATED_PLATFORM_macCatalyst(x,y) macCatalyst,introduced=x,deprecated=y
+#define __API_DEPRECATED_PLATFORM_macCatalyst(x,y) macCatalyst,introduced=x,deprecated=y
+#define __API_DEPRECATED_PLATFORM_uikitformac(x) uikitformac,introduced=x,deprecated=y
+#define __API_DEPRECATED_PLATFORM_driverkit(x,y) driverkit,introduced=x,deprecated=y
 #define __API_D(msg,x) __attribute__((availability(__API_DEPRECATED_PLATFORM_##x,message=msg)))
 #define __API_DEPRECATED_MSG2(msg,x) __API_D(msg,x)
 #define __API_DEPRECATED_MSG3(msg,x,y) __API_D(msg,x) __API_D(msg,y)
@@ -23738,7 +23060,17 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __API_DEPRECATED_MSG5(msg,x,y,z,t) __API_DEPRECATED_MSG4(msg,x,y,z) __API_D(msg,t)
 #define __API_DEPRECATED_MSG6(msg,x,y,z,t,b) __API_DEPRECATED_MSG5(msg,x,y,z,t) __API_D(msg,b)
 #define __API_DEPRECATED_MSG7(msg,x,y,z,t,b,m) __API_DEPRECATED_MSG6(msg,x,y,z,t,b) __API_D(msg,m)
-#define __API_DEPRECATED_MSG_GET_MACRO(_1,_2,_3,_4,_5,_6,_7,NAME,...) NAME
+#define __API_DEPRECATED_MSG8(msg,x,y,z,t,b,m,d) __API_DEPRECATED_MSG7(msg,x,y,z,t,b,m) __API_D(msg,d)
+#define __API_DEPRECATED_MSG_GET_MACRO(_1,_2,_3,_4,_5,_6,_7,_8,NAME,...) NAME
+#define __API_D_BEGIN(msg,x) _Pragma(__API_RANGE_STRINGIFY (clang attribute (__attribute__((availability(__API_DEPRECATED_PLATFORM_##x,message=msg))), apply_to = __API_APPLY_TO)))
+#define __API_DEPRECATED_BEGIN_MSG2(msg,a) __API_D_BEGIN(msg,a)
+#define __API_DEPRECATED_BEGIN_MSG3(msg,a,b) __API_D_BEGIN(msg,a) __API_D_BEGIN(msg,b)
+#define __API_DEPRECATED_BEGIN_MSG4(msg,a,b,c) __API_D_BEGIN(msg,a) __API_D_BEGIN(msg,b) __API_D_BEGIN(msg,c)
+#define __API_DEPRECATED_BEGIN_MSG5(msg,a,b,c,d) __API_D_BEGIN(msg,a) __API_D_BEGIN(msg,b) __API_D_BEGIN(msg,c) __API_D_BEGIN(msg,d)
+#define __API_DEPRECATED_BEGIN_MSG6(msg,a,b,c,d,e) __API_D_BEGIN(msg,a) __API_D_BEGIN(msg,b) __API_D_BEGIN(msg,c) __API_D_BEGIN(msg,d) __API_D_BEGIN(msg,e)
+#define __API_DEPRECATED_BEGIN_MSG7(msg,a,b,c,d,e,f) __API_D_BEGIN(msg,a) __API_D_BEGIN(msg,b) __API_D_BEGIN(msg,c) __API_D_BEGIN(msg,d) __API_D_BEGIN(msg,e) __API_D_BEGIN(msg,f)
+#define __API_DEPRECATED_BEGIN_MSG8(msg,a,b,c,d,e,f,g) __API_D_BEGIN(msg,a) __API_D_BEGIN(msg,b) __API_D_BEGIN(msg,c) __API_D_BEGIN(msg,d) __API_D_BEGIN(msg,e) __API_D_BEGIN(msg,f) __API_D_BEGIN(msg,g)
+#define __API_DEPRECATED_BEGIN_MSG_GET_MACRO(_1,_2,_3,_4,_5,_6,_7,_8,NAME,...) NAME
 #define __API_R(rep,x) __attribute__((availability(__API_DEPRECATED_PLATFORM_##x,replacement=rep)))
 #define __API_DEPRECATED_REP2(rep,x) __API_R(rep,x)
 #define __API_DEPRECATED_REP3(rep,x,y) __API_R(rep,x) __API_R(rep,y)
@@ -23746,12 +23078,26 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __API_DEPRECATED_REP5(rep,x,y,z,t) __API_DEPRECATED_REP4(rep,x,y,z) __API_R(rep,t)
 #define __API_DEPRECATED_REP6(rep,x,y,z,t,b) __API_DEPRECATED_REP5(rep,x,y,z,t) __API_R(rep,b)
 #define __API_DEPRECATED_REP7(rep,x,y,z,t,b,m) __API_DEPRECATED_REP6(rep,x,y,z,t,b) __API_R(rep,m)
-#define __API_DEPRECATED_REP_GET_MACRO(_1,_2,_3,_4,_5,_6,_7,NAME,...) NAME
+#define __API_DEPRECATED_REP8(rep,x,y,z,t,b,m,d) __API_DEPRECATED_REP7(rep,x,y,z,t,b,m) __API_R(rep,d)
+#define __API_DEPRECATED_REP_GET_MACRO(_1,_2,_3,_4,_5,_6,_7,_8,NAME,...) NAME
+#define __API_R_BEGIN(rep,x) _Pragma(__API_RANGE_STRINGIFY (clang attribute (__attribute__((availability(__API_DEPRECATED_PLATFORM_##x,replacement=rep))), apply_to = __API_APPLY_TO)))
+#define __API_DEPRECATED_BEGIN_REP2(rep,a) __API_R_BEGIN(rep,a)
+#define __API_DEPRECATED_BEGIN_REP3(rep,a,b) __API_R_BEGIN(rep,a) __API_R_BEGIN(rep,b)
+#define __API_DEPRECATED_BEGIN_REP4(rep,a,b,c) __API_R_BEGIN(rep,a) __API_R_BEGIN(rep,b) __API_R_BEGIN(rep,c)
+#define __API_DEPRECATED_BEGIN_REP5(rep,a,b,c,d) __API_R_BEGIN(rep,a) __API_R_BEGIN(rep,b) __API_R_BEGIN(rep,c) __API_R_BEGIN(rep,d)
+#define __API_DEPRECATED_BEGIN_REP6(rep,a,b,c,d,e) __API_R_BEGIN(rep,a) __API_R_BEGIN(rep,b) __API_R_BEGIN(rep,c) __API_R_BEGIN(rep,d) __API_R_BEGIN(rep,e)
+#define __API_DEPRECATED_BEGIN_REP7(rep,a,b,c,d,e,f) __API_R_BEGIN(rep,a) __API_R_BEGIN(rep,b) __API_R_BEGIN(rep,c) __API_R_BEGIN(rep,d) __API_R_BEGIN(rep,e) __API_R_BEGIN(rep,f)
+#define __API_DEPRECATED_BEGIN_REP8(rep,a,b,c,d,e,f,g) __API_R_BEGIN(rep,a) __API_R_BEGIN(rep,b) __API_R_BEGIN(rep,c) __API_R_BEGIN(rep,d) __API_R_BEGIN(rep,e) __API_R_BEGIN(rep,f) __API_R_BEGIN(rep,g)
+#define __API_DEPRECATED_BEGIN_REP_GET_MACRO(_1,_2,_3,_4,_5,_6,_7,_8,NAME,...) NAME
 #define __API_UNAVAILABLE_PLATFORM_macos macos,unavailable
 #define __API_UNAVAILABLE_PLATFORM_macosx macosx,unavailable
 #define __API_UNAVAILABLE_PLATFORM_ios ios,unavailable
 #define __API_UNAVAILABLE_PLATFORM_watchos watchos,unavailable
 #define __API_UNAVAILABLE_PLATFORM_tvos tvos,unavailable
+#define __API_UNAVAILABLE_PLATFORM_macCatalyst macCatalyst,unavailable
+#define __API_UNAVAILABLE_PLATFORM_macCatalyst macCatalyst,unavailable
+#define __API_UNAVAILABLE_PLATFORM_uikitformac(x) uikitformac,unavailable
+#define __API_UNAVAILABLE_PLATFORM_driverkit driverkit,unavailable
 #define __API_U(x) __attribute__((availability(__API_UNAVAILABLE_PLATFORM_##x)))
 #define __API_UNAVAILABLE1(x) __API_U(x)
 #define __API_UNAVAILABLE2(x,y) __API_U(x) __API_U(y)
@@ -23759,7 +23105,17 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __API_UNAVAILABLE4(x,y,z,t) __API_UNAVAILABLE3(x,y,z) __API_U(t)
 #define __API_UNAVAILABLE5(x,y,z,t,b) __API_UNAVAILABLE4(x,y,z,t) __API_U(b)
 #define __API_UNAVAILABLE6(x,y,z,t,b,m) __API_UNAVAILABLE5(x,y,z,t,b) __API_U(m)
-#define __API_UNAVAILABLE_GET_MACRO(_1,_2,_3,_4,_5,_6,NAME,...) NAME
+#define __API_UNAVAILABLE7(x,y,z,t,b,m,d) __API_UNAVAILABLE6(x,y,z,t,b,m) __API_U(d)
+#define __API_UNAVAILABLE_GET_MACRO(_1,_2,_3,_4,_5,_6,_7,NAME,...) NAME
+#define __API_U_BEGIN(x) _Pragma(__API_RANGE_STRINGIFY (clang attribute (__attribute__((availability(__API_UNAVAILABLE_PLATFORM_##x))), apply_to = __API_APPLY_TO)))
+#define __API_UNAVAILABLE_BEGIN1(a) __API_U_BEGIN(a)
+#define __API_UNAVAILABLE_BEGIN2(a,b) __API_U_BEGIN(a) __API_U_BEGIN(b)
+#define __API_UNAVAILABLE_BEGIN3(a,b,c) __API_U_BEGIN(a) __API_U_BEGIN(b) __API_U_BEGIN(c)
+#define __API_UNAVAILABLE_BEGIN4(a,b,c,d) __API_U_BEGIN(a) __API_U_BEGIN(b) __API_U_BEGIN(c) __API_U_BEGIN(d)
+#define __API_UNAVAILABLE_BEGIN5(a,b,c,d,e) __API_U_BEGIN(a) __API_U_BEGIN(b) __API_U_BEGIN(c) __API_U_BEGIN(d) __API_U_BEGIN(e)
+#define __API_UNAVAILABLE_BEGIN6(a,b,c,d,e,f) __API_U_BEGIN(a) __API_U_BEGIN(b) __API_U_BEGIN(c) __API_U_BEGIN(d) __API_U_BEGIN(e) __API_U_BEGIN(f)
+#define __API_UNAVAILABLE_BEGIN7(a,b,c,d,e,f) __API_U_BEGIN(a) __API_U_BEGIN(b) __API_U_BEGIN(c) __API_U_BEGIN(d) __API_U_BEGIN(e) __API_U_BEGIN(f) __API_U_BEGIN(g)
+#define __API_UNAVAILABLE_BEGIN_GET_MACRO(_1,_2,_3,_4,_5,_6,_7,NAME,...) NAME
 #define __swift_compiler_version_at_least(...) 1
 #define __SPI_AVAILABLE(...) 
 #define __OSX_AVAILABLE_STARTING(_osx,_ios) __AVAILABILITY_INTERNAL##_osx
@@ -23787,10 +23143,20 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __WATCHOS_DEPRECATED(_start,_dep,_msg) __WATCHOS_AVAILABLE(_start) __OS_AVAILABILITY_MSG(watchos,deprecated=_dep,_msg)
 #define __SWIFT_UNAVAILABLE __OS_AVAILABILITY(swift,unavailable)
 #define __SWIFT_UNAVAILABLE_MSG(_msg) __OS_AVAILABILITY_MSG(swift,unavailable,_msg)
-#define __API_AVAILABLE(...) __API_AVAILABLE_GET_MACRO(__VA_ARGS__,__API_AVAILABLE6, __API_AVAILABLE5, __API_AVAILABLE4, __API_AVAILABLE3, __API_AVAILABLE2, __API_AVAILABLE1, 0)(__VA_ARGS__)
-#define __API_DEPRECATED(...) __API_DEPRECATED_MSG_GET_MACRO(__VA_ARGS__,__API_DEPRECATED_MSG7,__API_DEPRECATED_MSG6,__API_DEPRECATED_MSG5,__API_DEPRECATED_MSG4,__API_DEPRECATED_MSG3,__API_DEPRECATED_MSG2,__API_DEPRECATED_MSG1, 0)(__VA_ARGS__)
-#define __API_DEPRECATED_WITH_REPLACEMENT(...) __API_DEPRECATED_REP_GET_MACRO(__VA_ARGS__,__API_DEPRECATED_REP7,__API_DEPRECATED_REP6,__API_DEPRECATED_REP5,__API_DEPRECATED_REP4,__API_DEPRECATED_REP3,__API_DEPRECATED_REP2,__API_DEPRECATED_REP1, 0)(__VA_ARGS__)
-#define __API_UNAVAILABLE(...) __API_UNAVAILABLE_GET_MACRO(__VA_ARGS__,__API_UNAVAILABLE6,__API_UNAVAILABLE5,__API_UNAVAILABLE4,__API_UNAVAILABLE3,__API_UNAVAILABLE2,__API_UNAVAILABLE1, 0)(__VA_ARGS__)
+#define __API_AVAILABLE(...) __API_AVAILABLE_GET_MACRO(__VA_ARGS__,__API_AVAILABLE7, __API_AVAILABLE6, __API_AVAILABLE5, __API_AVAILABLE4, __API_AVAILABLE3, __API_AVAILABLE2, __API_AVAILABLE1, 0)(__VA_ARGS__)
+#define __API_AVAILABLE_BEGIN(...) _Pragma("clang attribute push") __API_AVAILABLE_BEGIN_GET_MACRO(__VA_ARGS__,__API_AVAILABLE_BEGIN7, __API_AVAILABLE_BEGIN6, __API_AVAILABLE_BEGIN5, __API_AVAILABLE_BEGIN4, __API_AVAILABLE_BEGIN3, __API_AVAILABLE_BEGIN2, __API_AVAILABLE_BEGIN1, 0)(__VA_ARGS__)
+#define __API_AVAILABLE_END _Pragma("clang attribute pop")
+#define __API_DEPRECATED(...) __API_DEPRECATED_MSG_GET_MACRO(__VA_ARGS__,__API_DEPRECATED_MSG8,__API_DEPRECATED_MSG7,__API_DEPRECATED_MSG6,__API_DEPRECATED_MSG5,__API_DEPRECATED_MSG4,__API_DEPRECATED_MSG3,__API_DEPRECATED_MSG2,__API_DEPRECATED_MSG1, 0)(__VA_ARGS__)
+#define __API_DEPRECATED_WITH_REPLACEMENT(...) __API_DEPRECATED_REP_GET_MACRO(__VA_ARGS__,__API_DEPRECATED_REP8,__API_DEPRECATED_REP7,__API_DEPRECATED_REP6,__API_DEPRECATED_REP5,__API_DEPRECATED_REP4,__API_DEPRECATED_REP3,__API_DEPRECATED_REP2,__API_DEPRECATED_REP1, 0)(__VA_ARGS__)
+#define __API_DEPRECATED_BEGIN(...) _Pragma("clang attribute push") __API_DEPRECATED_BEGIN_MSG_GET_MACRO(__VA_ARGS__,__API_DEPRECATED_BEGIN_MSG8,__API_DEPRECATED_BEGIN_MSG7, __API_DEPRECATED_BEGIN_MSG6, __API_DEPRECATED_BEGIN_MSG5, __API_DEPRECATED_BEGIN_MSG4, __API_DEPRECATED_BEGIN_MSG3, __API_DEPRECATED_BEGIN_MSG2, __API_DEPRECATED_BEGIN_MSG1, 0)(__VA_ARGS__)
+#define __API_DEPRECATED_END _Pragma("clang attribute pop")
+#define __API_DEPRECATED_WITH_REPLACEMENT_BEGIN(...) _Pragma("clang attribute push") __API_DEPRECATED_BEGIN_REP_GET_MACRO(__VA_ARGS__,__API_DEPRECATED_BEGIN_REP8,__API_DEPRECATED_BEGIN_REP7, __API_DEPRECATED_BEGIN_REP6, __API_DEPRECATED_BEGIN_REP5, __API_DEPRECATED_BEGIN_REP4, __API_DEPRECATED_BEGIN_REP3, __API_DEPRECATED_BEGIN_REP2, __API_DEPRECATED_BEGIN_REP1, 0)(__VA_ARGS__)
+#define __API_DEPRECATED_WITH_REPLACEMENT_END _Pragma("clang attribute pop")
+#define __API_UNAVAILABLE(...) __API_UNAVAILABLE_GET_MACRO(__VA_ARGS__,__API_UNAVAILABLE7,__API_UNAVAILABLE6,__API_UNAVAILABLE5,__API_UNAVAILABLE4,__API_UNAVAILABLE3,__API_UNAVAILABLE2,__API_UNAVAILABLE1, 0)(__VA_ARGS__)
+#define __API_UNAVAILABLE_BEGIN(...) _Pragma("clang attribute push") __API_UNAVAILABLE_BEGIN_GET_MACRO(__VA_ARGS__,__API_UNAVAILABLE_BEGIN7,__API_UNAVAILABLE_BEGIN6, __API_UNAVAILABLE_BEGIN5, __API_UNAVAILABLE_BEGIN4, __API_UNAVAILABLE_BEGIN3, __API_UNAVAILABLE_BEGIN2, __API_UNAVAILABLE_BEGIN1, 0)(__VA_ARGS__)
+#define __API_UNAVAILABLE_END _Pragma("clang attribute pop")
+#define __SPI_DEPRECATED(...) 
+#define __SPI_DEPRECATED_WITH_REPLACEMENT(...) 
 #define __TYPES_H_ 
 #define _SYS__TYPES_H_ 
 #define _BSD_MACHINE__TYPES_H_ 
@@ -23867,7 +23233,7 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define stdout __stdoutp
 #define stderr __stderrp
 #define L_ctermid 1024
-#define __CTERMID_DEFINED 1
+#define _CTERMID_H_ 
 #define __swift_unavailable_on(osx_msg,ios_msg) __swift_unavailable(osx_msg)
 #undef __swift_unavailable_on
 #define __sgetc(p) (--(p)->_r < 0 ? __srget(p) : (int)(*(p)->_p++))
@@ -23923,11 +23289,11 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define BYTE_ORDER __DARWIN_BYTE_ORDER
 #define _SYS__ENDIAN_H_ 
 #define _OS__OSBYTEORDER_H 
-#define __DARWIN_OSSwapConstInt16(x) ((__uint16_t)((((__uint16_t)(x) & 0xff00) >> 8) | (((__uint16_t)(x) & 0x00ff) << 8)))
-#define __DARWIN_OSSwapConstInt32(x) ((__uint32_t)((((__uint32_t)(x) & 0xff000000) >> 24) | (((__uint32_t)(x) & 0x00ff0000) >> 8) | (((__uint32_t)(x) & 0x0000ff00) << 8) | (((__uint32_t)(x) & 0x000000ff) << 24)))
+#define __DARWIN_OSSwapConstInt16(x) ((__uint16_t)((((__uint16_t)(x) & 0xff00U) >> 8) | (((__uint16_t)(x) & 0x00ffU) << 8)))
+#define __DARWIN_OSSwapConstInt32(x) ((__uint32_t)((((__uint32_t)(x) & 0xff000000U) >> 24) | (((__uint32_t)(x) & 0x00ff0000U) >> 8) | (((__uint32_t)(x) & 0x0000ff00U) << 8) | (((__uint32_t)(x) & 0x000000ffU) << 24)))
 #define __DARWIN_OSSwapConstInt64(x) ((__uint64_t)((((__uint64_t)(x) & 0xff00000000000000ULL) >> 56) | (((__uint64_t)(x) & 0x00ff000000000000ULL) >> 40) | (((__uint64_t)(x) & 0x0000ff0000000000ULL) >> 24) | (((__uint64_t)(x) & 0x000000ff00000000ULL) >> 8) | (((__uint64_t)(x) & 0x00000000ff000000ULL) << 8) | (((__uint64_t)(x) & 0x0000000000ff0000ULL) << 24) | (((__uint64_t)(x) & 0x000000000000ff00ULL) << 40) | (((__uint64_t)(x) & 0x00000000000000ffULL) << 56)))
-#define _OS__OSBYTEORDERI386_H 
 #define __DARWIN_OS_INLINE static inline
+#define _OS__OSBYTEORDERI386_H 
 #define __DARWIN_OSSwapInt16(x) ((__uint16_t)(__builtin_constant_p(x) ? __DARWIN_OSSwapConstInt16(x) : _OSSwapInt16(x)))
 #define __DARWIN_OSSwapInt32(x) (__builtin_constant_p(x) ? __DARWIN_OSSwapConstInt32(x) : _OSSwapInt32(x))
 #define __DARWIN_OSSwapInt64(x) (__builtin_constant_p(x) ? __DARWIN_OSSwapConstInt64(x) : _OSSwapInt64(x))
@@ -23976,8 +23342,11 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define __DARWIN_NBBY 8
 #define __DARWIN_NFDBITS (sizeof(__int32_t) * __DARWIN_NBBY)
 #define __DARWIN_howmany(x,y) ((((x) % (y)) == 0) ? ((x) / (y)) : (((x) / (y)) + 1))
-#define __DARWIN_FD_SET(n,p) do { int __fd = (n); ((p)->fds_bits[(unsigned long)__fd/__DARWIN_NFDBITS] |= ((__int32_t)(((unsigned long)1)<<((unsigned long)__fd % __DARWIN_NFDBITS)))); } while(0)
-#define __DARWIN_FD_CLR(n,p) do { int __fd = (n); ((p)->fds_bits[(unsigned long)__fd/__DARWIN_NFDBITS] &= ~((__int32_t)(((unsigned long)1)<<((unsigned long)__fd % __DARWIN_NFDBITS)))); } while(0)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability-new"
+#pragma clang diagnostic pop
+#define __DARWIN_FD_SET(n,p) __darwin_fd_set((n), (p))
+#define __DARWIN_FD_CLR(n,p) __darwin_fd_clr((n), (p))
 #define __DARWIN_FD_ISSET(n,p) __darwin_fd_isset((n), (p))
 #define __DARWIN_FD_ZERO(p) __builtin_bzero(p, sizeof(*(p)))
 #define __DARWIN_FD_COPY(f,t) bcopy(f, t, sizeof(*(f)))
@@ -24063,13 +23432,22 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define UF_TRACKED 0x00000040
 #define UF_DATAVAULT 0x00000080
 #define UF_HIDDEN 0x00008000
-#define SF_SUPPORTED 0x001f0000
-#define SF_SETTABLE 0xffff0000
+#define SF_SUPPORTED 0x009f0000
+#define SF_SETTABLE 0x3fff0000
+#define SF_SYNTHETIC 0xc0000000
 #define SF_ARCHIVED 0x00010000
 #define SF_IMMUTABLE 0x00020000
 #define SF_APPEND 0x00040000
 #define SF_RESTRICTED 0x00080000
 #define SF_NOUNLINK 0x00100000
+#define SF_FIRMLINK 0x00800000
+#define SF_DATALESS 0x40000000
+#define EF_MAY_SHARE_BLOCKS 0x00000001
+#define EF_NO_XATTRS 0x00000002
+#define EF_IS_SYNC_ROOT 0x00000004
+#define EF_IS_PURGEABLE 0x00000008
+#define EF_IS_SPARSE 0x00000010
+#define EF_IS_SYNTHETIC 0x00000020
 #define UTIME_NOW -1
 #define UTIME_OMIT -2
 #define _FILESEC_T 
@@ -24140,6 +23518,13 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define _STRUCT_X86_AVX512_STATE32 struct __darwin_i386_avx512_state
 #define _STRUCT_X86_EXCEPTION_STATE32 struct __darwin_i386_exception_state
 #define _STRUCT_X86_DEBUG_STATE32 struct __darwin_x86_debug_state32
+#define _STRUCT_X86_INSTRUCTION_STATE struct __x86_instruction_state
+#define _X86_INSTRUCTION_STATE_MAX_INSN_BYTES (2448 - 64 - 4)
+#define _X86_INSTRUCTION_STATE_CACHELINE_SIZE 64
+#define _STRUCT_LAST_BRANCH_RECORD struct __last_branch_record
+#define _STRUCT_LAST_BRANCH_STATE struct __last_branch_state
+#define __LASTBRANCH_MAX 32
+#define _STRUCT_X86_PAGEIN_STATE struct __x86_pagein_state
 #define _STRUCT_X86_THREAD_STATE64 struct __darwin_x86_thread_state64
 #define _STRUCT_X86_THREAD_FULL_STATE64 struct __darwin_x86_thread_full_state64
 #define _STRUCT_X86_FLOAT_STATE64 struct __darwin_x86_float_state64
@@ -24248,6 +23633,16 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define _UINT64_T 
 #define _INTMAX_T 
 #define _UINTMAX_T 
+#define INT8_C(v) (v)
+#define INT16_C(v) (v)
+#define INT32_C(v) (v)
+#define INT64_C(v) (v ## LL)
+#define UINT8_C(v) (v)
+#define UINT16_C(v) (v)
+#define UINT32_C(v) (v ## U)
+#define UINT64_C(v) (v ## ULL)
+#define INTMAX_C(v) (v ## L)
+#define UINTMAX_C(v) (v ## UL)
 #define INT8_MAX 127
 #define INT16_MAX 32767
 #define INT32_MAX 2147483647
@@ -24287,11 +23682,11 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define INTPTR_MAX 9223372036854775807L
 #define INTPTR_MIN (-INTPTR_MAX-1)
 #define UINTPTR_MAX 18446744073709551615UL
-#define INTMAX_MIN INT64_MIN
-#define INTMAX_MAX INT64_MAX
-#define UINTMAX_MAX UINT64_MAX
-#define PTRDIFF_MIN INT64_MIN
-#define PTRDIFF_MAX INT64_MAX
+#define INTMAX_MAX INTMAX_C(9223372036854775807)
+#define UINTMAX_MAX UINTMAX_C(18446744073709551615)
+#define INTMAX_MIN (-INTMAX_MAX-1)
+#define PTRDIFF_MIN INTMAX_MIN
+#define PTRDIFF_MAX INTMAX_MAX
 #define SIZE_MAX UINTPTR_MAX
 #define RSIZE_MAX (SIZE_MAX >> 1)
 #define WCHAR_MAX __WCHAR_MAX__
@@ -24300,16 +23695,6 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define WINT_MAX INT32_MAX
 #define SIG_ATOMIC_MIN INT32_MIN
 #define SIG_ATOMIC_MAX INT32_MAX
-#define INT8_C(v) (v)
-#define INT16_C(v) (v)
-#define INT32_C(v) (v)
-#define INT64_C(v) (v ## LL)
-#define UINT8_C(v) (v)
-#define UINT16_C(v) (v)
-#define UINT32_C(v) (v ## U)
-#define UINT64_C(v) (v ## ULL)
-#define INTMAX_C(v) (v ## L)
-#define UINTMAX_C(v) (v ## UL)
 #define _STRUCT_TIMEVAL struct timeval
 #define PRIO_PROCESS 0
 #define PRIO_PGRP 1
@@ -24329,7 +23714,9 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define RUSAGE_INFO_V2 2
 #define RUSAGE_INFO_V3 3
 #define RUSAGE_INFO_V4 4
-#define RUSAGE_INFO_CURRENT RUSAGE_INFO_V4
+#define RUSAGE_INFO_V5 5
+#define RUSAGE_INFO_CURRENT RUSAGE_INFO_V5
+#define RU_PROC_RUNS_RESLIDE 0x00000001
 #define RLIM_INFINITY (((__uint64_t)1 << 63) - 1)
 #define RLIM_SAVED_MAX RLIM_INFINITY
 #define RLIM_SAVED_CUR RLIM_INFINITY
@@ -24358,6 +23745,12 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define FOOTPRINT_INTERVAL_RESET 0x1
 #define IOPOL_TYPE_DISK 0
 #define IOPOL_TYPE_VFS_ATIME_UPDATES 2
+#define IOPOL_TYPE_VFS_MATERIALIZE_DATALESS_FILES 3
+#define IOPOL_TYPE_VFS_STATFS_NO_DATA_VOLUME 4
+#define IOPOL_TYPE_VFS_TRIGGER_RESOLVE 5
+#define IOPOL_TYPE_VFS_IGNORE_CONTENT_PROTECTION 6
+#define IOPOL_TYPE_VFS_IGNORE_PERMISSIONS 7
+#define IOPOL_TYPE_VFS_SKIP_MTIME_UPDATE 8
 #define IOPOL_SCOPE_PROCESS 0
 #define IOPOL_SCOPE_THREAD 1
 #define IOPOL_SCOPE_DARWIN_BG 2
@@ -24371,6 +23764,19 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define IOPOL_NORMAL IOPOL_IMPORTANT
 #define IOPOL_ATIME_UPDATES_DEFAULT 0
 #define IOPOL_ATIME_UPDATES_OFF 1
+#define IOPOL_MATERIALIZE_DATALESS_FILES_DEFAULT 0
+#define IOPOL_MATERIALIZE_DATALESS_FILES_OFF 1
+#define IOPOL_MATERIALIZE_DATALESS_FILES_ON 2
+#define IOPOL_VFS_STATFS_NO_DATA_VOLUME_DEFAULT 0
+#define IOPOL_VFS_STATFS_FORCE_NO_DATA_VOLUME 1
+#define IOPOL_VFS_TRIGGER_RESOLVE_DEFAULT 0
+#define IOPOL_VFS_TRIGGER_RESOLVE_OFF 1
+#define IOPOL_VFS_CONTENT_PROTECTION_DEFAULT 0
+#define IOPOL_VFS_CONTENT_PROTECTION_IGNORE 1
+#define IOPOL_VFS_IGNORE_PERMISSIONS_OFF 0
+#define IOPOL_VFS_IGNORE_PERMISSIONS_ON 1
+#define IOPOL_VFS_SKIP_MTIME_UPDATE_OFF 0
+#define IOPOL_VFS_SKIP_MTIME_UPDATE_ON 1
 #define WNOHANG 0x00000001
 #define WUNTRACED 0x00000002
 #define _W_INT(w) (*(int *)&(w))
@@ -24413,6 +23819,7 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define _MALLOC_UNDERSCORE_MALLOC_H_ 
 #define __swift_unavailable_on(osx_msg,ios_msg) __swift_unavailable(osx_msg)
 #undef __swift_unavailable_on
+#define __sort_noescape __attribute__((__noescape__))
 #define __STDDEF_H 
 #define __need_ptrdiff_t 
 #define __need_size_t 
@@ -24754,7 +24161,7 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define _POSIX2_SW_DEV 200112L
 #define _POSIX2_UPE 200112L
 #define __ILP32_OFF32 (-1)
-#define __ILP32_OFFBIG (1)
+#define __ILP32_OFFBIG (-1)
 #define __LP64_OFF64 (1)
 #define __LPBIG_OFFBIG (1)
 #define _POSIX_V6_ILP32_OFF32 __ILP32_OFF32
@@ -25138,7 +24545,7 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define QUAD_MAX LLONG_MAX
 #define QUAD_MIN LLONG_MIN
 #define _SYS_SYSLIMITS_H_ 
-#define ARG_MAX (256 * 1024)
+#define ARG_MAX (1024 * 1024)
 #define CHILD_MAX 266
 #define GID_MAX 2147483647U
 #define LINK_MAX 32767
@@ -25503,10 +24910,10 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define RUBY_TYPED_PROMOTED1 RUBY_FL_PROMOTED1
 #define Data_Wrap_Struct(klass,mark,free,sval) rb_data_object_wrap((klass),(sval),(RUBY_DATA_FUNC)(mark),(RUBY_DATA_FUNC)(free))
 #define Data_Make_Struct0(result,klass,type,size,mark,free,sval) VALUE result = rb_data_object_zalloc((klass), (size), (RUBY_DATA_FUNC)(mark), (RUBY_DATA_FUNC)(free)); (void)((sval) = (type *)DATA_PTR(result));
-#define Data_Make_Struct(klass,type,mark,free,sval) RB_GNUC_EXTENSION_BLOCK( Data_Make_Struct0(data_struct_obj, klass, type, sizeof(type), mark, free, sval); data_struct_obj )
+#define Data_Make_Struct(klass,type,mark,free,sval) ({ Data_Make_Struct0(data_struct_obj, klass, type, sizeof(type), mark, free, sval); data_struct_obj; })
 #define TypedData_Wrap_Struct(klass,data_type,sval) rb_data_typed_object_wrap((klass),(sval),(data_type))
 #define TypedData_Make_Struct0(result,klass,type,size,data_type,sval) VALUE result = rb_data_typed_object_zalloc(klass, size, data_type); (void)((sval) = (type *)DATA_PTR(result));
-#define TypedData_Make_Struct(klass,type,data_type,sval) RB_GNUC_EXTENSION_BLOCK( TypedData_Make_Struct0(data_struct_obj, klass, type, sizeof(type), data_type, sval); data_struct_obj )
+#define TypedData_Make_Struct(klass,type,data_type,sval) ({ TypedData_Make_Struct0(data_struct_obj, klass, type, sizeof(type), data_type, sval); data_struct_obj; })
 #define Data_Get_Struct(obj,type,sval) ((sval) = (type*)rb_data_object_get(obj))
 #define TypedData_Get_Struct(obj,type,data_type,sval) ((sval) = (type*)rb_check_typeddata((obj), (data_type)))
 #define RSTRUCT_LEN(st) NUM2LONG(rb_struct_size(st))
@@ -26097,7 +25504,7 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define TIMET_MAX SIGNED_INTEGER_MAX(time_t)
 #define TIMET_MIN SIGNED_INTEGER_MIN(time_t)
 #define TIMET_MAX_PLUS_ONE (2*(double)(TIMET_MAX/2+1))
-#define MUL_OVERFLOW_P(a,b) RB_GNUC_EXTENSION_BLOCK(__typeof__(a) c; __builtin_mul_overflow((a), (b), &c))
+#define MUL_OVERFLOW_P(a,b) ({__typeof__(a) c; __builtin_mul_overflow((a), (b), &c);})
 #define MUL_OVERFLOW_SIGNED_INTEGER_P(a,b,min,max) ( (a) == 0 ? 0 : (a) == -1 ? (b) < -(max) : (a) > 0 ? ((b) > 0 ? (max) / (a) < (b) : (min) / (a) > (b)) : ((b) > 0 ? (min) / (a) < (b) : (max) / (a) > (b)))
 #define MUL_OVERFLOW_FIXNUM_P(a,b) MUL_OVERFLOW_SIGNED_INTEGER_P(a, b, FIXNUM_MIN, FIXNUM_MAX)
 #define MUL_OVERFLOW_LONG_LONG_P(a,b) MUL_OVERFLOW_P(a, b)
@@ -26640,7 +26047,7 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define ATOMIC_DEC(var) __atomic_fetch_sub(&(var), 1, __ATOMIC_SEQ_CST)
 #define ATOMIC_OR(var,val) __atomic_fetch_or(&(var), (val), __ATOMIC_SEQ_CST)
 #define ATOMIC_EXCHANGE(var,val) __atomic_exchange_n(&(var), (val), __ATOMIC_SEQ_CST)
-#define ATOMIC_CAS(var,oldval,newval) RB_GNUC_EXTENSION_BLOCK( __typeof__(var) oldvaldup = (oldval); __atomic_compare_exchange_n(&(var), &oldvaldup, (newval), 0, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST); oldvaldup )
+#define ATOMIC_CAS(var,oldval,newval) ({ __typeof__(var) oldvaldup = (oldval); __atomic_compare_exchange_n(&(var), &oldvaldup, (newval), 0, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST); oldvaldup; })
 #define ATOMIC_SIZE_ADD(var,val) __atomic_fetch_add(&(var), (val), __ATOMIC_SEQ_CST)
 #define ATOMIC_SIZE_SUB(var,val) __atomic_fetch_sub(&(var), (val), __ATOMIC_SEQ_CST)
 #define RUBY_ATOMIC_GENERIC_MACRO 1
@@ -26713,6 +26120,7 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define list_typeof(var) typeof(var)
 #define RUBY_THREAD_NATIVE_H 1
 #define _PTHREAD_H 
+#define _SCHED_H_ 
 #define _PTHREAD_IMPL_H_ 
 #pragma clang assume_nonnull begin
 #define _PTHREAD_MUTEX_SIG_init 0x32AAABA7
@@ -26727,7 +26135,6 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define SCHED_RR 2
 #define __SCHED_PARAM_SIZE__ 4
 #pragma clang assume_nonnull end
-#define _SCHED_H_ 
 #define _TIME_H_ 
 #define CLOCKS_PER_SEC 1000000
 #define __CLOCK_AVAILABILITY __OSX_AVAILABLE(10.12) __IOS_AVAILABLE(10.0) __TVOS_AVAILABLE(10.0) __WATCHOS_AVAILABLE(3.0)
@@ -26740,6 +26147,7 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define CLOCK_PROCESS_CPUTIME_ID _CLOCK_PROCESS_CPUTIME_ID
 #define CLOCK_THREAD_CPUTIME_ID _CLOCK_THREAD_CPUTIME_ID
 #undef __CLOCK_AVAILABILITY
+#define TIME_UTC 1
 #define _PTHREAD_QOS_H 
 #define _SYS_QOS_H 
 #define __QOS_ENUM(name,type,...) enum { __VA_ARGS__ }; typedef type name##_t
@@ -27083,9 +26491,9 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define _I386_PARAM_H_ 
 #define _I386__PARAM_H_ 
 #define __DARWIN_ALIGNBYTES (sizeof(__darwin_size_t) - 1)
-#define __DARWIN_ALIGN(p) ((__darwin_size_t)((char *)(__darwin_size_t)(p) + __DARWIN_ALIGNBYTES) &~ __DARWIN_ALIGNBYTES)
+#define __DARWIN_ALIGN(p) ((__darwin_size_t)((__darwin_size_t)(p) + __DARWIN_ALIGNBYTES) &~ __DARWIN_ALIGNBYTES)
 #define __DARWIN_ALIGNBYTES32 (sizeof(__uint32_t) - 1)
-#define __DARWIN_ALIGN32(p) ((__darwin_size_t)((char *)(__darwin_size_t)(p) + __DARWIN_ALIGNBYTES32) &~ __DARWIN_ALIGNBYTES32)
+#define __DARWIN_ALIGN32(p) ((__darwin_size_t)((__darwin_size_t)(p) + __DARWIN_ALIGNBYTES32) &~ __DARWIN_ALIGNBYTES32)
 #define ALIGNBYTES __DARWIN_ALIGNBYTES
 #define ALIGN(p) __DARWIN_ALIGN(p)
 #define NBPG 4096
@@ -27158,16 +26566,14 @@ vm_call_iseq_setup_func(const struct rb_call_info *ci, const int param_size, con
 #define MAXPHYSIO_WIRED (16 * 1024 * 1024)
 #define MAXPATHLEN PATH_MAX
 #define MAXSYMLINKS 32
-#define setbit(a,i) (((char *)(a))[(i)/NBBY] |= 1<<((i)%NBBY))
-#define clrbit(a,i) (((char *)(a))[(i)/NBBY] &= ~(1<<((i)%NBBY)))
-#define isset(a,i) (((char *)(a))[(i)/NBBY] & (1<<((i)%NBBY)))
-#define isclr(a,i) ((((char *)(a))[(i)/NBBY] & (1<<((i)%NBBY))) == 0)
+#define setbit(a,i) (((unsigned char *)(a))[(i)/NBBY] |= 1u<<((i)%NBBY))
+#define clrbit(a,i) (((unsigned char *)(a))[(i)/NBBY] &= ~(1u<<((i)%NBBY)))
+#define isset(a,i) (((unsigned char *)(a))[(i)/NBBY] & (1u<<((i)%NBBY)))
+#define isclr(a,i) ((((unsigned char *)(a))[(i)/NBBY] & (1u<<((i)%NBBY))) == 0)
 #define roundup(x,y) ((((x) % (y)) == 0) ? (x) : ((x) + ((y) - ((x) % (y)))))
 #define powerof2(x) ((((x)-1)&(x))==0)
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
-#define MINBUCKET 4
-#define MAXALLOCSAVE (2 * CLBYTES)
 #define FSHIFT 11
 #define FSCALE (1<<FSHIFT)
 #define SAVE_ROOT_JMPBUF_BEFORE_STMT 
