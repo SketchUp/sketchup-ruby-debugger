@@ -307,7 +307,6 @@
 					"$(SRCROOT)/..",
 					"$(SRCROOT)/../ThirdParty/include",
 					"$(SRCROOT)/../ThirdParty/include/ruby/mac",
-					"$(SRCROOT)/../ThirdParty/include/ruby/mac/x86_64-darwin14",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -329,7 +328,6 @@
 					"$(SRCROOT)/..",
 					"$(SRCROOT)/../ThirdParty/include",
 					"$(SRCROOT)/../ThirdParty/include/ruby/mac",
-					"$(SRCROOT)/../ThirdParty/include/ruby/mac/x86_64-darwin14",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
