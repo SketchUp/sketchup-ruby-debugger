@@ -163,7 +163,7 @@
 		33CC240818D57AB80079FC3E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1250;
+				LastUpgradeCheck = 1310;
 				ORGANIZATIONNAME = "Bugra Barin";
 			};
 			buildConfigurationList = 33CC240B18D57AB80079FC3E /* Build configuration list for PBXProject "SURubyDebugger" */;
