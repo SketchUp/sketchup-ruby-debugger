@@ -308,6 +308,7 @@
 					"$(SRCROOT)/../ThirdParty/include",
 					"$(SRCROOT)/../ThirdParty/include/ruby/mac",
 				);
+				OTHER_CFLAGS = "-fdeclspec";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -325,6 +326,7 @@
 					"$(SRCROOT)/../ThirdParty/include",
 					"$(SRCROOT)/../ThirdParty/include/ruby/mac",
 				);
+				OTHER_CFLAGS = "-fdeclspec";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
