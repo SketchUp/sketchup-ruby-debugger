@@ -62,7 +62,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)../ThirdParty/lib/Debug/x64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>x64-msvcrt-ruby270.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>x64-msvcrt-ruby310.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>set TARGETDIR=$(TargetDir)
@@ -89,7 +89,7 @@ call $(SolutionDir)postbuild.bat
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)../ThirdParty/lib/Release/x64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>x64-msvcrt-ruby270.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>x64-msvcrt-ruby310.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>set TARGETDIR=$(TargetDir)
