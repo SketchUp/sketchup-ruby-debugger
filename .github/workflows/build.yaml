@@ -1,0 +1,44 @@
+name: build-binaries
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - dev/ruby31
+      - dev/actions
+  pull_request:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Build app for release
+        run: msbuild Build\SURubyDebugger.sln -property:Configuration=Release
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ruby-debugger-win
+          path: Build/x64/Release/SURubyDebugger.dll
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build app for release
+        run: |
+          cd Build
+          xcodebuild -scheme SURubyDebugger -configuration Release -derivedDataPath output
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ruby-debugger-mac
+          path: Build/output/Build/Products/Release/SURubyDebugger.dylib
