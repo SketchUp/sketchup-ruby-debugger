@@ -42,6 +42,7 @@
       allowLocationSimulation = "YES">
       <PathRunnable
          runnableDebuggingMode = "0"
+         BundleIdentifier = "com.sketchup.SketchUp.2094"
          FilePath = "/Applications/SketchUp 2094/SketchUp.app">
       </PathRunnable>
       <MacroExpansion>
@@ -55,7 +56,7 @@
       </MacroExpansion>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "--args -rdebug &quot;ide port=7000&quot;"
+            argument = "-rdebug &quot;ide port=6123&quot;"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
