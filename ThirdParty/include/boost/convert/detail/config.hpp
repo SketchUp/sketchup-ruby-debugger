@@ -1,4 +1,4 @@
-// Copyright (c) 2009-2016 Vladimir Batov.
+// Copyright (c) 2009-2020 Vladimir Batov.
 // Use, modification and distribution are subject to the Boost Software License,
 // Version 1.0. See http://www.boost.org/LICENSE_1_0.txt.
 
@@ -8,6 +8,7 @@
 #include <boost/config.hpp>
 #include <boost/version.hpp>
 #include <boost/optional.hpp>
+#include <type_traits>
 
 #if defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) || defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
 #undef BOOST_CONVERT_CXX11
@@ -21,12 +22,12 @@
 #endif
 
 // No C++11 support
-#if defined(BOOST_GCC_VERSION) && (BOOST_GCC_VERSION <= 40600)
+#if defined(__GNUC__) && (__GNUC__ < 6)
 #   define BOOST_CONVERT_IS_NOT_SUPPORTED
 #endif
 
 // MSVC-11 and lower have broken SFINAE
-#if defined(BOOST_MSVC) && (BOOST_MSVC < 1800)
+#if defined(_MSVC_VER) && (_MSVC_VER < 1800)
 #   define BOOST_CONVERT_IS_NOT_SUPPORTED
 #endif
 
@@ -42,12 +43,13 @@
 //MSVC++ 14.0 _MSC_VER == 1900 (Visual Studio 2015)
 //MSVC++ 15.0 _MSC_VER == 1910 (Visual Studio 2017)
 
-#   pragma warning(disable: 4244)
-#   pragma warning(disable: 4224)
-#   pragma warning(disable: 4996)
-#   pragma warning(disable: 4180) // qualifier applied to function type has no meaning
 #   pragma warning(disable: 4100) // unreferenced formal parameter
 #   pragma warning(disable: 4146) // unary minus operator applied to unsigned type
+#   pragma warning(disable: 4180) // qualifier applied to function type has no meaning
+#   pragma warning(disable: 4224)
+#   pragma warning(disable: 4244)
+#   pragma warning(disable: 4800) // forcing value to bool
+#   pragma warning(disable: 4996)
 
 #if _MSC_VER < 1900 /* MSVC-14 defines real snprintf()... just about time! */
 #   define snprintf _snprintf

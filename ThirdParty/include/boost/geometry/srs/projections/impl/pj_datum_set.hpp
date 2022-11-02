@@ -3,8 +3,8 @@
 
 // Copyright (c) 2008-2012 Barend Gehrels, Amsterdam, the Netherlands.
 
-// This file was modified by Oracle on 2017, 2018, 2019.
-// Modifications copyright (c) 2017-2019, Oracle and/or its affiliates.
+// This file was modified by Oracle on 2017-2020.
+// Modifications copyright (c) 2017-2020, Oracle and/or its affiliates.
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Use, modification and distribution is subject to the Boost Software License,
@@ -103,7 +103,7 @@ inline const pj_datums_type<T>* pj_datum_find_datum(srs::dpar::parameters<T> con
 {
     typename srs::dpar::parameters<T>::const_iterator
         it = pj_param_find(params, srs::dpar::datum);
-    
+
     if (it != params.end())
     {
         const pj_datums_type<T>* pj_datums = pj_get_datums<T>().first;
@@ -146,7 +146,7 @@ struct pj_datum_find_datum_static
         }
         else
         {
-            // TODO: Implemnt as MPL_ASSERT instead
+            // TODO: Implemnt as BOOST_GEOMETRY_STATIC_ASSERT instead
             BOOST_THROW_EXCEPTION( projection_exception(error_unknown_ellp_param) );
         }
     }
@@ -161,12 +161,12 @@ struct pj_datum_find_datum_static<Params, Param, false>
     }
 };
 
-template <typename T, BOOST_GEOMETRY_PROJECTIONS_DETAIL_TYPENAME_PX>
-inline const pj_datums_type<T>* pj_datum_find_datum(srs::spar::parameters<BOOST_GEOMETRY_PROJECTIONS_DETAIL_PX> const& params)
+template <typename T, typename ...Ps>
+inline const pj_datums_type<T>* pj_datum_find_datum(srs::spar::parameters<Ps...> const& params)
 {
     return pj_datum_find_datum_static
         <
-            srs::spar::parameters<BOOST_GEOMETRY_PROJECTIONS_DETAIL_PX>
+            srs::spar::parameters<Ps...>
         >::template apply<T>(params);
 }
 
@@ -184,7 +184,7 @@ inline bool pj_datum_find_nadgrids(srs::detail::proj4_parameters const& params,
         {
             std::string::size_type end = snadgrids.find(',', i);
             std::string name = snadgrids.substr(i, end - i);
-                
+
             i = end;
             if (end != std::string::npos)
                 ++i;
@@ -207,7 +207,7 @@ inline bool pj_datum_find_nadgrids(srs::dpar::parameters<T> const& params,
     {
         out = it->template get_value<srs::detail::nadgrids>();
     }
-    
+
     return ! out.empty();
 }
 
@@ -219,13 +219,13 @@ template
             Params,
             srs::spar::detail::is_param<srs::spar::nadgrids>::pred
         >::value,
-    int N = boost::tuples::length<Params>::value
+    int N = geometry::tuples::size<Params>::value
 >
 struct pj_datum_find_nadgrids_static
 {
     static void apply(Params const& params, srs::detail::nadgrids & out)
     {
-        out = boost::tuples::get<I>(params);
+        out = geometry::tuples::get<I>(params);
     }
 };
 template <typename Params, int N>
@@ -235,13 +235,13 @@ struct pj_datum_find_nadgrids_static<Params, N, N>
     {}
 };
 
-template <BOOST_GEOMETRY_PROJECTIONS_DETAIL_TYPENAME_PX>
-inline bool pj_datum_find_nadgrids(srs::spar::parameters<BOOST_GEOMETRY_PROJECTIONS_DETAIL_PX> const& params,
+template <typename ...Ps>
+inline bool pj_datum_find_nadgrids(srs::spar::parameters<Ps...> const& params,
                                    srs::detail::nadgrids & out)
 {
     pj_datum_find_nadgrids_static
         <
-            srs::spar::parameters<BOOST_GEOMETRY_PROJECTIONS_DETAIL_PX>
+            srs::spar::parameters<Ps...>
         >::apply(params, out);
 
     return ! out.empty();
@@ -284,7 +284,7 @@ inline bool pj_datum_find_towgs84(srs::dpar::parameters<T> const& params,
 {
     typename srs::dpar::parameters<T>::const_iterator
         it = pj_param_find(params, srs::dpar::towgs84);
-    
+
     if (it != params.end())
     {
         srs::detail::towgs84<T> const&
@@ -314,15 +314,15 @@ template
             Params,
             srs::spar::detail::is_param_t<srs::spar::towgs84>::pred
         >::value,
-    int N = boost::tuples::length<Params>::value
+    int N = geometry::tuples::size<Params>::value
 >
 struct pj_datum_find_towgs84_static
 {
     template <typename T>
     static void apply(Params const& params, srs::detail::towgs84<T> & out)
     {
-        typename boost::tuples::element<I, Params>::type const&
-            towgs84 = boost::tuples::get<I>(params);
+        typename geometry::tuples::element<I, Params>::type const&
+            towgs84 = geometry::tuples::get<I>(params);
 
         std::size_t n = (std::min<std::size_t>)(towgs84.size(), 7u);
         std::size_t z = n <= 3 ? 3 : 7;
@@ -345,13 +345,13 @@ struct pj_datum_find_towgs84_static<Params, N, N>
     {}
 };
 
-template <typename T, BOOST_GEOMETRY_PROJECTIONS_DETAIL_TYPENAME_PX>
-inline bool pj_datum_find_towgs84(srs::spar::parameters<BOOST_GEOMETRY_PROJECTIONS_DETAIL_PX> const& params,
+template <typename T, typename ...Ps>
+inline bool pj_datum_find_towgs84(srs::spar::parameters<Ps...> const& params,
                                   srs::detail::towgs84<T> & out)
 {
     pj_datum_find_towgs84_static
         <
-            srs::spar::parameters<BOOST_GEOMETRY_PROJECTIONS_DETAIL_PX>
+            srs::spar::parameters<Ps...>
         >::apply(params, out);
 
     return ! out.empty();

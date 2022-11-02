@@ -5,8 +5,8 @@
 // Copyright (c) 2009-2014 Mateusz Loskot, London, UK.
 // Copyright (c) 2013-2014 Adam Wulkiewicz, Lodz, Poland.
 
-// This file was modified by Oracle on 2013-2017.
-// Modifications copyright (c) 2013-2017, Oracle and/or its affiliates.
+// This file was modified by Oracle on 2013-2020.
+// Modifications copyright (c) 2013-2020, Oracle and/or its affiliates.
 
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 // Contributed and/or modified by Menelaos Karavelas, on behalf of Oracle
@@ -24,9 +24,6 @@
 #include <cstddef>
 #include <deque>
 
-#include <boost/range.hpp>
-#include <boost/geometry/util/range.hpp>
-
 #include <boost/geometry/core/point_type.hpp>
 #include <boost/geometry/core/tag.hpp>
 #include <boost/geometry/core/tags.hpp>
@@ -35,6 +32,8 @@
 #include <boost/geometry/algorithms/detail/overlay/get_turns.hpp>
 #include <boost/geometry/algorithms/detail/overlay/do_reverse.hpp>
 #include <boost/geometry/algorithms/detail/overlay/segment_as_subrange.hpp>
+
+#include <boost/geometry/geometries/helper_geometry.hpp>
 
 #include <boost/geometry/policies/disjoint_interrupt_policy.hpp>
 #include <boost/geometry/policies/robustness/no_rescale_policy.hpp>
@@ -68,8 +67,8 @@ struct disjoint_segment
 
         detail::segment_as_subrange<Segment1> sub_range1(segment1);
         detail::segment_as_subrange<Segment2> sub_range2(segment2);
-        intersection_return_type is = strategy.apply(sub_range1, sub_range2,
-                                                     intersection_policy());
+        intersection_return_type is = strategy.relate().apply(sub_range1, sub_range2,
+                                                              intersection_policy());
 
         return is.count == 0;
     }
@@ -82,6 +81,7 @@ struct assign_disjoint_policy
     static bool const include_no_turn = true;
     static bool const include_degenerate = true;
     static bool const include_opposite = true;
+    static bool const include_start_turn = false;
 };
 
 
@@ -93,20 +93,21 @@ struct disjoint_linear
                              Geometry2 const& geometry2,
                              Strategy const& strategy)
     {
-        typedef typename geometry::point_type<Geometry1>::type point_type;
-        typedef geometry::segment_ratio
+        using point_type = typename geometry::point_type<Geometry1>::type;
+        using mutable_point_type = typename helper_geometry<point_type>::type;
+        using ratio_type = geometry::segment_ratio
             <
                 typename coordinate_type<point_type>::type
-            > ratio_type;
-        typedef overlay::turn_info
+            > ;
+        using turn_info_type = overlay::turn_info
             <
-                point_type,
+                mutable_point_type,
                 ratio_type,
                 typename detail::get_turns::turn_operation_type
                         <
-                            Geometry1, Geometry2, ratio_type
+                            Geometry1, Geometry2, mutable_point_type, ratio_type
                         >::type
-            > turn_info_type;
+            >;
 
         std::deque<turn_info_type> turns;
 

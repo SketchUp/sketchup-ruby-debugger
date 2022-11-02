@@ -15,12 +15,14 @@
 #ifndef BOOST_SIGNALS2_PREPROCESSED_SIGNAL_HPP
 #define BOOST_SIGNALS2_PREPROCESSED_SIGNAL_HPP
 
+#include <boost/config.hpp>
 #include <boost/preprocessor/arithmetic.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/control/expr_if.hpp>
 #include <boost/preprocessor/iteration.hpp>
 #include <boost/preprocessor/repetition.hpp>
 #include <boost/signals2/detail/preprocessed_arg_type.hpp>
+#include <boost/smart_ptr/make_shared.hpp>
 #include <boost/type_traits/add_reference.hpp>
 #include <boost/type_traits/is_void.hpp> 
 #include <boost/utility/enable_if.hpp>
@@ -51,8 +53,8 @@ namespace boost
         base_type(combiner_arg, group_compare)
       {}
 #if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES) && BOOST_WORKAROUND(BOOST_MSVC, < 1800)
-      signal(signal && other) : base_type(std::move(other)) {}
-      signal & operator=(signal && other) { base_type::operator=(std::move(other)); return *this; }
+      signal(signal && other) BOOST_NOEXCEPT: base_type(std::move(other)) {}
+      signal & operator=(signal && other) BOOST_NOEXCEPT{ base_type::operator=(std::move(other)); return *this; }
 #endif
     };
   }

@@ -6,6 +6,7 @@
 #ifndef BOOST_MATH_TOOLS_CONDITION_NUMBERS_HPP
 #define BOOST_MATH_TOOLS_CONDITION_NUMBERS_HPP
 #include <cmath>
+#include <limits>
 #include <boost/math/differentiation/finite_difference.hpp>
 
 namespace boost::math::tools {
@@ -79,7 +80,7 @@ private:
 };
 
 template<class F, class Real>
-auto evaluation_condition_number(F const & f, Real const & x)
+Real evaluation_condition_number(F const & f, Real const & x)
 {
     using std::abs;
     using std::isnan;
@@ -93,15 +94,18 @@ auto evaluation_condition_number(F const & f, Real const & x)
     }
     bool caught_exception = false;
     Real fp;
+#ifndef BOOST_NO_EXCEPTIONS
     try
     {
+#endif
         fp = finite_difference_derivative(f, x);
+#ifndef BOOST_NO_EXCEPTIONS
     }
     catch(...)
     {
         caught_exception = true;
     }
-
+#endif
     if (isnan(fp) || caught_exception)
     {
         // Check if the right derivative exists:

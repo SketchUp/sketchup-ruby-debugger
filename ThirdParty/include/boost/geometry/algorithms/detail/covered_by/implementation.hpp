@@ -4,8 +4,8 @@
 // Copyright (c) 2008-2012 Bruno Lalande, Paris, France.
 // Copyright (c) 2009-2012 Mateusz Loskot, London, UK.
 
-// This file was modified by Oracle on 2013, 2014, 2017, 2019.
-// Modifications copyright (c) 2013-2019 Oracle and/or its affiliates.
+// This file was modified by Oracle on 2013-2022.
+// Modifications copyright (c) 2013-2022 Oracle and/or its affiliates.
 
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
@@ -23,6 +23,9 @@
 #include <boost/core/ignore_unused.hpp>
 #include <boost/geometry/algorithms/detail/covered_by/interface.hpp>
 #include <boost/geometry/algorithms/detail/within/implementation.hpp>
+#include <boost/geometry/strategies/relate/cartesian.hpp>
+#include <boost/geometry/strategies/relate/geographic.hpp>
+#include <boost/geometry/strategies/relate/spherical.hpp>
 
 
 namespace boost { namespace geometry
@@ -45,11 +48,12 @@ struct use_relate
     template <typename Geometry1, typename Geometry2, typename Strategy>
     static inline bool apply(Geometry1 const& geometry1, Geometry2 const& geometry2, Strategy const& strategy)
     {
-        typedef typename detail::de9im::static_mask_covered_by_type
+        return detail::relate::relate_impl
             <
-                Geometry1, Geometry2
-            >::type covered_by_mask;
-        return geometry::relate(geometry1, geometry2, covered_by_mask(), strategy);
+                detail::de9im::static_mask_covered_by_type,
+                Geometry1,
+                Geometry2
+            >::apply(geometry1, geometry2, strategy);
     }
 };
 
@@ -66,8 +70,7 @@ struct covered_by<Point, Box, point_tag, box_tag>
     template <typename Strategy>
     static inline bool apply(Point const& point, Box const& box, Strategy const& strategy)
     {
-        ::boost::ignore_unused(strategy);
-        return strategy.apply(point, box);
+        return strategy.covered_by(point, box).apply(point, box);
     }
 };
 
@@ -78,8 +81,7 @@ struct covered_by<Box1, Box2, box_tag, box_tag>
     static inline bool apply(Box1 const& box1, Box2 const& box2, Strategy const& strategy)
     {
         assert_dimension_equal<Box1, Box2>();
-        ::boost::ignore_unused(strategy);
-        return strategy.apply(box1, box2);
+        return strategy.covered_by(box1, box2).apply(box1, box2);
     }
 };
 
