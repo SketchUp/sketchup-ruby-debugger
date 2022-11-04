@@ -5,7 +5,7 @@ This is a Ruby debugger framework for SketchUp 2014 and later. The `ruby-debug-i
 
 | IDE | Stable (1.2.0) | Stable (1.3.0) | Stable (1.4.0) | Stable (1.5.0) |
 | --- | --- | --- | --- | --- |
-| [RubyMine](https://github.com/SketchUp/sketchup-ruby-api-tutorials/wiki/RubyMine-Debugger-Setup) | *Untested* | *Untested* | *Untested* | *Untested* |
+| [RubyMine](https://github.com/SketchUp/sketchup-ruby-api-tutorials/wiki/RubyMine-Debugger-Setup) | *Untested* | Good | Good | Good |
 | [VS Code](https://github.com/SketchUp/sketchup-ruby-api-tutorials/wiki/VSCode-Debugger-Setup) (with `vscode-ruby` extension) | Not supported | Good | Good | Good |
 
 ## Instructions for Windows:
