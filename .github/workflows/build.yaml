@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - dev/ruby31
+      - dev/ruby32
       - dev/actions
   pull_request:
 
