@@ -9,6 +9,7 @@ This is a Ruby debugger framework for SketchUp 2014 and later. The `ruby-debug-i
 | [VS Code](https://github.com/SketchUp/sketchup-ruby-api-tutorials/wiki/VSCode-Debugger-Setup) (with `vscode-ruby` extension) | Not supported | Good | Good | Good |
 
 ## Instructions for Windows:
+
 - Download the pre-built dynamic library (SURubyDebugger.dll) from the [latest release](https://github.com/SketchUp/sketchup-ruby-debugger/releases) or build from the sources.
 - Copy the DLL into the SketchUp installation directory. As the exact path will depend on the version of SketchUp you have installed, look for a folder similar to the following:
 ```
@@ -22,6 +23,7 @@ SketchUp.exe -rdebug "ide port=6123"
 ```
 
 ## Instructions for Mac OS X:
+
 - Install SketchUp 2014 Maintenance 1 Release (version 14.1.1283) or later.
 - Download `SURubyDebugger.dylib` into the Frameworks directory of the app bundle:
 ```
@@ -49,6 +51,7 @@ sudo lsof -i -P | grep LISTEN | grep :$PORT
 ```
 
 ## Command-line arguments:
+
 When launching SketchUp with debugging enabled, the following command-line arguments are supported:
 
 ```
@@ -60,6 +63,7 @@ When launching SketchUp with debugging enabled, the following command-line argum
 - `wait` - Instructs the SketchUp debugger to wait for an initial connection from an IDE before allowing execution to continue. This is necessary to debug scripts that run automatically, for instance when an extension is loaded. When using this option, the SketchUp process will appear to be frozen until an IDE is attached.
 
 ## Notes:
+
 While most common debugging functionality has been implemented, there are few TODOs:
 - Debugging of multi-threaded execution
 - Function breakpoints
