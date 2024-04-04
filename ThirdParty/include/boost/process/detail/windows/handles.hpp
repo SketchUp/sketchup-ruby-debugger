@@ -11,6 +11,7 @@
 #include <boost/process/detail/windows/handle_workaround.hpp>
 #include <boost/process/detail/windows/handler.hpp>
 #include <boost/winapi/get_current_process_id.hpp>
+#include <boost/winapi/handles.hpp>
 
 namespace boost { namespace process { namespace detail {
 
@@ -136,7 +137,7 @@ struct limit_handles_ : handler_base_ext
                 [&](::boost::winapi::HANDLE_ handle)
                 {
                     auto itr = std::find(all_handles.begin(), all_handles .end(), handle);
-                    DWORD flags = 0u;
+                    ::boost::winapi::DWORD_ flags = 0u;
                     if (itr != all_handles.end())
                         *itr = ::boost::winapi::INVALID_HANDLE_VALUE_;
                     else if ((::boost::winapi::GetHandleInformation(*itr, &flags) != 0)

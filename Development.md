@@ -20,3 +20,7 @@ TODO:
 3. Tag commit it was built from.
 4. Upload binaries to GitHub Releases.
 5. Update README.md to refer to new download URL and versions.
+
+## Automation
+
+TODO: Setup action to publish release no GitHub when creating new tag. https://trstringer.com/github-actions-create-release-upload-artifacts/

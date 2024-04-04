@@ -7,6 +7,7 @@
 
 #include <Common/BreakPoint.h>
 
+#include <functional>
 #include <map>
 #include <vector>
 

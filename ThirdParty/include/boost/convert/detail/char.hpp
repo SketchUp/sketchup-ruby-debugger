@@ -1,4 +1,4 @@
-// Copyright (c) 2009-2016 Vladimir Batov.
+// Copyright (c) 2009-2020 Vladimir Batov.
 // Use, modification and distribution are subject to the Boost Software License,
 // Version 1.0. See http://www.boost.org/LICENSE_1_0.txt.
 
@@ -6,15 +6,15 @@
 #define BOOST_CONVERT_DETAIL_IS_CHAR_HPP
 
 #include <boost/convert/detail/config.hpp>
-#include <type_traits>
 #include <cctype>
 #include <cwctype>
 
-namespace boost { namespace cnv
+namespace boost::cnv
 {
     using  char_type = char;
     using uchar_type = unsigned char;
     using wchar_type = wchar_t;
+    using  char_cptr = char const*;
 
     namespace detail
     {
@@ -33,7 +33,7 @@ namespace boost { namespace cnv
     template<> inline  char_type to_upper ( char_type c) { return std::toupper(static_cast<uchar_type>(c)); }
     template<> inline uchar_type to_upper (uchar_type c) { return std::toupper(c); }
     template<> inline wchar_type to_upper (wchar_type c) { return std::towupper(c); }
-}}
+}
 
 #endif // BOOST_CONVERT_DETAIL_IS_CHAR_HPP
 

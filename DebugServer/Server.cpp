@@ -1,7 +1,18 @@
-// SketchUp Ruby API Debugger. Copyright 2013 Trimble Navigation Ltd.
+// SketchUp Ruby API Debugger. Copyright 2013-2022 Trimble Inc.
 // Authors:
 // - Bugra Barin
-//
+// - Thomas Thomassen
+
+// Ruby keeps messing with the global namespace.
+// In this case it redefines memcpy which causes problems for boost.
+// This kludge of undefining memcpy after the Ruby headers allows the
+// standard memcpy to be available to boost.
+#include <ruby.h>
+#include <ruby/debug.h>
+#include <ruby/encoding.h>
+// Undo things Ruby do to the global namespace.
+#undef memcpy
+
 #include "./Server.h"
 #include "./DebuggerSettings.h"
 #include "./FindSubstringCaseInsensitive.h"
@@ -9,10 +20,6 @@
 
 #include <Common/BreakPoint.h>
 #include <Common/StackFrame.h>
-
-#include <ruby.h>
-#include <ruby/debug.h>
-#include <ruby/encoding.h>
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wcomma"

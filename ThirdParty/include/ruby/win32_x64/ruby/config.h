@@ -1,7 +1,7 @@
 #ifndef INCLUDE_RUBY_CONFIG_H
 #define INCLUDE_RUBY_CONFIG_H 1
-#if _MSC_VER < 1920
-#warning MSC version unmatch: _MSC_VER: >= 1920 is expected.
+#if (_MSC_VER < 1920) || (_MSC_VER > 1939)
+#error MSC version unmatch: 1920..1939 is expected.
 #endif
 #define RUBY_MSVCRT_VERSION 140
 #define STDC_HEADERS 1
@@ -12,14 +12,21 @@
 #define HAVE_STDDEF_H 1
 #define HAVE_STRING_H 1
 #define HAVE_MEMORY_H 1
+#define HAVE_AFUNIX_H 1
 #define HAVE_LONG_LONG 1
 #define HAVE_OFF_T 1
+#define rb_off_t __int64
+#define SIGNEDNESS_OF_OFF_T -1
+#define OFFT2NUM(v) LL2NUM(v)
+#define NUM2OFFT(v) NUM2LL(v)
 #define SIZEOF_INT 4
 #define SIZEOF_SHORT 2
 #define SIZEOF_LONG 4
 #define SIZEOF_LONG_LONG 8
 #define SIZEOF___INT64 8
+#ifndef _INTEGRAL_MAX_BITS
 #define _INTEGRAL_MAX_BITS 64
+#endif
 #define SIZEOF_OFF_T 8
 #define SIZEOF_VOIDP 8
 #define SIZEOF_FLOAT 4
@@ -37,20 +44,15 @@
 #define SIZEOF_PTRDIFF_T 8
 #define SIZEOF_INTPTR_T 8
 #define SIZEOF_UINTPTR_T 8
-#define HAVE_PROTOTYPES 1
-#define TOKEN_PASTE(x,y) x##y
-#define HAVE_STDARG_PROTOTYPES 1
 #define HAVE_VA_COPY 1
 #define NORETURN(x) __declspec(noreturn) x
 #define DEPRECATED(x) __declspec(deprecated) x
-#define DEPRECATED_TYPE(mesg, x) __declspec(deprecated mesg) x
 #define RUBY_CXX_DEPRECATED(mesg) __declspec(deprecated(mesg))
 #define NOINLINE(x) __declspec(noinline) x
 #define ALWAYS_INLINE(x) __forceinline x
 #define WARN_UNUSED_RESULT(x) x
 #define MAYBE_UNUSED(x) x
-#define UNREACHABLE __assume(0)
-#define ASSUME(x) __assume(!!(x))
+#define HAVE___ASSUME 1
 #define FUNC_STDCALL(x) __stdcall x
 #define FUNC_CDECL(x) __cdecl x
 #define FUNC_FASTCALL(x) __fastcall x
@@ -70,7 +72,6 @@
 #define rb_gid_t int
 #define rb_uid_t int
 #define HAVE_STRUCT_STAT_ST_RDEV 1
-#define HAVE_ST_RDEV 1
 #define HAVE_STRUCT_TIMEVAL 1
 #define HAVE_STRUCT_TIMESPEC
 #define HAVE_STDINT_H 1
@@ -98,7 +99,6 @@
 #define PRI_LL_PREFIX "I64"
 #define PRI_PIDT_PREFIX PRI_INT_PREFIX
 #define GETGROUPS_T int
-#define RETSIGTYPE void
 #define TYPEOF_TIMEVAL_TV_SEC long
 #define HAVE_ACOSH 1
 #define HAVE_ASINH 1
@@ -157,27 +157,47 @@
 #define HAVE_TZNAME 1
 #define HAVE_DAYLIGHT 1
 #define HAVE_GMTIME_R 1
+#define HAVE_CHMOD 1
+#define HAVE_CHOWN 1
+#define HAVE_DUP 1
+#define HAVE_EXECL 1
+#define HAVE_EXECLE 1
+#define HAVE_EXECV 1
+#define HAVE_EXECVE 1
+#define HAVE_GETEGID 1
+#define HAVE_GETEUID 1
+#define HAVE_GETGID 1
+#define HAVE_GETUID 1
+#define HAVE_PCLOSE 1
+#define HAVE_PIPE 1
+#define HAVE_POPEN 1
+#define HAVE_SHUTDOWN 1
+#define HAVE_SYSTEM 1
+#define HAVE_TZSET 1
+#define HAVE_UMASK 1
 #define HAVE_QSORT_S
 #define HAVE_TYPE_NET_LUID 1
+#define HAVE_NULLPTR 1
 #define SETPGRP_VOID 1
 #define RSHIFT(x,y) ((x)>>(int)y)
 #define HAVE_RB_FD_INIT 1
 #define RUBY_SETJMP(env) _setjmp(env)
 #define RUBY_LONGJMP(env,val) longjmp(env,val)
 #define RUBY_JMP_BUF jmp_buf
-// #define inline __inline
 #ifndef __cplusplus
+// #define inline __inline
 #define restrict __restrict
 #endif
 #define NEED_IO_SEEK_BETWEEN_RW 1
 #define STACK_GROW_DIRECTION -1
 #define COROUTINE_H "coroutine/win64/Context.h"
-#define DEFAULT_KCODE KCODE_NONE
+#define THREAD_IMPL_H "thread_win32.h"
+#define THREAD_IMPL_SRC "thread_win32.c"
 #define LOAD_RELATIVE 1
 #define DLEXT ".so"
 #define EXECUTABLE_EXTS ".exe",".com",".cmd",".bat"
 #define RUBY_COREDLL "vcruntime140"
 #define RUBY_PLATFORM "x64-mswin64_140"
 #define RUBY_SITEARCH "x64-vcruntime140"
-#define USE_MJIT 1
+#define USE_MJIT 0
 #endif /* INCLUDE_RUBY_CONFIG_H */

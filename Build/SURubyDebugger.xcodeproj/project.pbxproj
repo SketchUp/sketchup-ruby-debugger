@@ -22,7 +22,21 @@
 		33CC243418D57BE30079FC3E /* StackFrame.h in Headers */ = {isa = PBXBuildFile; fileRef = 33CC243218D57BE30079FC3E /* StackFrame.h */; };
 		33CC243B18D5808E0079FC3E /* Ruby.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33CC243918D5808E0079FC3E /* Ruby.framework */; };
 		CE5F5B2125123C3300237692 /* IDebuggerUI.h in Headers */ = {isa = PBXBuildFile; fileRef = CE5F5B2025123C3300237692 /* IDebuggerUI.h */; };
+		F9D3F8562912B20000BE62A9 /* SURubyDebugger.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33CC241118D57AB80079FC3E /* SURubyDebugger.dylib */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F9D3F8552912B1E700BE62A9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "/Applications/SketchUp 2094/SketchUp.app/Contents/Frameworks";
+			dstSubfolderSpec = 0;
+			files = (
+				F9D3F8562912B20000BE62A9 /* SURubyDebugger.dylib in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		33B5057B18D65A33000C89F1 /* DebugServerExports.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DebugServerExports.cpp; path = ../DebugServer/DebugServerExports.cpp; sourceTree = "<group>"; };
@@ -147,6 +161,7 @@
 				33CC240D18D57AB80079FC3E /* Sources */,
 				33CC240E18D57AB80079FC3E /* Frameworks */,
 				33CC240F18D57AB80079FC3E /* Headers */,
+				F9D3F8552912B1E700BE62A9 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -163,7 +178,7 @@
 		33CC240818D57AB80079FC3E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1250;
+				LastUpgradeCheck = 1310;
 				ORGANIZATIONNAME = "Bugra Barin";
 			};
 			buildConfigurationList = 33CC240B18D57AB80079FC3E /* Build configuration list for PBXProject "SURubyDebugger" */;
@@ -308,6 +323,7 @@
 					"$(SRCROOT)/../ThirdParty/include",
 					"$(SRCROOT)/../ThirdParty/include/ruby/mac",
 				);
+				OTHER_CFLAGS = "-fdeclspec";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -325,6 +341,7 @@
 					"$(SRCROOT)/../ThirdParty/include",
 					"$(SRCROOT)/../ThirdParty/include/ruby/mac",
 				);
+				OTHER_CFLAGS = "-fdeclspec";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

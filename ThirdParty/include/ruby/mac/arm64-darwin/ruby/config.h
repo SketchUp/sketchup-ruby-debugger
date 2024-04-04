@@ -1,24 +1,42 @@
 #ifndef INCLUDE_RUBY_CONFIG_H
 #define INCLUDE_RUBY_CONFIG_H 1
 /* confdefs.h */
-#define STDC_HEADERS 1
-#define HAVE_SYS_TYPES_H 1
-#define HAVE_SYS_STAT_H 1
+#define HAVE_STDIO_H 1
 #define HAVE_STDLIB_H 1
 #define HAVE_STRING_H 1
-#define HAVE_MEMORY_H 1
-#define HAVE_STRINGS_H 1
 #define HAVE_INTTYPES_H 1
 #define HAVE_STDINT_H 1
+#define HAVE_STRINGS_H 1
+#define HAVE_SYS_STAT_H 1
+#define HAVE_SYS_TYPES_H 1
 #define HAVE_UNISTD_H 1
-#define __EXTENSIONS__ 1
+#define HAVE_WCHAR_H 1
+#define STDC_HEADERS 1
 #define _ALL_SOURCE 1
+#define _DARWIN_C_SOURCE 1
 #define _GNU_SOURCE 1
+#define _HPUX_ALT_XOPEN_SOCKET_API 1
+#define _NETBSD_SOURCE 1
+#define _OPENBSD_SOURCE 1
 #define _POSIX_PTHREAD_SEMANTICS 1
+#define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
+#define __STDC_WANT_IEC_60559_BFP_EXT__ 1
+#define __STDC_WANT_IEC_60559_DFP_EXT__ 1
+#define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
+#define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
+#define __STDC_WANT_LIB_EXT2__ 1
+#define __STDC_WANT_MATH_SPEC_FUNCS__ 1
 #define _TANDEM_SOURCE 1
+#define __EXTENSIONS__ 1
 #define RUBY_SYMBOL_EXPORT_BEGIN _Pragma("GCC visibility push(default)")
 #define RUBY_SYMBOL_EXPORT_END _Pragma("GCC visibility pop")
 #define HAVE_STMT_AND_DECL_IN_EXPR 1
+#define HAVE_PTHREAD_H 1
+#define _REENTRANT 1
+#define _THREAD_SAFE 1
+#define HAVE_LIBPTHREAD 1
+#define THREAD_IMPL_H "thread_pthread.h"
+#define THREAD_IMPL_SRC "thread_pthread.c"
 #define BROKEN_CRYPT 1
 #define HAVE_CRT_EXTERNS_H 1
 #define HAVE_LIBDL 1
@@ -38,11 +56,13 @@
 #define HAVE_SANITIZER_ASAN_INTERFACE_H 1
 #define HAVE_SANITIZER_MSAN_INTERFACE_H 1
 #define HAVE_STDALIGN_H 1
+#define HAVE_STDIO_H 1
 #define HAVE_SYS_ATTR_H 1
 #define HAVE_SYS_FCNTL_H 1
 #define HAVE_SYS_FILE_H 1
 #define HAVE_SYS_IOCTL_H 1
 #define HAVE_SYS_PARAM_H 1
+#define HAVE_SYS_RANDOM_H 1
 #define HAVE_SYS_RESOURCE_H 1
 #define HAVE_SYS_SELECT_H 1
 #define HAVE_SYS_SOCKET_H 1
@@ -53,7 +73,7 @@
 #define HAVE_UCONTEXT_H 1
 #define HAVE_UTIME_H 1
 #define HAVE_TYPEOF 1
-#define restrict __restrict
+#define restrict __restrict__
 #define HAVE_LONG_LONG 1
 #define HAVE_OFF_T 1
 #define SIZEOF_INT 4
@@ -125,19 +145,13 @@
 #define CLOCKID2NUM(v) UINT2NUM(v)
 #define NUM2CLOCKID(v) NUM2UINT(v)
 #define PRI_CLOCKID_PREFIX PRI_INT_PREFIX
-#define HAVE_PROTOTYPES 1
-#define TOKEN_PASTE(x,y) x##y
-#define STRINGIZE(expr) STRINGIZE0(expr)
-#define HAVE_STDARG_PROTOTYPES 1
 #define HAVE_VA_ARGS_MACRO 1
-#define RUBY_ALIGNAS(x) __attribute__((__aligned__(x)))
-#define RUBY_ALIGNOF alignof
+#define HAVE__ALIGNOF 1
 #define CONSTFUNC(x) __attribute__ ((__const__)) x
 #define PUREFUNC(x) __attribute__ ((__pure__)) x
 #define NORETURN(x) __attribute__ ((__noreturn__)) x
 #define DEPRECATED(x) __attribute__ ((__deprecated__)) x
 #define DEPRECATED_BY(n,x) __attribute__ ((__deprecated__("by "#n))) x
-#define DEPRECATED_TYPE(mesg,x) x __attribute__ ((__deprecated__ mesg))
 #define NOINLINE(x) __attribute__ ((__noinline__)) x
 #define ALWAYS_INLINE(x) __attribute__ ((__always_inline__)) x
 #define NO_SANITIZE(san, x) __attribute__ ((__no_sanitize__(san))) x
@@ -145,13 +159,16 @@
 #define NO_ADDRESS_SAFETY_ANALYSIS(x) __attribute__ ((__no_address_safety_analysis__)) x
 #define WARN_UNUSED_RESULT(x) __attribute__ ((__warn_unused_result__)) x
 #define MAYBE_UNUSED(x) __attribute__ ((__unused__)) x
+#define ERRORFUNC(mesg,x) __attribute__ ((__error__ mesg)) x
+#define WARNINGFUNC(mesg,x) __attribute__ ((__warning__ mesg)) x
 #define WEAK(x) __attribute__ ((__weak__)) x
 #define HAVE_FUNC_WEAK 1
 #define RUBY_CXX_DEPRECATED(msg) __attribute__((__deprecated__(msg)))
+#define HAVE_NULLPTR 1
 #define FUNC_CDECL(x) __attribute__ ((__cdecl__)) x
 #define HAVE_GCC_ATOMIC_BUILTINS 1
 #define HAVE_GCC_SYNC_BUILTINS 1
-#define UNREACHABLE __builtin_unreachable()
+#define HAVE___BUILTIN_UNREACHABLE 1
 #define RUBY_FUNC_EXPORTED __attribute__ ((__visibility__("default"))) extern
 #define RUBY_FUNC_NONNULL(n,x) __attribute__ ((__nonnull__(n))) x
 #define RUBY_FUNCTION_NAME_STRING __func__
@@ -160,17 +177,17 @@
 #define HAVE_DECL_GETENV 1
 #define SIZEOF_SIZE_T 8
 #define SIZEOF_PTRDIFF_T 8
+#define SIZEOF_DEV_T 4
 #define PRI_SIZE_PREFIX "z"
 #define PRI_PTRDIFF_PREFIX "t"
 #define HAVE_STRUCT_STAT_ST_BLKSIZE 1
-#define HAVE_ST_BLKSIZE 1
 #define HAVE_STRUCT_STAT_ST_BLOCKS 1
-#define HAVE_ST_BLOCKS 1
 #define HAVE_STRUCT_STAT_ST_RDEV 1
-#define HAVE_ST_RDEV 1
 #define SIZEOF_STRUCT_STAT_ST_SIZE SIZEOF_OFF_T
 #define SIZEOF_STRUCT_STAT_ST_BLOCKS SIZEOF_OFF_T
 #define SIZEOF_STRUCT_STAT_ST_INO SIZEOF_LONG
+#define SIZEOF_STRUCT_STAT_ST_DEV SIZEOF_DEV_T
+#define SIZEOF_STRUCT_STAT_ST_RDEV SIZEOF_DEV_T
 #define HAVE_STRUCT_STAT_ST_ATIMESPEC 1
 #define HAVE_STRUCT_STAT_ST_MTIMESPEC 1
 #define HAVE_STRUCT_STAT_ST_CTIMESPEC 1
@@ -211,13 +228,13 @@
 #define SIZEOF_SSIZE_T 8
 #define PRI_64_PREFIX "ll"
 #define GETGROUPS_T gid_t
-#define RETSIGTYPE void
 #define HAVE_ALLOCA_H 1
 #define HAVE_ALLOCA 1
+#define HAVE_DUP 1
+#define HAVE_DUP2 1
 #define HAVE_ACOSH 1
 #define HAVE_CBRT 1
 #define HAVE_CRYPT 1
-#define HAVE_DUP2 1
 #define HAVE_ERF 1
 #define HAVE_FFS 1
 #define HAVE_FLOCK 1
@@ -232,8 +249,7 @@
 #define HAVE_STRLCPY 1
 #define HAVE_STRSTR 1
 #define HAVE_TGAMMA 1
-#define HAVE_ISINF 1
-#define HAVE_ISNAN 1
+#define HAVE_ISFINITE 1
 #define SPT_TYPE SPT_REUSEARGV
 #define HAVE_SIGNBIT 1
 #define HAVE_FORK 1
@@ -243,14 +259,19 @@
 #define HAVE_ARC4RANDOM_BUF 1
 #define HAVE_ATAN2L 1
 #define HAVE_ATAN2F 1
+#define HAVE_CHMOD 1
+#define HAVE_CHOWN 1
 #define HAVE_CHROOT 1
 #define HAVE_CLOCK_GETTIME 1
 #define HAVE_COSH 1
 #define HAVE_DIRFD 1
 #define HAVE_DLOPEN 1
 #define HAVE_DLADDR 1
-#define HAVE_DUP 1
 #define HAVE_ENDGRENT 1
+#define HAVE_EXECL 1
+#define HAVE_EXECLE 1
+#define HAVE_EXECV 1
+#define HAVE_EXECVE 1
 #define HAVE_FCOPYFILE 1
 #define HAVE_FCHMOD 1
 #define HAVE_FCHOWN 1
@@ -263,21 +284,33 @@
 #define HAVE_FTRUNCATE 1
 #define HAVE_GETATTRLIST 1
 #define HAVE_GETCWD 1
+#define HAVE_GETEGID 1
+#define HAVE_GETENTROPY 1
+#define HAVE_GETEUID 1
+#define HAVE_GETGID 1
 #define HAVE_GETGRNAM 1
 #define HAVE_GETGRNAM_R 1
 #define HAVE_GETGROUPS 1
+#define HAVE_GETLOGIN 1
+#define HAVE_GETLOGIN_R 1
 #define HAVE_GETPGID 1
 #define HAVE_GETPGRP 1
+#define HAVE_GETPPID 1
 #define HAVE_GETPRIORITY 1
+#define HAVE_GETPWNAM 1
 #define HAVE_GETPWNAM_R 1
+#define HAVE_GETPWUID 1
+#define HAVE_GETPWUID_R 1
 #define HAVE_GETRLIMIT 1
 #define HAVE_GETSID 1
 #define HAVE_GETTIMEOFDAY 1
+#define HAVE_GETUID 1
 #define HAVE_GMTIME_R 1
 #define HAVE_GRANTPT 1
 #define HAVE_INITGROUPS 1
 #define HAVE_IOCTL 1
 #define HAVE_ISSETUGID 1
+#define HAVE_KILL 1
 #define HAVE_KILLPG 1
 #define HAVE_LCHMOD 1
 #define HAVE_LCHOWN 1
@@ -295,8 +328,13 @@
 #define HAVE_MKFIFO 1
 #define HAVE_MKNOD 1
 #define HAVE_MKTIME 1
+#define HAVE_MMAP 1
 #define HAVE_OPENAT 1
+#define HAVE_PCLOSE 1
+#define HAVE_PIPE 1
 #define HAVE_POLL 1
+#define HAVE_POPEN 1
+#define HAVE_POSIX_MADVISE 1
 #define HAVE_POSIX_MEMALIGN 1
 #define HAVE_PREAD 1
 #define HAVE_PWRITE 1
@@ -327,16 +365,21 @@
 #define HAVE_SINH 1
 #define HAVE_SYMLINK 1
 #define HAVE_SYSCONF 1
+#define HAVE_SYSTEM 1
 #define HAVE_TANH 1
 #define HAVE_TELLDIR 1
 #define HAVE_TIMEGM 1
 #define HAVE_TIMES 1
 #define HAVE_TRUNCATE 1
+#define HAVE_TZSET 1
+#define HAVE_UMASK 1
 #define HAVE_UNSETENV 1
 #define HAVE_UTIMENSAT 1
 #define HAVE_UTIMES 1
 #define HAVE_WAIT4 1
 #define HAVE_WAITPID 1
+#define HAVE___COSPI 1
+#define HAVE___SINPI 1
 #if !defined __STDC_WANT_LIB_EXT1__
 #define __STDC_WANT_LIB_EXT1__ 1
 #endif /* !defined __STDC_WANT_LIB_EXT1__ */
@@ -360,6 +403,7 @@
 #define HAVE_BUILTIN___BUILTIN_CHOOSE_EXPR_CONSTANT_P 1
 #define HAVE_BUILTIN___BUILTIN_TYPES_COMPATIBLE_P 1
 #define HAVE_BUILTIN___BUILTIN_TRAP 1
+#define HAVE_BUILTIN___BUILTIN_EXPECT 1
 #define HAVE_BSD_QSORT_R 1
 #define ATAN2_INF_C99 1
 #define HAVE_CLOCK_GETRES 1
@@ -374,28 +418,33 @@
 #define HAVE__SC_CLK_TCK 1
 #define STACK_GROW_DIRECTION -1
 #define COROUTINE_H "coroutine/arm64/Context.h"
-#define _REENTRANT 1
-#define _THREAD_SAFE 1
-#define HAVE_LIBPTHREAD 1
 #define HAVE_SCHED_YIELD 1
 #define HAVE_PTHREAD_ATTR_SETINHERITSCHED 1
 #define HAVE_PTHREAD_ATTR_GETSTACK 1
 #define HAVE_PTHREAD_ATTR_GETGUARDSIZE 1
 #define HAVE_PTHREAD_GET_STACKADDR_NP 1
 #define HAVE_PTHREAD_GET_STACKSIZE_NP 1
-#define HAVE_PTHREAD_SIGMASK 1
 #define HAVE_PTHREAD_SETNAME_NP 1
+#define HAVE_PTHREAD_SIGMASK 1
 #define SET_CURRENT_THREAD_NAME(name) pthread_setname_np(name)
 #define DEFINE_MCONTEXT_PTR(mc, uc) mcontext_t mc = (uc)->uc_mcontext
+#define HAVE_SYS_USER_H 1
+#define HAVE_CONST_PAGE_SIZE 0
+#define IOCTL_REQ_TYPE unsigned long
+#define NUM2IOCTLREQ(num) NUM2ULONG(num)
 #define HAVE_MACH_O_LOADER_H 1
+#define EXTSTATIC 1
 #define HAVE_LIBPROC_H 1
 #define HAVE_EXECINFO_H 1
 #define HAVE_LIBUNWIND_H 1
+#define HAVE_MACH_TASK_H 1
+#define HAVE_MACH_MACH_INIT_H 1
+#define HAVE_MACH_MACH_PORT_H 1
+#define HAVE_MACH_TASK_EXCEPTION_PORTS 1
 #define HAVE_BACKTRACE 1
 #define BROKEN_BACKTRACE 1
 #define DLEXT_MAXLEN 7
 #define DLEXT ".bundle"
-#define EXTSTATIC 1
 #define LIBDIR_BASENAME "lib"
 #define HAVE__SETJMP 1
 #define HAVE_SIGSETJMP 1
@@ -403,7 +452,7 @@
 #define RUBY_LONGJMP(env,val) siglongjmp((env),val)
 #define RUBY_JMP_BUF sigjmp_buf
 #define USE_MJIT 1
-#define HAVE_PTHREAD_H 1
+#define USE_YJIT 0
 #define LOAD_RELATIVE 1
-#define RUBY_PLATFORM "arm64-darwin20"
+#define RUBY_PLATFORM "arm64-darwin21"
 #endif /* INCLUDE_RUBY_CONFIG_H */
