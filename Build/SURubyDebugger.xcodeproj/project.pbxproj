@@ -313,6 +313,7 @@
 		33CC241618D57AB80079FC3E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = arm64;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -323,7 +324,7 @@
 					"$(SRCROOT)/../ThirdParty/include",
 					"$(SRCROOT)/../ThirdParty/include/ruby/mac",
 				);
-				OTHER_CFLAGS = "-fdeclspec";
+				OTHER_CFLAGS = "-fdeclspec -Wno-enum-constexpr-conversion";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -331,6 +332,7 @@
 		33CC241718D57AB80079FC3E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = arm64;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -341,7 +343,7 @@
 					"$(SRCROOT)/../ThirdParty/include",
 					"$(SRCROOT)/../ThirdParty/include/ruby/mac",
 				);
-				OTHER_CFLAGS = "-fdeclspec";
+				OTHER_CFLAGS = "-fdeclspec -Wno-enum-constexpr-conversion";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
