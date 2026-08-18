@@ -30,7 +30,7 @@
 RBIMPL_SYMBOL_EXPORT_BEGIN()
 
 /**
- * Identical to rb_enc_str_new(), except it additionally takes an encoding.
+ * Identical to rb_str_new(), except it additionally takes an encoding.
  *
  * @param[in]  ptr             A memory region of `len` bytes length.
  * @param[in]  len             Length  of `ptr`,  in bytes,  not including  the
@@ -307,13 +307,13 @@ RBIMPL_ATTR_NONNULL(())
 /**
  * Looks for the passed string in the passed buffer.
  *
- * @param[in]  x          Buffer that potentially includes `y`.
+ * @param[in]  x          Query string.
  * @param[in]  m          Number of bytes of `x`.
- * @param[in]  y          Query string.
+ * @param[in]  y          Buffer that potentially includes `x`.
  * @param[in]  n          Number of bytes of `y`.
  * @param[in]  enc        Encoding of both `x` and `y`.
  * @retval     -1         Not found.
- * @retval     otherwise  Found index in `x`.
+ * @retval     otherwise  Found index in `y`.
  * @note       This API can match at a non-character-boundary.
  */
 long rb_memsearch(const void *x, long m, const void *y, long n, rb_encoding *enc);

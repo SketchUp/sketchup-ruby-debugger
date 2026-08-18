@@ -1,5 +1,5 @@
-#ifndef RBIMPL_STDBOOL_H                             /*-*-C++-*-vi:se ft=cpp:*/
-#define RBIMPL_STDBOOL_H
+#ifndef RBIMPL_ATTR_PACKED_STRUCT_H                 /*-*-C++-*-vi:se ft=cpp:*/
+#define RBIMPL_ATTR_PACKED_STRUCT_H
 /**
  * @file
  * @author     Ruby developers <ruby-core@ruby-lang.org>
@@ -18,22 +18,26 @@
  *             Do not  expect for  instance `__VA_ARGS__` is  always available.
  *             We assume C99  for ruby itself but we don't  assume languages of
  *             extension libraries.  They could be written in C++98.
- * @brief      C99 shim for <stdbool.h>
+ * @brief      Defines #RBIMPL_ATTR_PACKED_STRUCT_BEGIN,
+ *             #RBIMPL_ATTR_PACKED_STRUCT_END,
+ *             #RBIMPL_ATTR_PACKED_STRUCT_UNALIGNED_BEGIN, and
+ *             #RBIMPL_ATTR_PACKED_STRUCT_UNALIGNED_END.
  */
 #include "ruby/internal/config.h"
 
-#if defined(__bool_true_false_are_defined)
-# /* Take that. */
-
-#elif defined(__cplusplus)
-# /* bool is a keyword in C++. */
-# ifndef __bool_true_false_are_defined
-#  define __bool_true_false_are_defined
-# endif
-
-#else
-# /* Take stdbool.h definition. It exists since GCC 3.0 and VS 2015. */
-# include <stdbool.h>
+#ifndef RBIMPL_ATTR_PACKED_STRUCT_BEGIN
+# define RBIMPL_ATTR_PACKED_STRUCT_BEGIN() /* void */
+#endif
+#ifndef RBIMPL_ATTR_PACKED_STRUCT_END
+# define RBIMPL_ATTR_PACKED_STRUCT_END() /* void */
 #endif
 
-#endif /* RBIMPL_STDBOOL_H */
+#if UNALIGNED_WORD_ACCESS
+# define RBIMPL_ATTR_PACKED_STRUCT_UNALIGNED_BEGIN() RBIMPL_ATTR_PACKED_STRUCT_BEGIN()
+# define RBIMPL_ATTR_PACKED_STRUCT_UNALIGNED_END() RBIMPL_ATTR_PACKED_STRUCT_END()
+#else
+# define RBIMPL_ATTR_PACKED_STRUCT_UNALIGNED_BEGIN() /* void */
+# define RBIMPL_ATTR_PACKED_STRUCT_UNALIGNED_END() /* void */
+#endif
+
+#endif

@@ -1,5 +1,5 @@
-#ifndef RBIMPL_STDBOOL_H                             /*-*-C++-*-vi:se ft=cpp:*/
-#define RBIMPL_STDBOOL_H
+#ifndef RBIMPL_ATTR_NONSTRING_H                        /*-*-C++-*-vi:se ft=cpp:*/
+#define RBIMPL_ATTR_NONSTRING_H
 /**
  * @file
  * @author     Ruby developers <ruby-core@ruby-lang.org>
@@ -18,22 +18,23 @@
  *             Do not  expect for  instance `__VA_ARGS__` is  always available.
  *             We assume C99  for ruby itself but we don't  assume languages of
  *             extension libraries.  They could be written in C++98.
- * @brief      C99 shim for <stdbool.h>
+ * @brief      Defines #RBIMPL_ATTR_NONSTRING.
  */
-#include "ruby/internal/config.h"
+#include "ruby/internal/has/attribute.h"
 
-#if defined(__bool_true_false_are_defined)
-# /* Take that. */
-
-#elif defined(__cplusplus)
-# /* bool is a keyword in C++. */
-# ifndef __bool_true_false_are_defined
-#  define __bool_true_false_are_defined
+/** Wraps (or simulates) `__attribute__((nonstring))` */
+#if RBIMPL_HAS_ATTRIBUTE(nonstring)
+# define RBIMPL_ATTR_NONSTRING() __attribute__((nonstring))
+# if RBIMPL_COMPILER_SINCE(GCC, 15, 0, 0)
+#   define RBIMPL_ATTR_NONSTRING_ARRAY() RBIMPL_ATTR_NONSTRING()
+# elif RBIMPL_COMPILER_SINCE(Clang, 21, 0, 0)
+#   define RBIMPL_ATTR_NONSTRING_ARRAY() RBIMPL_ATTR_NONSTRING()
+# else
+#   define RBIMPL_ATTR_NONSTRING_ARRAY() /* void */
 # endif
-
 #else
-# /* Take stdbool.h definition. It exists since GCC 3.0 and VS 2015. */
-# include <stdbool.h>
+# define RBIMPL_ATTR_NONSTRING() /* void */
+# define RBIMPL_ATTR_NONSTRING_ARRAY() /* void */
 #endif
 
-#endif /* RBIMPL_STDBOOL_H */
+#endif /* RBIMPL_ATTR_NONSTRING_H */
