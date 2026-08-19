@@ -29,7 +29,7 @@
 		F9D3F8552912B1E700BE62A9 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "/Applications/SketchUp 2094/SketchUp.app/Contents/Frameworks";
+			dstPath = "$(SKETCHUP_APP_PATH)/Contents/Frameworks";
 			dstSubfolderSpec = 0;
 			files = (
 				F9D3F8562912B20000BE62A9 /* SURubyDebugger.dylib in CopyFiles */,
@@ -326,6 +326,7 @@
 				);
 				OTHER_CFLAGS = "-fdeclspec -Wno-enum-constexpr-conversion";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKETCHUP_APP_PATH = "/Applications/SketchUp 2027/SketchUp.app";
 			};
 			name = Debug;
 		};
@@ -345,6 +346,7 @@
 				);
 				OTHER_CFLAGS = "-fdeclspec -Wno-enum-constexpr-conversion";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKETCHUP_APP_PATH = "/Applications/SketchUp 2027/SketchUp.app";
 			};
 			name = Release;
 		};
