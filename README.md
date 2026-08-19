@@ -13,7 +13,7 @@ This is a Ruby debugger framework for SketchUp 2014 and later. The `ruby-debug-i
 - Download the pre-built dynamic library (SURubyDebugger.dll) from the [latest release](https://github.com/SketchUp/sketchup-ruby-debugger/releases) or build from the sources.
 - Copy the DLL into the SketchUp installation directory. As the exact path will depend on the version of SketchUp you have installed, look for a folder similar to the following:
 ```
-C:\Program Files\SketchUp\SketchUp 2024\
+C:\Program Files\SketchUp\SketchUp 2027\
 
 C:\Program Files (x86)\SketchUp\SketchUp 2015\
 ```
@@ -27,15 +27,15 @@ SketchUp.exe -rdebug "ide port=6123"
 - Install SketchUp 2014 Maintenance 1 Release (version 14.1.1283) or later.
 - Download `SURubyDebugger.dylib` into the Frameworks directory of the app bundle:
 ```
-curl -L https://github.com/SketchUp/sketchup-ruby-debugger/releases/download/1.5.0.0/SURubyDebugger.dylib -o /Applications/SketchUp\ 2024/SketchUp.app/Contents/Frameworks/SURubyDebugger.dylib
+curl -L https://github.com/SketchUp/sketchup-ruby-debugger/releases/download/1.5.0.0/SURubyDebugger.dylib -o /Applications/SketchUp\ 2027/SketchUp.app/Contents/Frameworks/SURubyDebugger.dylib
 ```
 - Run SketchUp from the command line:
 ```
-/Applications/SketchUp\ 2024/SketchUp.app/Contents/MacOS/SketchUp -rdebug "ide port=6123"
+/Applications/SketchUp\ 2027/SketchUp.app/Contents/MacOS/SketchUp -rdebug "ide port=6123"
 ```
 Alternatively:
 ```
-open -a /Applications/SketchUp\ 2024/SketchUp.app --args -rdebug "ide port=6123"
+open -a /Applications/SketchUp\ 2027/SketchUp.app --args -rdebug "ide port=6123"
 ```
 
 ## Known Issues
