@@ -3,10 +3,10 @@ SketchUp Ruby API Debugger
 
 This is a Ruby debugger framework for SketchUp 2014 and later. The `ruby-debug-ide` protocol has been mostly implemented so any Ruby IDE that supports this protocol should work.
 
-| IDE | Stable (1.2.0) | Stable (1.3.0) | Stable (1.4.0) | Stable (1.5.0) |
-| --- | --- | --- | --- | --- |
-| [RubyMine](https://github.com/SketchUp/sketchup-ruby-api-tutorials/wiki/RubyMine-Debugger-Setup) | *Untested* | Good | Good | Good |
-| [VS Code](https://github.com/SketchUp/sketchup-ruby-api-tutorials/wiki/VSCode-Debugger-Setup) (with `vscode-ruby` extension) | Not supported | Good | Good | Good |
+| IDE | Stable (1.2.0) | Stable (1.3.0) | Stable (1.4.0) | Stable (1.5.0) | Stable (1.6.0) |
+| --- | --- | --- | --- | --- | --- |
+| [RubyMine](https://github.com/SketchUp/sketchup-ruby-api-tutorials/wiki/RubyMine-Debugger-Setup) | *Untested* | Good | Good | Good | Good |
+| [VS Code](https://github.com/SketchUp/sketchup-ruby-api-tutorials/wiki/VSCode-Debugger-Setup) (with `vscode-ruby` extension) | Not supported | Good | Good | Good | *Untested* |
 
 ## Instructions for Windows:
 
@@ -27,7 +27,7 @@ SketchUp.exe -rdebug "ide port=6123"
 - Install SketchUp 2014 Maintenance 1 Release (version 14.1.1283) or later.
 - Download `SURubyDebugger.dylib` into the Frameworks directory of the app bundle:
 ```
-curl -L https://github.com/SketchUp/sketchup-ruby-debugger/releases/download/1.5.0.0/SURubyDebugger.dylib -o /Applications/SketchUp\ 2027/SketchUp.app/Contents/Frameworks/SURubyDebugger.dylib
+curl -L https://github.com/SketchUp/sketchup-ruby-debugger/releases/download/1.6.0.0/SURubyDebugger.dylib -o /Applications/SketchUp\ 2027/SketchUp.app/Contents/Frameworks/SURubyDebugger.dylib
 ```
 - Run SketchUp from the command line:
 ```
