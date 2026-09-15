@@ -16,31 +16,33 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@v3
 
       - name: Build app for release
         run: msbuild Build\SURubyDebugger.sln -property:Configuration=Release
 
-      - uses: actions/upload-artifact@v4
+      # archive: false uploads the binary as-is instead of zipping it. The
+      # artifact is then named after the file, so 'name' would be ignored.
+      - uses: actions/upload-artifact@v7
         with:
-          name: ruby-debugger-win
           path: Build/x64/Release/SURubyDebugger.dll
+          archive: false
 
   macos:
     runs-on: macos-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Build app for release
         run: |
           cd Build
           xcodebuild -scheme SURubyDebugger -configuration Release -derivedDataPath output
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
-          name: ruby-debugger-mac
           path: Build/output/Build/Products/Release/SURubyDebugger.dylib
+          archive: false
