@@ -324,7 +324,7 @@
 					"$(SRCROOT)/../ThirdParty/include",
 					"$(SRCROOT)/../ThirdParty/include/ruby/mac",
 				);
-				OTHER_CFLAGS = "-fdeclspec -Wno-enum-constexpr-conversion";
+				OTHER_CFLAGS = "-fdeclspec";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKETCHUP_APP_PATH = "/Applications/SketchUp 2027/SketchUp.app";
 			};
@@ -344,7 +344,7 @@
 					"$(SRCROOT)/../ThirdParty/include",
 					"$(SRCROOT)/../ThirdParty/include/ruby/mac",
 				);
-				OTHER_CFLAGS = "-fdeclspec -Wno-enum-constexpr-conversion";
+				OTHER_CFLAGS = "-fdeclspec";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKETCHUP_APP_PATH = "/Applications/SketchUp 2027/SketchUp.app";
 			};
