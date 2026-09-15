@@ -29,7 +29,7 @@
 		F9D3F8552912B1E700BE62A9 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "/Applications/SketchUp 2094/SketchUp.app/Contents/Frameworks";
+			dstPath = "$(SKETCHUP_APP_PATH)/Contents/Frameworks";
 			dstSubfolderSpec = 0;
 			files = (
 				F9D3F8562912B20000BE62A9 /* SURubyDebugger.dylib in CopyFiles */,
@@ -313,6 +313,7 @@
 		33CC241618D57AB80079FC3E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = arm64;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -325,12 +326,14 @@
 				);
 				OTHER_CFLAGS = "-fdeclspec";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKETCHUP_APP_PATH = "/Applications/SketchUp 2027/SketchUp.app";
 			};
 			name = Debug;
 		};
 		33CC241718D57AB80079FC3E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = arm64;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -343,6 +346,7 @@
 				);
 				OTHER_CFLAGS = "-fdeclspec";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKETCHUP_APP_PATH = "/Applications/SketchUp 2027/SketchUp.app";
 			};
 			name = Release;
 		};
