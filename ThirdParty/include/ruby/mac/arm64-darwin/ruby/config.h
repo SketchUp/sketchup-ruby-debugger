@@ -72,6 +72,9 @@
 #define HAVE_TIME_H 1
 #define HAVE_UCONTEXT_H 1
 #define HAVE_UTIME_H 1
+#define HAVE_SYS_EVENT_H 1
+#define HAVE_STDCKDINT_H 1
+#define HAVE_STDATOMIC_H 1
 #define HAVE_TYPEOF 1
 #define restrict __restrict__
 #define HAVE_LONG_LONG 1
@@ -88,7 +91,8 @@
 #define SIZEOF_DOUBLE 8
 #define SIZEOF_TIME_T 8
 #define SIZEOF_CLOCK_T 8
-#define PACKED_STRUCT(x) x __attribute__((packed))
+#define RBIMPL_ATTR_PACKED_STRUCT_BEGIN()
+#define RBIMPL_ATTR_PACKED_STRUCT_END() __attribute__((packed))
 #define USE_UNALIGNED_MEMBER_ACCESS 1
 #define PRI_LL_PREFIX "ll"
 #define HAVE_PID_T 1
@@ -259,6 +263,7 @@
 #define HAVE_ARC4RANDOM_BUF 1
 #define HAVE_ATAN2L 1
 #define HAVE_ATAN2F 1
+#define HAVE_DECL_ATOMIC_SIGNAL_FENCE 1
 #define HAVE_CHMOD 1
 #define HAVE_CHOWN 1
 #define HAVE_CHROOT 1
@@ -273,6 +278,7 @@
 #define HAVE_EXECV 1
 #define HAVE_EXECVE 1
 #define HAVE_FCOPYFILE 1
+#define HAVE_FCHDIR 1
 #define HAVE_FCHMOD 1
 #define HAVE_FCHOWN 1
 #define HAVE_FCNTL 1
@@ -306,7 +312,6 @@
 #define HAVE_GETTIMEOFDAY 1
 #define HAVE_GETUID 1
 #define HAVE_GMTIME_R 1
-#define HAVE_GRANTPT 1
 #define HAVE_INITGROUPS 1
 #define HAVE_IOCTL 1
 #define HAVE_ISSETUGID 1
@@ -363,6 +368,7 @@
 #define HAVE_SIGALTSTACK 1
 #define HAVE_SIGPROCMASK 1
 #define HAVE_SINH 1
+#define HAVE_SNPRINTF 1
 #define HAVE_SYMLINK 1
 #define HAVE_SYSCONF 1
 #define HAVE_SYSTEM 1
@@ -380,9 +386,6 @@
 #define HAVE_WAITPID 1
 #define HAVE___COSPI 1
 #define HAVE___SINPI 1
-#if !defined __STDC_WANT_LIB_EXT1__
-#define __STDC_WANT_LIB_EXT1__ 1
-#endif /* !defined __STDC_WANT_LIB_EXT1__ */
 #define HAVE_BUILTIN___BUILTIN_ALLOCA_WITH_ALIGN 1
 #define HAVE_BUILTIN___BUILTIN_ASSUME_ALIGNED 1
 #define HAVE_BUILTIN___BUILTIN_BSWAP16 1
@@ -395,15 +398,18 @@
 #define HAVE_BUILTIN___BUILTIN_CLZLL 1
 #define HAVE_BUILTIN___BUILTIN_CTZ 1
 #define HAVE_BUILTIN___BUILTIN_CTZLL 1
-#define HAVE_BUILTIN___BUILTIN_ADD_OVERFLOW 1
-#define HAVE_BUILTIN___BUILTIN_SUB_OVERFLOW 1
-#define HAVE_BUILTIN___BUILTIN_MUL_OVERFLOW 1
 #define HAVE_BUILTIN___BUILTIN_CONSTANT_P 1
 #define HAVE_BUILTIN___BUILTIN_CHOOSE_EXPR 1
 #define HAVE_BUILTIN___BUILTIN_CHOOSE_EXPR_CONSTANT_P 1
 #define HAVE_BUILTIN___BUILTIN_TYPES_COMPATIBLE_P 1
 #define HAVE_BUILTIN___BUILTIN_TRAP 1
 #define HAVE_BUILTIN___BUILTIN_EXPECT 1
+#define HAVE_BUILTIN___BUILTIN_ADD_OVERFLOW 1
+#define USE___BUILTIN_ADD_OVERFLOW_LONG_LONG 1
+#define HAVE_BUILTIN___BUILTIN_SUB_OVERFLOW 1
+#define USE___BUILTIN_SUB_OVERFLOW_LONG_LONG 1
+#define HAVE_BUILTIN___BUILTIN_MUL_OVERFLOW 1
+#define USE___BUILTIN_MUL_OVERFLOW_LONG_LONG 1
 #define HAVE_BSD_QSORT_R 1
 #define ATAN2_INF_C99 1
 #define HAVE_CLOCK_GETRES 1
@@ -427,6 +433,7 @@
 #define HAVE_PTHREAD_SETNAME_NP 1
 #define HAVE_PTHREAD_SIGMASK 1
 #define SET_CURRENT_THREAD_NAME(name) pthread_setname_np(name)
+#define RB_THREAD_LOCAL_SPECIFIER _Thread_local
 #define DEFINE_MCONTEXT_PTR(mc, uc) mcontext_t mc = (uc)->uc_mcontext
 #define HAVE_SYS_USER_H 1
 #define HAVE_CONST_PAGE_SIZE 0
@@ -445,14 +452,16 @@
 #define BROKEN_BACKTRACE 1
 #define DLEXT_MAXLEN 7
 #define DLEXT ".bundle"
+#define SOEXT ".dylib"
 #define LIBDIR_BASENAME "lib"
 #define HAVE__SETJMP 1
-#define HAVE_SIGSETJMP 1
-#define RUBY_SETJMP(env) sigsetjmp((env),0)
-#define RUBY_LONGJMP(env,val) siglongjmp((env),val)
-#define RUBY_JMP_BUF sigjmp_buf
-#define USE_MJIT 1
+#define RUBY_SETJMP(env) _setjmp((env))
+#define RUBY_LONGJMP(env,val) _longjmp((env),val)
+#define RUBY_JMP_BUF jmp_buf
+#define USE_MODULAR_GC 0
 #define USE_YJIT 0
+#define USE_RJIT 1
 #define LOAD_RELATIVE 1
-#define RUBY_PLATFORM "arm64-darwin21"
+#define RUBY_PLATFORM "arm64-darwin"
+#define RB_DEFAULT_PARSER RB_DEFAULT_PARSER_PRISM
 #endif /* INCLUDE_RUBY_CONFIG_H */

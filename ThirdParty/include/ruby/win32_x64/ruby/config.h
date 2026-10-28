@@ -1,9 +1,10 @@
 #ifndef INCLUDE_RUBY_CONFIG_H
 #define INCLUDE_RUBY_CONFIG_H 1
-#if (_MSC_VER < 1920) || (_MSC_VER > 1939)
-#error MSC version unmatch: 1920..1939 is expected.
+#if (_MSC_VER < 1940)
+#error MSC version unmatch: 1940 or greater expected.
 #endif
 #define RUBY_MSVCRT_VERSION 140
+//#define _WIN32_WINNT _WIN32_WINNT_WIN8
 #define STDC_HEADERS 1
 #define HAVE_SYS_TYPES_H 1
 #define HAVE_SYS_STAT_H 1
@@ -57,9 +58,10 @@
 #define FUNC_CDECL(x) __cdecl x
 #define FUNC_FASTCALL(x) __fastcall x
 #define RUBY_FUNCTION_NAME_STRING __FUNCTION__
-#define PACKED_STRUCT(x) __pragma(pack(push, 1)) x __pragma(pack(pop))
-#define PACKED_STRUCT_UNALIGNED(x) PACKED_STRUCT(x)
+#define RBIMPL_ATTR_PACKED_STRUCT_BEGIN() __pragma(pack(push, 1))
+#define RBIMPL_ATTR_PACKED_STRUCT_END() __pragma(pack(pop))
 #define RUBY_EXTERN extern __declspec(dllimport)
+#define RUBY_FUNC_EXPORTED extern __declspec(dllexport)
 #define RUBY_ALIGNAS(n) __declspec(align(n))
 #define RUBY_ALIGNOF __alignof
 #define HAVE_DECL_SYS_NERR 1
@@ -74,6 +76,7 @@
 #define HAVE_STRUCT_STAT_ST_RDEV 1
 #define HAVE_STRUCT_TIMEVAL 1
 #define HAVE_STRUCT_TIMESPEC
+#define HAVE_INTTYPES_H 1
 #define HAVE_STDINT_H 1
 #define HAVE_INT8_T 1
 #define HAVE_UINT8_T 1
@@ -127,6 +130,7 @@
 #define HAVE_STRCHR 1
 #define HAVE_STRSTR 1
 #define HAVE_FLOCK 1
+#define HAVE_ISINF 1
 #define HAVE_ISNAN 1
 #define HAVE_FINITE 1
 #define HAVE_NAN 1
@@ -199,5 +203,5 @@
 #define RUBY_COREDLL "vcruntime140"
 #define RUBY_PLATFORM "x64-mswin64_140"
 #define RUBY_SITEARCH "x64-vcruntime140"
-#define USE_MJIT 0
+#define USE_RJIT 0
 #endif /* INCLUDE_RUBY_CONFIG_H */
